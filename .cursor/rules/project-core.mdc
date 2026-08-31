@@ -1,0 +1,33 @@
+---
+description: Core project standards — security, scope, language, and documentation links
+alwaysApply: true
+---
+
+# envm-vault Core Rules
+
+## Security (non-negotiable)
+
+- Never commit real secrets, tokens, passwords, or production `.env` values.
+- Never log environment variable values — redact in all output.
+- Access tokens must be scoped to explicit project/environment pairs.
+
+## Scope
+
+- Keep diffs minimal and focused on the requested change.
+- Do not refactor unrelated code in the same PR.
+- This repo is Phase 0 — no application code unless explicitly requested.
+
+## Language
+
+- Code, comments, and technical docs: **English**.
+- README: **Portuguese**.
+
+## Before implementing domain logic
+
+Read these files first:
+- `docs/architecture.md` — entities, API flow, security principles
+- `AGENTS.md` — conventions and project map
+
+## Commits
+
+Use conventional commits: `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `test:`.

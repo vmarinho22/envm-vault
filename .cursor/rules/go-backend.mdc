@@ -1,0 +1,40 @@
+---
+description: Go backend conventions for envm-vault API
+globs: backend/**
+alwaysApply: false
+---
+
+# Go Backend Rules
+
+## Layout
+
+```
+backend/
+├── cmd/server/main.go
+├── internal/
+│   ├── handler/       # HTTP handlers — thin, delegate to service
+│   ├── service/       # Business logic
+│   ├── repository/    # Database access (pgx)
+│   └── model/         # Domain types
+└── pkg/               # Shared utilities (only if truly reusable)
+```
+
+## Standards
+
+- Go 1.22+, stdlib first
+- PostgreSQL via `pgx` — no ORM
+- Wrap errors with context: `fmt.Errorf("create project: %w", err)`
+- Never swallow errors silently
+- Table-driven tests in co-located `*_test.go` files
+
+## Handlers
+
+- Validate input at the handler layer
+- Return consistent JSON error responses
+- Do not access the database directly from handlers
+
+## Secrets
+
+- Never return decrypted secret values in list endpoints
+- Redact secret values in structured logs
+- Encrypt at rest (Phase 2)

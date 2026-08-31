@@ -1,0 +1,38 @@
+---
+description: Vue 3 frontend conventions for envm-vault admin UI
+globs: frontend/**
+alwaysApply: false
+---
+
+# Vue Frontend Rules
+
+## Stack
+
+- Vue 3 with Composition API and `<script setup lang="ts">`
+- Vite + TypeScript (strict mode)
+- Pinia for state management
+
+## Structure
+
+```
+frontend/src/
+├── components/     # Reusable UI components
+├── composables/    # Shared logic (useAuth, useProjects, etc.)
+├── views/          # Route-level pages
+├── stores/         # Pinia stores
+└── api/            # API client functions
+```
+
+## Standards
+
+- Extract reusable logic into composables
+- Keep components under 200 lines — split if larger
+- Use TypeScript interfaces for API response types
+- No secret values stored in client state beyond display needs
+- Handle loading and error states in every data-fetching view
+
+## API Calls
+
+- Centralize HTTP calls in `src/api/`
+- Use composables to wrap API calls with loading/error state
+- Never hardcode tokens — use session/auth store
