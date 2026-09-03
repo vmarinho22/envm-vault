@@ -29,6 +29,7 @@ make setup          # copia .env.example → .env
 make db-up          # sobe PostgreSQL
 make migrate        # roda AutoMigrate (GORM)
 make dev            # inicia API em :8080
+make hooks-install  # instala git hooks (testes unitários + conventional commits)
 ```
 
 ### Primeiro acesso (bootstrap)

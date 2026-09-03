@@ -8,6 +8,34 @@ Thank you for your interest in contributing! This guide covers the workflow and 
 2. Clone your fork: `git clone https://github.com/<you>/envm-vault.git`
 3. Read [AGENTS.md](AGENTS.md) and [docs/architecture.md](docs/architecture.md) to understand the project.
 4. Check [docs/roadmap.md](docs/roadmap.md) for the current phase and open work.
+5. Install git hooks (recommended):
+
+```bash
+brew install lefthook    # or: go install github.com/evilmartians/lefthook@latest
+make hooks-install
+```
+
+## Git Hooks
+
+This project uses [lefthook](https://github.com/evilmartians/lefthook) for local git hooks.
+
+| Hook | Trigger | What it does |
+|------|---------|--------------|
+| `pre-commit` | Staged `.go` files in `api/` | Runs API unit tests (`go test ./...`, no Postgres) |
+| `pre-commit` | Staged frontend files | Runs `npm test` when `frontend/` exists (skipped until Phase 3) |
+| `commit-msg` | Every commit | Validates [conventional commit](https://www.conventionalcommits.org/) format |
+
+Allowed commit types: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`.
+
+Examples:
+
+```
+feat: add project CRUD endpoint
+fix(api): handle invalid OTP code
+docs: update architecture diagram
+```
+
+To bypass hooks temporarily (use sparingly): `LEFTHOOK=0 git commit ...`
 
 ## Development Workflow
 

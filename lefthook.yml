@@ -1,0 +1,19 @@
+pre-commit:
+  parallel: true
+  commands:
+    api-unit-tests:
+      root: api/
+      glob: "api/**/*.go"
+      run: go test ./...
+
+    frontend-unit-tests:
+      root: frontend/
+      glob: "frontend/**/*.{ts,vue,tsx,js}"
+      run: npm test -- --run
+      skip:
+        - run: test ! -f frontend/package.json
+
+commit-msg:
+  commands:
+    conventional-commit:
+      run: scripts/validate-commit-msg.sh {1}

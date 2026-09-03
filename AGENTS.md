@@ -80,7 +80,7 @@ Always read `docs/architecture.md` before implementing domain logic.
   │   └── repository/        # data access (UserRepository, LoginCodeRepository)
   ```
 - **Error handling:** Wrap errors with context; use sentinel errors in service layer
-- **Tests:** Co-located `*_test.go`; integration tests skip without `DATABASE_URL`
+- **Tests:** Co-located `*_test.go`; integration tests use `//go:build integration` and require Postgres
 
 ### Commands
 
@@ -90,7 +90,9 @@ make db-up      # start PostgreSQL
 make migrate    # run GORM AutoMigrate
 make db-reset   # reset database volume + AutoMigrate
 make dev        # run API server
-make test       # run tests
+make test       # unit + integration tests
+make test-unit  # unit tests only (used by pre-commit hook)
+make hooks-install  # install lefthook git hooks
 ```
 
 **Use RTK** to reduce token usage when running shell commands. See [RTK.md](RTK.md).
@@ -120,9 +122,10 @@ Project skills live in `.cursor/skills/`:
 
 ## Testing
 
-- Run `make test` before finishing any task.
-- Add tests for new behavior; skip trivial assertions.
-- Integration tests require `DATABASE_URL` and running PostgreSQL.
+- Run `make test` before finishing any task (unit + integration).
+- Run `make test-unit` for fast feedback without Postgres.
+- Integration tests use build tag `integration` and require `DATABASE_URL` + running PostgreSQL.
+- Pre-commit hook runs `make test-unit` when API Go files are staged.
 
 ## Pull Request Guidelines
 
