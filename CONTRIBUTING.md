@@ -36,11 +36,13 @@ This repository is designed for AI-assisted development:
 | Resource | Purpose |
 |----------|---------|
 | [AGENTS.md](AGENTS.md) | Project-wide agent instructions (works with any coding agent) |
+| [RTK.md](RTK.md) | Token-optimized CLI usage — prefix commands with `rtk` |
+| [.rtk/filters.toml](.rtk/filters.toml) | Project-local RTK filters (run `make rtk-trust` after clone) |
 | [.cursor/rules/](.cursor/rules/) | Cursor-specific scoped rules (Go, Vue) |
 | [.cursor/skills/](.cursor/skills/) | Reusable workflow skills |
 | [docs/agent-guide.md](docs/agent-guide.md) | Guide and suggested prompts |
 
-If you use an agent, point it to `AGENTS.md` before asking it to implement anything.
+If you use an agent, point it to `AGENTS.md` and `RTK.md` before asking it to implement anything.
 
 ## Code Conventions
 

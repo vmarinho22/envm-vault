@@ -1,40 +1,56 @@
 ---
-description: Go backend conventions for envm-vault API
-globs: backend/**
+description: Go API conventions for envm-vault (Fiber + GORM)
+globs: api/**
 alwaysApply: false
 ---
 
-# Go Backend Rules
+# Go API Rules
 
 ## Layout
 
 ```
-backend/
-├── cmd/server/main.go
+api/
+├── cmd/server/main.go       # wiring + router.Register
+├── cmd/migrate/main.go      # standalone AutoMigrate
 ├── internal/
-│   ├── handler/       # HTTP handlers — thin, delegate to service
-│   ├── service/       # Business logic
-│   ├── repository/    # Database access (pgx)
-│   └── model/         # Domain types
-└── pkg/               # Shared utilities (only if truly reusable)
+│   ├── router/              # Route registration by context
+│   │   ├── router.go        # Register(app, Deps)
+│   │   ├── health.go        # /v1/health
+│   │   ├── auth.go          # /v1/auth/login, verify
+│   │   └── user.go          # /v1/auth/register
+│   ├── handler/             # One subpackage per domain
+│   │   ├── auth/
+│   │   ├── user/
+│   │   ├── health/
+│   │   └── httperr/         # Shared error mapping
+│   ├── service/             # auth/, user/ + shared.go
+│   ├── middleware/
+│   ├── email/
+│   ├── database/            # Open, WithTx, Ping
+│   ├── model/               # GORM models
+│   └── repository/          # data access layer
 ```
 
 ## Standards
 
-- Go 1.22+, stdlib first
-- PostgreSQL via `pgx` — no ORM
-- Wrap errors with context: `fmt.Errorf("create project: %w", err)`
-- Never swallow errors silently
-- Table-driven tests in co-located `*_test.go` files
+- Go 1.25+, Fiber v2 for HTTP
+- All API routes under `/v1` prefix
+- PostgreSQL via GORM + repository layer — services never use `*gorm.DB` directly
+- Schema via GORM AutoMigrate in `database.Open`
+- Register new routes in `internal/router/{context}.go`, not in `main.go`
+- Map errors via `httperr.Write(c, err)` in handlers
 
-## Handlers
+## Adding an endpoint
 
-- Validate input at the handler layer
-- Return consistent JSON error responses
-- Do not access the database directly from handlers
+1. Add GORM model in `internal/model/` (if new table)
+2. Add repository methods in `internal/repository/`
+3. Add service method in `internal/service/{context}/`
+4. Add handler method in `internal/handler/{context}/`
+5. Register route in `internal/router/{context}.go`
+6. Add tests
 
 ## Secrets
 
 - Never return decrypted secret values in list endpoints
 - Redact secret values in structured logs
-- Encrypt at rest (Phase 2)
+- OTP codes logged only in development

@@ -7,22 +7,36 @@ This guide helps contributors — human or AI — work effectively in the envm-v
 | Layer | Location | Scope | Tool support |
 |-------|----------|-------|--------------|
 | **AGENTS.md** | Repository root | Project-wide instructions | Cursor, Copilot, Codex, Aider, and 20+ other agents |
+| **RTK.md** | Repository root | Token-optimized CLI commands | Any agent running shell commands |
 | **Cursor Rules** | `.cursor/rules/*.mdc` | File-pattern scoped rules | Cursor only |
 | **Skills** | `.cursor/skills/*/SKILL.md` | Reusable workflows | Cursor (project skills) |
 
 ### When to use each
 
 - **AGENTS.md** — Always the starting point. Portable markdown read by any coding agent.
-- **Cursor Rules** — Automatic context when editing matching files (e.g. `backend/**` triggers Go rules once that folder exists).
+- **RTK.md** — Prefix shell commands with `rtk` to reduce token usage (`rtk go test`, `rtk docker compose ps`).
+- **Cursor Rules** — Automatic context when editing matching files (e.g. `api/**` triggers Go rules).
 - **Skills** — Invoke explicitly or let the agent discover them by description. Use for domain knowledge and repeatable checklists.
+
+## RTK Setup
+
+[RTK](https://www.rtk-ai.app/) (Rust Token Killer) filters command output before it reaches the agent context.
+
+```bash
+brew install rtk              # or see rtk-ai.app
+make rtk-trust                # trust project filters in .rtk/filters.toml
+rtk gain                      # view token savings
+```
+
+Project filters cover: make targets and go test in `api/`.
 
 ## Getting Started with an Agent
 
 Before asking an agent to implement anything, provide this context:
 
 ```
-Read AGENTS.md and docs/architecture.md before making any changes.
-This repository is in Phase 0 — documentation only, no application code yet.
+Read AGENTS.md, RTK.md, and docs/architecture.md before making any changes.
+Use rtk prefix for shell commands (e.g. rtk go test ./...).
 ```
 
 ## Suggested Prompts

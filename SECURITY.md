@@ -40,6 +40,7 @@ Use placeholders and describe the issue conceptually.
 
 - Never commit real secrets, tokens, or `.env` files with production values.
 - Never log secret values — redact in all output.
+- **OTP codes are logged to stdout only when `APP_ENV=development`.** Never enable this in production.
 - Use the [security-review skill](.cursor/skills/security-review/SKILL.md) when reviewing auth or secret-related changes.
 - Follow the security principles in [docs/architecture.md](docs/architecture.md#security-principles).
 

@@ -1,0 +1,33 @@
+# Project-local RTK filters — commit this file with your repo.
+# Filters here override user-global and built-in filters.
+# Docs: https://github.com/rtk-ai/rtk#custom-filters
+#
+# After editing, run: rtk trust --yes
+schema_version = 1
+
+[filters.make-dev-tools]
+description = "Compact make output for db/migrate targets"
+match_command = "^make\\s+(migrate|db-up|db-down|db-reset|test)\\b"
+strip_ansi = true
+strip_lines_matching = [
+  "^\\s*$",
+  "^make\\[",
+]
+max_lines = 40
+
+[filters.api-go-test]
+description = "Go test in api module — keep failures, collapse pass noise"
+match_command = "^go\\s+test\\s+.*api"
+strip_ansi = true
+keep_lines_matching = [
+  "FAIL",
+  "Error",
+  "error:",
+  "panic:",
+  "--- FAIL:",
+  "PASS:",
+  "ok\\s+\\S",
+  "FAIL\\s+\\S",
+]
+max_lines = 80
+on_empty = "go test: all passed"

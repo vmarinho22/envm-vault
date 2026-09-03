@@ -6,56 +6,95 @@ Com um token de acesso pessoal, desenvolvedores e pipelines de CI baixam variáv
 
 ## Status
 
-**Fase 0** — documentação e base para agentes de IA. Código da aplicação em breve.
+**Fase 1** — API com autenticação por e-mail (OTP). UI admin em breve.
 
-## Stack planejada
+## Stack
 
 | Camada | Tecnologia |
 |--------|------------|
-| API | Go (monolito) |
-| UI Admin | Vue 3 + TypeScript + Vite |
-| Banco | PostgreSQL |
+| API | Go + Fiber |
+| Banco | PostgreSQL (GORM + AutoMigrate) |
+| Auth | OTP por e-mail + JWT |
+| UI Admin | Vue 3 + TypeScript + Vite (Fase 3) |
 
-## Como funciona (visão geral)
+## Quick Start
 
-```mermaid
-flowchart LR
-  Dev[Desenvolvedor_ou_CI] -->|"Bearer token"| API[API_Go]
-  Admin[Admin_Vue] -->|sessão| API
-  API --> DB[(PostgreSQL)]
-  API -->|"variáveis de ambiente"| Dev
+Pré-requisitos: Go 1.25+, Docker, Make.
+
+```bash
+git clone https://github.com/envm-vault/envm-vault.git
+cd envm-vault
+
+make setup          # copia .env.example → .env
+make db-up          # sobe PostgreSQL
+make migrate        # roda AutoMigrate (GORM)
+make dev            # inicia API em :8080
 ```
 
-1. Admin cria um **projeto** com **ambientes** customizáveis.
-2. Admin cadastra **secrets** (pares chave-valor) por ambiente.
-3. Admin gera um **token de acesso** com escopo por projeto/ambiente.
-4. Desenvolvedor ou CI usa o token para baixar as variáveis:
+### Primeiro acesso (bootstrap)
 
+```bash
+# 1. Solicitar código OTP
+curl -X POST http://localhost:8080/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@example.com"}'
+
+# 2. Verificar código (veja o código no log do terminal em dev)
+curl -X POST http://localhost:8080/v1/auth/verify \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@example.com", "code": "12345678"}'
+
+# Resposta: JWT + user com role super_admin
 ```
-GET /v1/projects/{project}/environments/{env}
-Authorization: Bearer <seu_token>
+
+### Cadastrar usuário (requer JWT de admin)
+
+```bash
+curl -X POST http://localhost:8080/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <jwt>" \
+  -d '{"email": "user@example.com", "role": "user"}'
 ```
+
+## Endpoints
+
+| Método | Rota | Auth | Descrição |
+|--------|------|------|-----------|
+| `GET` | `/v1/health` | — | Health check |
+| `GET` | `/health` | — | Health check (alias infra) |
+| `POST` | `/v1/auth/login` | — | Solicita OTP por e-mail |
+| `POST` | `/v1/auth/verify` | — | Valida OTP, retorna JWT |
+| `POST` | `/v1/auth/register` | JWT (admin+) | Cadastra usuário |
+
+## Agentes de IA e RTK
+
+Este repositório é otimizado para contribuições assistidas por agentes:
+
+- **[AGENTS.md](AGENTS.md)** — instruções portáveis para coding agents
+- **[RTK.md](RTK.md)** — prefixe comandos shell com `rtk` para economizar tokens
+- **[`.rtk/filters.toml`](.rtk/filters.toml)** — filtros customizados (make, go test)
+
+Setup RTK (recomendado para quem usa Cursor/Copilot/Codex):
+
+```bash
+brew install rtk          # ou: https://www.rtk-ai.app/
+make rtk-trust            # confia nos filtros do projeto
+make test-rtk             # testes com output compacto
+```
+
+Veja [docs/agent-guide.md](docs/agent-guide.md) para mais detalhes.
 
 ## Documentação
 
 | Documento | Descrição |
 |-----------|-----------|
-| [Arquitetura](docs/architecture.md) | Modelo de domínio, fluxos e princípios de segurança |
+| [Arquitetura](docs/architecture.md) | Modelo de domínio, fluxos e segurança |
 | [Roadmap](docs/roadmap.md) | Fases do projeto |
-| [Guia de agentes](docs/agent-guide.md) | Como usar agentes de IA neste repositório |
+| [Guia de agentes](docs/agent-guide.md) | Como usar agentes de IA |
 | [AGENTS.md](AGENTS.md) | Instruções para coding agents |
+| [RTK.md](RTK.md) | Comandos shell otimizados para agentes |
 | [Contribuindo](CONTRIBUTING.md) | Como contribuir |
 | [Segurança](SECURITY.md) | Reporte de vulnerabilidades |
-
-## Trabalhando com agentes de IA
-
-Este repositório é otimizado para contribuições assistidas por agentes:
-
-- **`AGENTS.md`** — instruções portáveis (Cursor, Copilot, Codex, etc.)
-- **`.cursor/rules/`** — regras scoped por stack (Go, Vue)
-- **`.cursor/skills/`** — workflows reutilizáveis (domínio, endpoints, security review)
-
-Veja o [guia de agentes](docs/agent-guide.md) para prompts sugeridos.
 
 ## Contribuindo
 
@@ -67,6 +106,4 @@ Contribuições são bem-vindas! Leia [CONTRIBUTING.md](CONTRIBUTING.md) para co
 
 ## English Summary
 
-**envm-vault** is an open-source environment variable vault. Users download env vars for projects across customizable environments using a personal access token. Built with Go (API) and Vue 3 (admin UI). Currently in documentation phase — application code coming in Phase 1.
-
-See [docs/architecture.md](docs/architecture.md) for technical details.
+**envm-vault** is an open-source environment variable vault. Built with Go (Fiber API) and PostgreSQL. Currently in Phase 1 with email OTP authentication. See [docs/architecture.md](docs/architecture.md) for details.

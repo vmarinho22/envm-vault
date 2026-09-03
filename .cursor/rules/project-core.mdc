@@ -27,6 +27,7 @@ alwaysApply: true
 Read these files first:
 - `docs/architecture.md` — entities, API flow, security principles
 - `AGENTS.md` — conventions and project map
+- `RTK.md` — prefix shell commands with `rtk` to save tokens
 
 ## Commits
 

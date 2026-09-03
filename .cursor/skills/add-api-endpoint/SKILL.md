@@ -5,44 +5,43 @@ description: Checklist for adding a new Go API endpoint in envm-vault. Use when 
 
 # Add API Endpoint
 
-Use this checklist when adding a new endpoint to the Go API (Phase 2+).
+Use this checklist when adding a new endpoint to the Go API.
 
 ## Before coding
 
 1. Read [docs/architecture.md](../../docs/architecture.md) for domain context.
-2. Confirm the endpoint fits the REST pattern: `/v1/{resource}`.
-3. Identify required auth: access token, session, or public.
+2. Confirm the endpoint fits under `/v1/{context}/...`.
+3. Identify required auth: access token, JWT session, or public.
+4. Choose the route context: `health`, `auth`, `user`, or create a new `router/{context}.go`.
 
 ## Implementation checklist
 
 ```
-- [ ] Define request/response types in internal/model/
-- [ ] Add repository method in internal/repository/
-- [ ] Add service method in internal/service/ (business logic)
-- [ ] Add handler in internal/handler/ (input validation, HTTP response)
-- [ ] Register route in cmd/server/main.go or router setup
-- [ ] Add integration test
+- [ ] Add GORM model in internal/model/ (if new table)
+- [ ] Add repository methods in internal/repository/
+- [ ] Add service method in internal/service/{context}/
+- [ ] Add handler method in internal/handler/{context}/
+- [ ] Register route in internal/router/{context}.go
+- [ ] Map errors via httperr.Write(c, err)
+- [ ] Add tests
 - [ ] Update docs if endpoint is user-facing
 ```
 
-## Handler pattern
+## Route registration pattern
 
 ```go
-func (h *Handler) GetProject(w http.ResponseWriter, r *http.Request) {
-    slug := chi.URLParam(r, "project")
-    if slug == "" {
-        respondError(w, http.StatusBadRequest, "project slug required")
-        return
-    }
-
-    project, err := h.service.GetProject(r.Context(), slug)
-    if err != nil {
-        respondError(w, http.StatusInternalServerError, "failed to get project")
-        return
-    }
-
-    respondJSON(w, http.StatusOK, project)
+// internal/router/project.go
+func registerProjectRoutes(v1 fiber.Router, deps Deps) {
+    g := v1.Group("/projects", deps.JWT.Protect())
+    g.Get("/", deps.Project.List)
+    g.Post("/", deps.Project.Create)
 }
+```
+
+Wire in `router.go`:
+
+```go
+registerProjectRoutes(v1, deps)
 ```
 
 ## Security checks
@@ -50,5 +49,5 @@ func (h *Handler) GetProject(w http.ResponseWriter, r *http.Request) {
 - [ ] Input validated and sanitized
 - [ ] Auth middleware applied if required
 - [ ] Token scope verified for secret-related endpoints
-- [ ] No secret values in response unless explicitly requested (download endpoint)
+- [ ] No secret values in response unless explicitly requested
 - [ ] No secret values in error messages or logs

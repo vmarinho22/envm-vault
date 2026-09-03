@@ -1,20 +1,54 @@
 # Architecture
 
-This document describes the planned architecture of **envm-vault**. The repository is currently in documentation phase — no application code exists yet.
+This document describes the architecture of **envm-vault**.
 
 ## Overview
 
-envm-vault is an open-source environment variable vault. Users authenticate with a personal access token and download environment variables for projects across customizable environments (e.g. `dev`, `tst`, `staging`, `prod`).
+envm-vault is an open-source environment variable vault. Users download environment variables for projects across customizable environments using a personal access token.
 
 ```mermaid
 flowchart LR
-  Client[CI_or_Developer] -->|"Bearer user_token"| API[Go_API_Monolith]
-  Admin[Admin_UI_Vue] -->|session| API
+  Client[CI_or_Developer] -->|"Bearer user_token"| API[Go_API_Fiber]
+  Admin[Admin_UI_Vue] -->|JWT| API
   API --> DB[(PostgreSQL)]
   API -->|"GET env vars"| Client
 ```
 
-## Core Concepts
+## Current Implementation (Phase 1)
+
+The API lives in `api/` and provides authentication via email OTP.
+
+### Stack
+
+| Component | Choice |
+|-----------|--------|
+| Language | Go 1.25+ |
+| HTTP | Fiber v2 |
+| Database | PostgreSQL 16 |
+| DB driver | GORM (postgres driver) |
+| Schema | GORM AutoMigrate |
+| Data access | repository layer |
+| Auth | Email OTP (8 digits, 10 min) + JWT |
+
+### API Endpoints
+
+| Method | Route | Auth | Description |
+|--------|-------|------|-------------|
+| `GET` | `/v1/health` | — | Health check (API + DB) |
+| `GET` | `/health` | — | Health check alias (infra probes) |
+| `POST` | `/v1/auth/login` | — | Request OTP via email |
+| `POST` | `/v1/auth/verify` | — | Verify OTP, returns JWT |
+| `POST` | `/v1/auth/register` | JWT (admin+) | Register user (email + role) |
+
+### Auth Flow
+
+1. **Bootstrap:** When no users exist, the first successful OTP verification creates a `super_admin`.
+2. **Login:** Registered users request OTP via `/v1/auth/login`, verify via `/v1/auth/verify`.
+3. **Register:** `super_admin` or `admin` creates users via `/v1/auth/register` with role `admin` or `user`.
+
+In development (`APP_ENV=development`), OTP codes are logged to stdout instead of sent via email.
+
+## Core Concepts (planned)
 
 ### Project
 
@@ -22,7 +56,7 @@ A logical grouping of environment variables (e.g. `my-app`, `payment-service`).
 
 ### Environment
 
-A named deployment target within a project. Environments are fully customizable per project — there is no fixed set. Common examples: `dev`, `tst`, `staging`, `prod`.
+A named deployment target within a project. Environments are fully customizable per project.
 
 ### Secret / EnvVar
 
@@ -30,72 +64,37 @@ A key-value pair scoped to a **Project + Environment** combination.
 
 ### User
 
-An account that owns or administers projects. Manages tokens and configuration through the admin UI.
+An account with role `super_admin`, `admin`, or `user`. Authenticates via email OTP.
 
 ### AccessToken
 
-A unique token issued to a user for programmatic access. Tokens are scoped to specific projects and/or environments. Used via `Authorization: Bearer <token>` header.
+A programmatic credential for downloading env vars (Phase 2). Scoped to project/environment pairs.
 
-## Planned API Flow
-
-Primary use case — download environment variables:
-
-```
-GET /v1/projects/{project}/environments/{env}
-Authorization: Bearer <access_token>
-```
-
-Response format (TBD): `.env` plain text or JSON.
-
-### Planned Admin Endpoints (future)
-
-- CRUD for projects, environments, secrets
-- Token management (create, revoke, scope)
-- User authentication (session-based for UI)
-
-## Repository Structure (planned)
+## Repository Structure
 
 ```
 envm-vault/
-├── backend/          # Go monolith API (Phase 1)
-├── frontend/         # Vue 3 admin UI (Phase 3)
+├── api/                  # Go API (Fiber)
+│   ├── cmd/server/
+│   ├── internal/
+│   │   ├── router/       # Route registration by context (health, auth, user)
+│   │   ├── handler/      # Handlers per domain (auth/, user/, health/)
+│   │   ├── service/      # Business logic per domain (auth/, user/)
+│   │   ├── middleware/
+│   │   ├── database/     # GORM connection + AutoMigrate
+│   │   ├── model/        # GORM models
+│   │   ├── repository/   # data access layer
+├── frontend/             # Vue 3 admin UI (Phase 3)
 ├── docs/
-├── .cursor/
-└── ...
+├── docker-compose.yml
+└── Makefile
 ```
 
-## Backend Stack (planned)
-
-| Component | Choice |
-|-----------|--------|
-| Language | Go 1.22+ |
-| Database | PostgreSQL |
-| DB driver | pgx |
-| HTTP router | TBD (chi or echo) |
-| Layout | `cmd/`, `internal/`, `pkg/` |
-
-## Frontend Stack (planned)
-
-| Component | Choice |
-|-----------|--------|
-| Framework | Vue 3 |
-| Language | TypeScript |
-| Build | Vite |
-| State | Pinia |
-| API style | Composition API + composables |
-
-## Security Principles
-
-1. **Never store plaintext secrets in logs** — redact values in all log output.
-2. **Encrypt secrets at rest** — Phase 2; use envelope encryption with a master key.
-3. **Token scoping** — access tokens must be limited to explicit project/environment pairs.
-4. **No secrets in the repository** — never commit real tokens, `.env` files, or credentials.
-5. **Audit trail** — log token usage (who, when, which project/env) without logging secret values.
-
-## Data Model (draft)
+## Data Model
 
 ```mermaid
 erDiagram
+  User ||--o{ LoginCode : requests
   User ||--o{ AccessToken : has
   User ||--o{ Project : owns
   Project ||--o{ Environment : contains
@@ -103,50 +102,41 @@ erDiagram
 
   User {
     uuid id PK
-    string email
-    string password_hash
+    string email UK
+    string role
     timestamp created_at
-  }
-
-  AccessToken {
-    uuid id PK
-    uuid user_id FK
-    string token_hash
-    jsonb scopes
-    timestamp expires_at
-    timestamp revoked_at
-  }
-
-  Project {
-    uuid id PK
-    uuid user_id FK
-    string slug
-    string name
-    timestamp created_at
-  }
-
-  Environment {
-    uuid id PK
-    uuid project_id FK
-    string slug
-    string name
-    timestamp created_at
-  }
-
-  Secret {
-    uuid id PK
-    uuid environment_id FK
-    string key
-    string value_encrypted
     timestamp updated_at
   }
+
+  LoginCode {
+    uuid id PK
+    string email
+    string code_hash
+    timestamp expires_at
+    timestamp used_at
+  }
 ```
+
+### User Roles
+
+| Role | Description |
+|------|-------------|
+| `super_admin` | First user (bootstrap). Full access. |
+| `admin` | Can register users. Full access. |
+| `user` | Standard user. |
+
+## Security Principles
+
+1. **Never store plaintext OTP codes** — only SHA-256 hashes in `login_codes`.
+2. **Never log secret values** — OTP codes are logged only in development.
+3. **Token scoping** — access tokens (Phase 2) limited to project/environment pairs.
+4. **No secrets in the repository** — never commit real tokens or `.env` files.
+5. **JWT expiry** — configurable via `JWT_EXPIRY` (default 24h).
 
 ## Open Decisions
 
 | Decision | Status |
 |----------|--------|
-| Response format (`.env` vs JSON) | TBD |
-| HTTP router (chi vs echo) | TBD |
-| Encryption library | TBD (Phase 2) |
-| Auth for admin UI (session vs JWT) | TBD (Phase 3) |
+| Response format (`.env` vs JSON) | TBD (Phase 2) |
+| SMTP provider for production email | TBD |
+| Encryption at rest for secrets | TBD (Phase 2) |
