@@ -1,0 +1,92 @@
+@import '@fontsource-variable/syne';
+@import '@fontsource-variable/manrope';
+@import 'tailwindcss';
+@plugin 'daisyui';
+@plugin 'daisyui/theme' {
+  name: 'vault';
+  default: true;
+  prefersdark: true;
+  color-scheme: dark;
+
+  --color-base-100: oklch(16% 0.02 200);
+  --color-base-200: oklch(20% 0.025 200);
+  --color-base-300: oklch(26% 0.03 200);
+  --color-base-content: oklch(94% 0.015 180);
+  --color-primary: oklch(72% 0.1 185);
+  --color-primary-content: oklch(16% 0.03 185);
+  --color-secondary: oklch(55% 0.04 200);
+  --color-secondary-content: oklch(96% 0.01 200);
+  --color-accent: oklch(78% 0.09 90);
+  --color-accent-content: oklch(18% 0.03 90);
+  --color-neutral: oklch(32% 0.02 200);
+  --color-neutral-content: oklch(94% 0.01 200);
+  --color-info: oklch(70% 0.08 220);
+  --color-info-content: oklch(18% 0.03 220);
+  --color-success: oklch(72% 0.1 155);
+  --color-success-content: oklch(18% 0.03 155);
+  --color-warning: oklch(78% 0.12 85);
+  --color-warning-content: oklch(22% 0.04 85);
+  --color-error: oklch(68% 0.16 25);
+  --color-error-content: oklch(98% 0.01 25);
+
+  --radius-selector: 0.25rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.35rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+html {
+  font-family: 'Manrope Variable', sans-serif;
+  background-color: var(--color-base-100);
+  color: var(--color-base-content);
+}
+
+.font-brand {
+  font-family: 'Syne Variable', sans-serif;
+}
+
+.vault-bg {
+  min-height: 100svh;
+  background-color: oklch(14% 0.022 200);
+  background-image:
+    radial-gradient(ellipse 90% 55% at 8% 12%, oklch(28% 0.06 185 / 0.45), transparent 58%),
+    radial-gradient(ellipse 70% 50% at 92% 88%, oklch(24% 0.04 90 / 0.28), transparent 52%),
+    repeating-linear-gradient(-18deg, oklch(94% 0.01 180 / 0.03) 0 1px, transparent 1px 18px);
+}
+
+@keyframes vault-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.vault-enter {
+  animation: vault-enter 0.7s ease-out both;
+}
+
+.vault-enter-delay {
+  animation: vault-enter 0.55s ease-out 0.12s both;
+}
+
+.vault-step {
+  animation: vault-enter 0.4s ease-out both;
+}
+
+.btn {
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.btn:not(:disabled):active {
+  transform: translateY(1px);
+}

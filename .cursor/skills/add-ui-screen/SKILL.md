@@ -5,31 +5,34 @@ description: Checklist for adding a new Vue screen or view in the envm-vault adm
 
 # Add UI Screen
 
-Use this checklist when adding a new screen to the Vue admin UI (Phase 3+).
+Use this checklist when adding a new screen to the Vue admin UI.
 
 ## Before coding
 
 1. Read [docs/architecture.md](../../docs/architecture.md) for domain context.
 2. Identify which API endpoints the screen needs.
-3. Check if a composable or store already exists for the data.
+3. Choose or create the module under `frontend/src/modules/{domain}/`.
+4. Check if a service, composable, or store already exists in that module.
 
 ## Implementation checklist
 
 ```
-- [ ] Create view component in src/views/
-- [ ] Add route in router config
-- [ ] Create or extend Pinia store if shared state is needed
-- [ ] Create composable in src/composables/ for data fetching
-- [ ] Add API client function in src/api/
+- [ ] Add or extend a typed service: `interface XService` + `export const xService: XService`
+- [ ] Create view in modules/{domain}/views/
+- [ ] Register route in app/router/index.ts
+- [ ] Create or extend Pinia store in the module if shared state is needed
+- [ ] Create composable in modules/{domain}/composables/ for UI flow
 - [ ] Handle loading, error, and empty states
-- [ ] Add navigation link if needed
+- [ ] Add Vitest coverage: unit under `tests/unit/` (mirrors module), components under `tests/component/` (mirrors src path)
+- [ ] Every component test calls `expectComponentSnapshot(wrapper)` (commit the generated `__snapshots__`)
+- [ ] Add nav item in app/layouts/DefaultLayout.vue if needed
 ```
 
 ## View pattern
 
 ```vue
 <script setup lang="ts">
-import { useProjects } from '@/composables/useProjects'
+import { useProjects } from '@/modules/project/composables/useProjects'
 
 const { projects, loading, error, fetchProjects } = useProjects()
 
@@ -38,16 +41,32 @@ onMounted(() => fetchProjects())
 
 <template>
   <div>
-    <p v-if="loading">Loading...</p>
-    <p v-else-if="error">{{ error }}</p>
+    <p v-if="loading">Carregando...</p>
+    <p v-else-if="error" role="alert">{{ error }}</p>
     <ProjectList v-else :projects="projects" />
   </div>
 </template>
 ```
 
+## Component test pattern
+
+```ts
+import { expectComponentSnapshot, mountComponent } from '../../../helpers/mount'
+
+it('renders …', async () => {
+  const { wrapper } = await mountComponent(MyView)
+  // assertions…
+  expectComponentSnapshot(wrapper)
+})
+```
+
+Commit the generated `__snapshots__/` files. Update with `npm run test:component -- -u` only when the UI change is intentional.
+
 ## Standards
 
 - Use `<script setup lang="ts">` — no Options API
-- Extract logic into composables, not inline in views
+- Extract logic into module composables, not inline in views
+- Call the API only through typed service instances (`projectService.list()`, etc.)
 - Never store decrypted secret values in Pinia beyond the current view lifecycle
 - Include accessible labels on form inputs
+- Every component test calls `expectComponentSnapshot(wrapper)`

@@ -8,11 +8,11 @@ Instructions for AI coding agents working on **envm-vault**.
 
 envm-vault is an open-source environment variable vault. Users download environment variables for projects across customizable environments using a personal access token.
 
-**Current status:** Phase 1 — API with auth (health, login, verify, register).
+**Current status:** Phase 1 — API with auth + Vue login UI.
 
 **Stack:**
 - API: Go + Fiber (`api/`)
-- Frontend: Vue 3 admin UI (Phase 3)
+- Frontend: Vue 3 + Vite + TypeScript (`frontend/`)
 - Database: PostgreSQL via GORM + AutoMigrate
 
 ## Repository Map
@@ -22,6 +22,7 @@ envm-vault/
 ├── AGENTS.md              ← you are here
 ├── RTK.md                 ← token-optimized CLI usage for agents
 ├── .rtk/filters.toml      ← project-local RTK filters
+├── mise.toml              ← Node + Go versions (mise)
 ├── api/                   ← Go API (Fiber)
 │   ├── cmd/server/
 │   ├── internal/
@@ -36,7 +37,7 @@ envm-vault/
 ├── docs/
 ├── docker-compose.yml
 ├── Makefile
-└── frontend/              ← Vue UI (Phase 3 — not created yet)
+└── frontend/              ← Vue 3 admin UI (Vite, login OTP)
 ```
 
 Always read `docs/architecture.md` before implementing domain logic.
@@ -60,7 +61,7 @@ Always read `docs/architecture.md` before implementing domain logic.
 
 ### Go API (`api/`)
 
-- **Go version:** 1.25+
+- **Go version:** 1.25+ (pinned in root `mise.toml`)
 - **HTTP:** Fiber v2
 - **Database:** PostgreSQL via GORM + repository layer
 - **Migrations:** GORM AutoMigrate (schema in `internal/model/`)
@@ -90,8 +91,9 @@ make db-up      # start PostgreSQL
 make migrate    # run GORM AutoMigrate
 make db-reset   # reset database volume + AutoMigrate
 make dev        # run API server
+make frontend-dev  # Vue UI on :3100
 make test       # unit + integration tests
-make test-unit  # unit tests only (used by pre-commit hook)
+make test-unit  # API + frontend unit tests (used by pre-commit hook)
 make hooks-install  # install lefthook git hooks
 ```
 
@@ -103,11 +105,18 @@ rtk docker compose ps
 rtk gain        # check token savings
 ```
 
-### Vue Frontend (planned — Phase 3+)
+### Vue Frontend (`frontend/`)
 
+- **Node:** version pinned in root `mise.toml` (`mise install`); do not use `.nvmrc`
 - **Vue 3** with Composition API and `<script setup lang="ts">`
-- **Build:** Vite + TypeScript (strict mode)
-- **State:** Pinia stores
+- **Build:** Vite + TypeScript (strict, `noUncheckedIndexedAccess`)
+- **Architecture:** module-oriented (`app/`, `shared/`, `modules/{domain}/`)
+- **Services:** typed interfaces + instances — `authService`, `userService`, `healthService`, `httpClient`
+- **State:** Pinia (`sessionStorage` for JWT)
+- **UI:** Tailwind CSS v4 + daisyUI 5 + Heroicons
+- **Dev server:** port **3100** (`strictPort`); proxies `/v1` and `/health` to the API on `:8080`
+- **Tests:** Vitest under `frontend/tests/{unit,component}/` (`npm test` / `make test-frontend`)
+- **Component snapshots:** every component test must call `expectComponentSnapshot(wrapper)` from `tests/component/helpers/mount` and commit the generated `__snapshots__/` files
 
 ## Skills
 
@@ -123,9 +132,10 @@ Project skills live in `.cursor/skills/`:
 ## Testing
 
 - Run `make test` before finishing any task (unit + integration).
-- Run `make test-unit` for fast feedback without Postgres.
+- Run `make test-unit` for fast feedback without Postgres (API + frontend).
 - Integration tests use build tag `integration` and require `DATABASE_URL` + running PostgreSQL.
-- Pre-commit hook runs `make test-unit` when API Go files are staged.
+- Pre-commit hook runs API unit tests when Go files are staged, and frontend Vitest + `npm run type-check` when Vue/TS files are staged.
+- Frontend component tests always include a HTML snapshot via `expectComponentSnapshot(wrapper)`.
 
 ## Pull Request Guidelines
 

@@ -8,8 +8,15 @@ pre-commit:
 
     frontend-unit-tests:
       root: frontend/
-      glob: "frontend/**/*.{ts,vue,tsx,js}"
+      glob: "frontend/**/*.{ts,vue}"
       run: npm test -- --run
+      skip:
+        - run: test ! -f frontend/package.json
+
+    frontend-type-check:
+      root: frontend/
+      glob: "frontend/**/*.{ts,vue}"
+      run: npm run type-check
       skip:
         - run: test ! -f frontend/package.json
 

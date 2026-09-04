@@ -29,6 +29,8 @@ The API lives in `api/` and provides authentication via email OTP.
 | Schema | GORM AutoMigrate |
 | Data access | repository layer |
 | Auth | Email OTP (8 digits, 10 min) + JWT |
+| Admin UI | Vue 3 + Vite + TypeScript |
+| UI styling | Tailwind CSS v4 + daisyUI 5 |
 
 ### API Endpoints
 
@@ -47,6 +49,8 @@ The API lives in `api/` and provides authentication via email OTP.
 3. **Register:** `super_admin` or `admin` creates users via `/v1/auth/register` with role `admin` or `user`.
 
 In development (`APP_ENV=development`), OTP codes are logged to stdout instead of sent via email.
+
+The admin UI (`frontend/`) implements the same OTP flow on `/login`. Dev server: `http://localhost:3100` (proxies `/v1` to the API). CORS origins are configured via `CORS_ORIGINS` (JSON array).
 
 ## Core Concepts (planned)
 
@@ -84,7 +88,7 @@ envm-vault/
 │   │   ├── database/     # GORM connection + AutoMigrate
 │   │   ├── model/        # GORM models
 │   │   ├── repository/   # data access layer
-├── frontend/             # Vue 3 admin UI (Phase 3)
+├── frontend/             # Vue 3 admin UI (Vite :3100)
 ├── docs/
 ├── docker-compose.yml
 └── Makefile

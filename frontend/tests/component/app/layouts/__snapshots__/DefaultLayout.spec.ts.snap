@@ -1,0 +1,80 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`DefaultLayout (component) > logs out and navigates to login when Sair is clicked 1`] = `
+"<div class="vault-bg flex min-h-svh">
+  <aside class="flex w-56 shrink-0 flex-col border-r border-base-300/80 bg-base-200/50 md:w-60" aria-label="Menu principal">
+    <div class="flex h-14 items-center px-5">
+      <p class="font-brand text-xl leading-none tracking-tight">envm-vault</p>
+    </div>
+    <nav class="flex flex-1 flex-col gap-1 px-3 pt-2"><a href="/" class="flex items-center gap-3 px-3 py-2.5 text-sm text-base-content/75 transition-colors hover:bg-base-300/60 hover:text-base-content"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 shrink-0">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"></path>
+        </svg> Início </a></nav>
+  </aside>
+  <div class="flex min-w-0 flex-1 flex-col">
+    <header class="flex h-14 shrink-0 items-center justify-end gap-4 border-b border-base-300/80 bg-base-200/40 px-6 md:px-8">
+      <!--v-if--><button class="btn btn-ghost btn-sm gap-2" type="button"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"></path>
+        </svg> Sair </button>
+    </header>
+    <main class="min-h-0 flex-1 overflow-auto">
+      <main class="vault-bg flex min-h-svh items-end px-6 pb-16 md:items-center md:px-16 md:pb-0">
+        <section class="mx-auto w-full max-w-xl">
+          <p class="font-brand vault-enter text-5xl leading-none tracking-tight text-base-content md:text-7xl"> envm-vault </p>
+          <h1 class="vault-enter-delay mt-8 max-w-md text-2xl font-medium leading-snug text-base-content md:text-3xl"> Entre para gerenciar os ambientes. </h1>
+          <p class="vault-enter-delay mt-3 max-w-md text-base text-base-content/70"> Enviamos um código de 8 dígitos para o seu e-mail. </p>
+          <form class="vault-step mt-10 flex max-w-md flex-col gap-4"><label class="flex flex-col gap-2"><span class="text-sm font-medium">E-mail</span><input class="input input-bordered w-full" type="email" name="email" autocomplete="email" required=""></label>
+            <!--v-if--><button class="btn btn-primary w-fit gap-2" type="submit"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"></path>
+              </svg> Enviar código </button>
+          </form>
+        </section>
+      </main>
+    </main>
+  </div>
+</div>"
+`;
+
+exports[`DefaultLayout (component) > renders sidebar with Início and top bar with user email 1`] = `
+"<div class="vault-bg flex min-h-svh">
+  <aside class="flex w-56 shrink-0 flex-col border-r border-base-300/80 bg-base-200/50 md:w-60" aria-label="Menu principal">
+    <div class="flex h-14 items-center px-5">
+      <p class="font-brand text-xl leading-none tracking-tight">envm-vault</p>
+    </div>
+    <nav class="flex flex-1 flex-col gap-1 px-3 pt-2"><a aria-current="page" href="/" class="!bg-base-300 !text-primary router-link-exact-active flex items-center gap-3 px-3 py-2.5 text-sm text-base-content/75 transition-colors hover:bg-base-300/60 hover:text-base-content"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 shrink-0">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"></path>
+        </svg> Início </a></nav>
+  </aside>
+  <div class="flex min-w-0 flex-1 flex-col">
+    <header class="flex h-14 shrink-0 items-center justify-end gap-4 border-b border-base-300/80 bg-base-200/40 px-6 md:px-8">
+      <p class="truncate text-sm text-base-content/70">admin@example.com</p><button class="btn btn-ghost btn-sm gap-2" type="button"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"></path>
+        </svg> Sair </button>
+    </header>
+    <main class="min-h-0 flex-1 overflow-auto">
+      <div class="vault-bg flex min-h-svh">
+        <aside class="flex w-56 shrink-0 flex-col border-r border-base-300/80 bg-base-200/50 md:w-60" aria-label="Menu principal">
+          <div class="flex h-14 items-center px-5">
+            <p class="font-brand text-xl leading-none tracking-tight">envm-vault</p>
+          </div>
+          <nav class="flex flex-1 flex-col gap-1 px-3 pt-2"><a aria-current="page" href="/" class="!bg-base-300 !text-primary router-link-exact-active flex items-center gap-3 px-3 py-2.5 text-sm text-base-content/75 transition-colors hover:bg-base-300/60 hover:text-base-content"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 shrink-0">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"></path>
+              </svg> Início </a></nav>
+        </aside>
+        <div class="flex min-w-0 flex-1 flex-col">
+          <header class="flex h-14 shrink-0 items-center justify-end gap-4 border-b border-base-300/80 bg-base-200/40 px-6 md:px-8">
+            <p class="truncate text-sm text-base-content/70">admin@example.com</p><button class="btn btn-ghost btn-sm gap-2" type="button"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"></path>
+              </svg> Sair </button>
+          </header>
+          <main class="min-h-0 flex-1 overflow-auto">
+            <section class="px-8 py-10 md:px-12">
+              <h1 class="text-2xl font-medium tracking-tight md:text-3xl">Início</h1>
+              <p class="mt-3 max-w-lg text-base text-base-content/70">Bem-vindo ao envm-vault.</p>
+            </section>
+          </main>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>"
+`;

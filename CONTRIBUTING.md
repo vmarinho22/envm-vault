@@ -7,8 +7,9 @@ Thank you for your interest in contributing! This guide covers the workflow and 
 1. Fork the repository.
 2. Clone your fork: `git clone https://github.com/<you>/envm-vault.git`
 3. Read [AGENTS.md](AGENTS.md) and [docs/architecture.md](docs/architecture.md) to understand the project.
-4. Check [docs/roadmap.md](docs/roadmap.md) for the current phase and open work.
-5. Install git hooks (recommended):
+4. Install tool versions with [mise](https://mise.jdx.dev/): `mise install` (see root `mise.toml` for Node and Go).
+5. Check [docs/roadmap.md](docs/roadmap.md) for the current phase and open work.
+6. Install git hooks (recommended):
 
 ```bash
 brew install lefthook    # or: go install github.com/evilmartians/lefthook@latest

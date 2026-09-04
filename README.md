@@ -6,7 +6,7 @@ Com um token de acesso pessoal, desenvolvedores e pipelines de CI baixam variáv
 
 ## Status
 
-**Fase 1** — API com autenticação por e-mail (OTP). UI admin em breve.
+**Fase 1** — API com autenticação por e-mail (OTP) e UI de login.
 
 ## Stack
 
@@ -15,22 +15,28 @@ Com um token de acesso pessoal, desenvolvedores e pipelines de CI baixam variáv
 | API | Go + Fiber |
 | Banco | PostgreSQL (GORM + AutoMigrate) |
 | Auth | OTP por e-mail + JWT |
-| UI Admin | Vue 3 + TypeScript + Vite (Fase 3) |
+| UI Admin | Vue 3 + Vite + TypeScript + Tailwind + daisyUI |
+
+Testes da UI: Vitest (`make test-frontend`). Em testes de componente, sempre use `expectComponentSnapshot(wrapper)` e versione os `__snapshots__/`. Detalhes em [frontend/README.md](frontend/README.md).
 
 ## Quick Start
 
-Pré-requisitos: Go 1.25+, Docker, Make.
+Pré-requisitos: [mise](https://mise.jdx.dev/) (Node 24 + Go 1.25), Docker, Make.
 
 ```bash
 git clone https://github.com/envm-vault/envm-vault.git
 cd envm-vault
 
+mise install        # instala as versões de Node e Go definidas em mise.toml
 make setup          # copia .env.example → .env
 make db-up          # sobe PostgreSQL
 make migrate        # roda AutoMigrate (GORM)
 make dev            # inicia API em :8080
+make frontend-dev   # inicia UI em :3100
 make hooks-install  # instala git hooks (testes unitários + conventional commits)
 ```
+
+A UI em `http://localhost:3100` faz proxy de `/v1` para a API. Em desenvolvimento, o código OTP aparece no log da API.
 
 ### Primeiro acesso (bootstrap)
 
@@ -107,4 +113,4 @@ Contribuições são bem-vindas! Leia [CONTRIBUTING.md](CONTRIBUTING.md) para co
 
 ## English Summary
 
-**envm-vault** is an open-source environment variable vault. Built with Go (Fiber API) and PostgreSQL. Currently in Phase 1 with email OTP authentication. See [docs/architecture.md](docs/architecture.md) for details.
+**envm-vault** is an open-source environment variable vault. Built with Go (Fiber API), Vue 3, and PostgreSQL. Currently in Phase 1 with email OTP authentication. See [docs/architecture.md](docs/architecture.md) for details.

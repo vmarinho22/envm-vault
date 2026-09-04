@@ -1,9 +1,11 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -15,6 +17,7 @@ type Config struct {
 	DatabaseURL string
 	JWTSecret   string
 	JWTExpiry   time.Duration
+	CORSOrigins []string
 }
 
 func Load() (*Config, error) {
@@ -32,6 +35,12 @@ func Load() (*Config, error) {
 		JWTSecret:   getEnv("JWT_SECRET", ""),
 		JWTExpiry:   jwtExpiry,
 	}
+
+	origins, err := parseCORSOrigins(os.Getenv("CORS_ORIGINS"))
+	if err != nil {
+		return nil, err
+	}
+	cfg.CORSOrigins = origins
 
 	if cfg.DatabaseURL == "" {
 		return nil, fmt.Errorf("DATABASE_URL is required")
@@ -77,4 +86,19 @@ func getEnv(key, fallback string) string {
 		return v
 	}
 	return fallback
+}
+
+func parseCORSOrigins(raw string) ([]string, error) {
+	if strings.TrimSpace(raw) == "" {
+		return []string{"http://localhost:3100"}, nil
+	}
+
+	var origins []string
+	if err := json.Unmarshal([]byte(raw), &origins); err != nil {
+		return nil, fmt.Errorf("parse CORS_ORIGINS: %w", err)
+	}
+	if len(origins) == 0 {
+		return nil, fmt.Errorf("CORS_ORIGINS must contain at least one origin")
+	}
+	return origins, nil
 }

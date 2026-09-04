@@ -9,30 +9,57 @@ alwaysApply: false
 ## Stack
 
 - Vue 3 with Composition API and `<script setup lang="ts">`
-- Vite + TypeScript (strict mode)
+- Vite + TypeScript (strict, `noUncheckedIndexedAccess`)
+- Node version via root `mise.toml` (`mise install`) — not `.nvmrc`
 - Pinia for state management
+- Tailwind CSS v4 + daisyUI 5
+- Heroicons (`@heroicons/vue`)
+- Vitest for unit and component tests
 
-## Structure
+## Structure (module-oriented)
 
 ```
 frontend/src/
-├── components/     # Reusable UI components
-├── composables/    # Shared logic (useAuth, useProjects, etc.)
-├── views/          # Route-level pages
-├── stores/         # Pinia stores
-└── api/            # API client functions
+├── app/                 # bootstrap, router, layouts, styles
+├── shared/              # cross-cutting (HttpClient, ApiError, shared types)
+├── modules/
+│   ├── auth/            # LoginView, AuthService, auth.store, useLogin
+│   ├── user/            # UserService + user types
+│   ├── health/          # HealthService
+│   └── home/            # HomeView
+
+frontend/tests/
+├── unit/                # service / pure unit tests (mirrors src)
+│   ├── shared/
+│   └── modules/
+└── component/           # Vue component tests (mirrors src)
+    ├── helpers/         # mount helpers (component-only)
+    ├── app/
+    └── modules/
 ```
 
 ## Standards
 
-- Extract reusable logic into composables
+- Keep domain code inside its module; do not reach into another module's internals except via its public services/types/stores
+- Named services: `interface XService` + `const xService: XService = { ... }`
+  (`AuthService` / `authService`; same for User, Health, HttpClient)
+- Extract reusable logic into composables inside the module
 - Keep components under 200 lines — split if larger
-- Use TypeScript interfaces for API response types
-- No secret values stored in client state beyond display needs
+- JWT lives in memory + `sessionStorage` only (never `localStorage`)
 - Handle loading and error states in every data-fetching view
+- UI copy in Portuguese; identifiers in English
+
+## Testing
+
+- Unit: `frontend/tests/unit/` (mirrors `src/`)
+- Component: `frontend/tests/component/` (mirrors `src/`); mount via `mountComponent` from `tests/component/helpers/mount`
+- **Every** component test must end with `expectComponentSnapshot(wrapper)` and commit `__snapshots__/`
+- Update snapshots intentionally (`npm run test:component -- -u`) when UI changes are expected
 
 ## API Calls
 
-- Centralize HTTP calls in `src/api/`
-- Use composables to wrap API calls with loading/error state
-- Never hardcode tokens — use session/auth store
+- All HTTP goes through `HttpClient` in `shared/http`
+- Domain calls live in `modules/{domain}/services/{Name}Service.ts`
+- Use composables to wrap service calls with loading/error state
+- Inject auth via `HttpClient.configure` from the auth store in `app/main.ts`
+- Never log tokens or OTP codes
