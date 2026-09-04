@@ -25,7 +25,7 @@ function logout(): void {
       <nav class="flex flex-1 flex-col gap-1 px-3 pt-2">
         <RouterLink
           :to="{ name: 'home' }"
-          class="flex items-center gap-3 px-3 py-2.5 text-sm text-base-content/75 transition-colors hover:bg-base-300/60 hover:text-base-content"
+          class="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm text-base-content/75 transition-colors hover:bg-base-300/60 hover:text-base-content"
           active-class="!bg-base-300 !text-primary"
         >
           <HomeIcon class="size-5 shrink-0" aria-hidden="true" />

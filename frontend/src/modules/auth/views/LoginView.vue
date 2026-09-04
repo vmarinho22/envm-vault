@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { EnvelopeIcon, KeyIcon } from '@heroicons/vue/24/outline';
+import OtpCodeInput from '@/modules/auth/components/OtpCodeInput.vue';
 import { useLogin } from '@/modules/auth/composables/useLogin';
 
 const { step, email, code, loading, error, submitEmail, submitCode, backToEmail } = useLogin();
@@ -52,25 +53,17 @@ const { step, email, code, loading, error, submitEmail, submitCode, backToEmail 
         class="vault-step mt-10 flex max-w-md flex-col gap-4"
         @submit.prevent="submitCode"
       >
-        <label class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2">
           <span class="text-sm font-medium">Código</span>
-          <input
-            v-model="code"
-            class="input input-bordered w-full tracking-[0.35em]"
-            type="text"
-            name="code"
-            inputmode="numeric"
-            autocomplete="one-time-code"
-            maxlength="8"
-            minlength="8"
-            pattern="[0-9]{8}"
-            required
-            :disabled="loading"
-          />
-        </label>
+          <OtpCodeInput v-model="code" :disabled="loading" />
+        </div>
         <p v-if="error" class="text-sm text-error" role="alert">{{ error }}</p>
         <div class="flex flex-wrap items-center gap-4">
-          <button class="btn btn-primary w-fit gap-2" type="submit" :disabled="loading">
+          <button
+            class="btn btn-primary w-fit gap-2"
+            type="submit"
+            :disabled="loading || code.length !== 8"
+          >
             <span v-if="loading" class="loading loading-spinner loading-sm" />
             <KeyIcon v-else class="size-5" />
             Entrar

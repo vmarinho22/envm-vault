@@ -1,4 +1,4 @@
-import { flushPromises } from '@vue/test-utils';
+import { flushPromises, type VueWrapper } from '@vue/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { authService } from '@/modules/auth/services/AuthService';
 import LoginView from '@/modules/auth/views/LoginView.vue';
@@ -15,6 +15,19 @@ vi.mock('@/modules/auth/services/AuthService', () => ({
 
 const requestLoginMock = vi.mocked(authService.requestLogin);
 const verifyLoginMock = vi.mocked(authService.verifyLogin);
+
+async function fillOtpCode(wrapper: VueWrapper, code: string): Promise<void> {
+  const digitInputs = wrapper.findAll('input[aria-label^="Dígito"]');
+  expect(digitInputs).toHaveLength(8);
+
+  const first = digitInputs[0];
+  expect(first).toBeDefined();
+  await first!.trigger('paste', {
+    clipboardData: {
+      getData: () => code,
+    },
+  });
+}
 
 describe('LoginView (component)', () => {
   beforeEach(() => {
@@ -52,7 +65,7 @@ describe('LoginView (component)', () => {
     await flushPromises();
 
     expect(requestLoginMock).toHaveBeenCalledWith('admin@example.com');
-    expect(wrapper.find('input[name="code"]').exists()).toBe(true);
+    expect(wrapper.findAll('input[aria-label^="Dígito"]')).toHaveLength(8);
     expect(wrapper.text()).toContain('Entrar');
     expectComponentSnapshot(wrapper);
   });
@@ -93,7 +106,7 @@ describe('LoginView (component)', () => {
     await wrapper.get('form').trigger('submit');
     await flushPromises();
 
-    await wrapper.get('input[name="code"]').setValue('12345678');
+    await fillOtpCode(wrapper, '12345678');
     await wrapper.get('form').trigger('submit');
     await flushPromises();
 
