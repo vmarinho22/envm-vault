@@ -28,13 +28,20 @@ git clone https://github.com/envm-vault/envm-vault.git
 cd envm-vault
 
 mise install        # instala as versões de Node e Go definidas em mise.toml
-make setup          # copia .env.example → .env
+make setup          # copia .env.example → .env e frontend/.env.example → frontend/.env
 make db-up          # sobe PostgreSQL
 make migrate        # roda AutoMigrate (GORM)
 make dev            # inicia API em :8080
 make frontend-dev   # inicia UI em :3100
 make hooks-install  # instala git hooks (testes unitários + conventional commits)
 ```
+
+Ambiente separado:
+
+| Arquivo | Uso |
+|---------|-----|
+| `.env` (raiz) | API + Docker Compose (secrets: DB, JWT, CORS) |
+| `frontend/.env` | Só variáveis públicas `VITE_*` (expostas no browser) |
 
 A UI em `http://localhost:3100` faz proxy de `/v1` para a API. Em desenvolvimento, o código OTP aparece no log da API.
 

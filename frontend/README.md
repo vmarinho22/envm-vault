@@ -45,6 +45,23 @@ npm run dev         # http://localhost:3100
 
 O Vite faz proxy de `/v1` e `/health` para a API.
 
+## Variáveis de ambiente
+
+O frontend **não** usa o `.env` da API. Configure só variáveis públicas aqui:
+
+| Arquivo | Conteúdo |
+|---------|----------|
+| `../.env` | Secrets da API / Docker (nunca `VITE_*`) |
+| `.env` | Só `VITE_*` — vão para o bundle do browser |
+
+```bash
+# Na raiz: make setup  (cria frontend/.env a partir de .env.example)
+cp .env.example .env   # se ainda não existir
+```
+
+- Em desenvolvimento local, deixe `VITE_API_BASE_URL` vazio (proxy do Vite).
+- Em staging/prod, defina a URL absoluta da API (e alinhe `CORS_ORIGINS` no `.env` da raiz).
+
 ## Testes
 
 ```bash

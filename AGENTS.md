@@ -45,9 +45,10 @@ Always read `docs/architecture.md` before implementing domain logic.
 ## Security Rules (always apply)
 
 1. **Never commit secrets** — no real tokens, passwords, or `.env` files with production values.
-2. **Never log secret values** — OTP codes are logged only in `APP_ENV=development`.
-3. **Token scoping** — access tokens must be limited to explicit project/environment pairs.
-4. **Minimal diffs** — do not refactor unrelated code in the same change.
+2. **Env split** — root `.env` is API + Docker only; `frontend/.env` is `VITE_*` only (public, baked into the browser bundle). Never put `JWT_SECRET` / `DATABASE_URL` in the frontend env.
+3. **Never log secret values** — OTP codes are logged only in `APP_ENV=development`.
+4. **Token scoping** — access tokens must be limited to explicit project/environment pairs.
+5. **Minimal diffs** — do not refactor unrelated code in the same change.
 
 ## Conventions
 
@@ -86,7 +87,7 @@ Always read `docs/architecture.md` before implementing domain logic.
 ### Commands
 
 ```bash
-make setup      # copy .env.example → .env
+make setup      # copy root + frontend .env.example → .env if missing
 make db-up      # start PostgreSQL
 make migrate    # run GORM AutoMigrate
 make db-reset   # reset database volume + AutoMigrate
@@ -115,6 +116,7 @@ rtk gain        # check token savings
 - **State:** Pinia (`sessionStorage` for JWT)
 - **UI:** Tailwind CSS v4 + daisyUI 5 + Heroicons
 - **Dev server:** port **3100** (`strictPort`); proxies `/v1` and `/health` to the API on `:8080`
+- **Env:** `frontend/.env` (`VITE_*` only); API secrets stay in root `.env`
 - **Tests:** Vitest under `frontend/tests/{unit,component}/` (`npm test` / `make test-frontend`)
 - **Component snapshots:** every component test must call `expectComponentSnapshot(wrapper)` from `tests/component/helpers/mount` and commit the generated `__snapshots__/` files
 

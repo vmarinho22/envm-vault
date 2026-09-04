@@ -2,7 +2,7 @@
 
 help:
 	@echo "Available commands:"
-	@echo "  make setup             - Copy .env.example to .env if missing"
+	@echo "  make setup             - Copy root and frontend .env.example files if missing"
 	@echo "  make db-up             - Start PostgreSQL via docker compose"
 	@echo "  make db-down           - Stop PostgreSQL"
 	@echo "  make db-reset          - Reset database volume and run AutoMigrate"
@@ -20,7 +20,8 @@ help:
 
 setup:
 	@test -f .env || cp .env.example .env
-	@echo "Setup complete. Edit .env if needed."
+	@test -f frontend/.env || cp frontend/.env.example frontend/.env
+	@echo "Setup complete. Edit .env (API) and frontend/.env (UI) if needed."
 
 db-up:
 	docker compose up -d postgres
