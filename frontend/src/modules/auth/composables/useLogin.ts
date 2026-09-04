@@ -18,6 +18,12 @@ export function useLogin() {
 
   function toErrorMessage(err: unknown): string {
     if (err instanceof ApiError) {
+      if (err.status === 429) {
+        if (err.message.includes('verification')) {
+          return 'Muitas tentativas. Solicite um novo código.';
+        }
+        return 'Muitas requisições. Tente novamente em instantes.';
+      }
       return err.message;
     }
     return 'não foi possível concluir o login';
@@ -46,6 +52,13 @@ export function useLogin() {
       await router.push({ name: 'home' });
     } catch (err) {
       error.value = toErrorMessage(err);
+      if (
+        err instanceof ApiError &&
+        err.status === 429 &&
+        err.message.includes('verification')
+      ) {
+        code.value = '';
+      }
     } finally {
       loading.value = false;
     }

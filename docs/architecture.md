@@ -28,7 +28,7 @@ The API lives in `api/` and provides authentication via email OTP.
 | DB driver | GORM (postgres driver) |
 | Schema | GORM AutoMigrate |
 | Data access | repository layer |
-| Auth | Email OTP (8 digits, 10 min) + JWT |
+| Auth | Email OTP (8 digits, 10 min, max 5 verify attempts) + JWT |
 | Admin UI | Vue 3 + Vite + TypeScript |
 | UI styling | Tailwind CSS v4 + daisyUI 5 |
 
@@ -133,9 +133,11 @@ erDiagram
 
 1. **Never store plaintext OTP codes** — only SHA-256 hashes in `login_codes`.
 2. **Never log secret values** — OTP codes are logged only in development.
-3. **Token scoping** — access tokens (Phase 2) limited to project/environment pairs.
-4. **No secrets in the repository** — never commit real tokens or `.env` files.
-5. **JWT expiry** — configurable via `JWT_EXPIRY` (default 24h).
+3. **OTP verify lockout** — max 5 failed attempts per code (`attempt_count`); then the code is invalidated and the user must request a new OTP.
+4. **Global HTTP rate limit** — per-IP limiter (`RATE_LIMIT_MAX` / `RATE_LIMIT_WINDOW`, defaults 100/1m). `/health` and `/v1/health` are exempt. In-memory store (single instance); shared store needed for multi-replica later.
+5. **Token scoping** — access tokens (Phase 2) limited to project/environment pairs.
+6. **No secrets in the repository** — never commit real tokens or `.env` files.
+7. **JWT expiry** — configurable via `JWT_EXPIRY` (default 24h).
 
 ## Open Decisions
 

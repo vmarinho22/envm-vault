@@ -147,4 +147,77 @@ func TestService_RegisterUser(t *testing.T) {
 	gormDB.WithContext(ctx).Where("email IN ?", []string{adminEmail, newUserEmail}).Delete(&model.User{})
 }
 
+func TestService_OTPAttemptLimit(t *testing.T) {
+	databaseURL := os.Getenv("DATABASE_URL")
+	if databaseURL == "" {
+		t.Skip("DATABASE_URL not set, skipping integration test")
+	}
+
+	gormDB, err := database.Open(databaseURL)
+	if err != nil {
+		t.Fatalf("connect database: %v", err)
+	}
+	defer func() {
+		sqlDB, _ := gormDB.DB()
+		if sqlDB != nil {
+			sqlDB.Close()
+		}
+	}()
+
+	if err := database.Ping(gormDB); err != nil {
+		t.Skipf("database not available: %v", err)
+	}
+
+	ctx := context.Background()
+	userRepo := repository.NewUserRepository(gormDB)
+	loginCodeRepo := repository.NewLoginCodeRepository(gormDB)
+	sender := &captureSender{}
+	auth := New(gormDB, userRepo, loginCodeRepo, service.NewOTPService(), sender, "test-secret-key-for-jwt-signing", time.Hour)
+
+	testEmail := "otp-limit-test@example.com"
+
+	gormDB.WithContext(ctx).Where("email = ?", testEmail).Delete(&model.LoginCode{})
+	gormDB.WithContext(ctx).Where("email = ?", testEmail).Delete(&model.User{})
+
+	if err := auth.RequestLogin(ctx, testEmail); err != nil {
+		t.Fatalf("RequestLogin() error = %v", err)
+	}
+	validCode := sender.lastCode
+	if validCode == "" {
+		t.Fatal("expected OTP code to be sent")
+	}
+
+	for i := 0; i < service.MaxOTPVerifyAttempts-1; i++ {
+		_, err := auth.VerifyLogin(ctx, testEmail, "00000000")
+		if err != service.ErrInvalidCode {
+			t.Fatalf("attempt %d error = %v, want ErrInvalidCode", i+1, err)
+		}
+	}
+
+	_, err = auth.VerifyLogin(ctx, testEmail, "00000000")
+	if err != service.ErrTooManyAttempts {
+		t.Fatalf("final failed attempt error = %v, want ErrTooManyAttempts", err)
+	}
+
+	_, err = auth.VerifyLogin(ctx, testEmail, validCode)
+	if err != service.ErrTooManyAttempts && err != service.ErrInvalidCode {
+		t.Fatalf("after lockout error = %v, want ErrTooManyAttempts or ErrInvalidCode", err)
+	}
+
+	if err := auth.RequestLogin(ctx, testEmail); err != nil {
+		t.Fatalf("RequestLogin() after lockout error = %v", err)
+	}
+
+	resp, err := auth.VerifyLogin(ctx, testEmail, sender.lastCode)
+	if err != nil {
+		t.Fatalf("VerifyLogin() after new OTP error = %v", err)
+	}
+	if resp.Token == "" {
+		t.Error("expected JWT token after recovery")
+	}
+
+	gormDB.WithContext(ctx).Where("email = ?", testEmail).Delete(&model.LoginCode{})
+	gormDB.WithContext(ctx).Where("email = ?", testEmail).Delete(&model.User{})
+}
+
 var _ email.Sender = (*captureSender)(nil)

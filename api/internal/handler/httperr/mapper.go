@@ -15,6 +15,8 @@ func Write(c *fiber.Ctx, err error) error {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "user not found"})
 	case errors.Is(err, service.ErrInvalidCode):
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "invalid or expired verification code"})
+	case errors.Is(err, service.ErrTooManyAttempts):
+		return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{"error": "too many verification attempts; request a new code"})
 	case errors.Is(err, service.ErrUnauthorized):
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "unauthorized"})
 	case errors.Is(err, service.ErrForbidden):

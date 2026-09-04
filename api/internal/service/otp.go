@@ -9,9 +9,10 @@ import (
 )
 
 const (
-	otpLength  = 8
-	otpExpiry  = 10 // minutes
-	maxOTPCode = 100000000
+	otpLength            = 8
+	otpExpiry            = 10 // minutes
+	maxOTPCode           = 100000000
+	MaxOTPVerifyAttempts = 5
 )
 
 type OTPService struct{}

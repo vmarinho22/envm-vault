@@ -31,7 +31,7 @@ func TestLoad_MissingEnv(t *testing.T) {
 	}
 	t.Chdir(t.TempDir())
 
-	for _, key := range []string{"DATABASE_URL", "JWT_SECRET", "APP_ENV", "PORT", "JWT_EXPIRY", "CORS_ORIGINS"} {
+	for _, key := range []string{"DATABASE_URL", "JWT_SECRET", "APP_ENV", "PORT", "JWT_EXPIRY", "CORS_ORIGINS", "RATE_LIMIT_MAX", "RATE_LIMIT_WINDOW"} {
 		os.Unsetenv(key)
 	}
 
@@ -103,5 +103,31 @@ func TestLoad_CORSOriginsInvalidJSON(t *testing.T) {
 	_, err = Load()
 	if err == nil {
 		t.Fatal("expected error for invalid CORS_ORIGINS JSON")
+	}
+}
+
+func TestLoad_RateLimitDefaults(t *testing.T) {
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("getwd: %v", err)
+	}
+	t.Chdir(t.TempDir())
+	t.Cleanup(func() { t.Chdir(wd) })
+
+	t.Setenv("DATABASE_URL", "postgres://envm:envm@localhost:5432/envm?sslmode=disable")
+	t.Setenv("JWT_SECRET", "test-secret")
+	t.Setenv("CORS_ORIGINS", "")
+	os.Unsetenv("RATE_LIMIT_MAX")
+	os.Unsetenv("RATE_LIMIT_WINDOW")
+
+	cfg, err := Load()
+	if err != nil {
+		t.Fatalf("Load() error = %v", err)
+	}
+	if cfg.RateLimitMax != 100 {
+		t.Errorf("RateLimitMax = %d, want 100", cfg.RateLimitMax)
+	}
+	if cfg.RateLimitWindow.String() != "1m0s" {
+		t.Errorf("RateLimitWindow = %v, want 1m", cfg.RateLimitWindow)
 	}
 }

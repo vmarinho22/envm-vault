@@ -68,3 +68,15 @@ func (r *LoginCodeRepository) MarkUsed(ctx context.Context, id uuid.UUID) error 
 	}
 	return nil
 }
+
+func (r *LoginCodeRepository) IncrementAttempts(ctx context.Context, id uuid.UUID) (int, error) {
+	var attemptCount int
+	err := r.db.WithContext(ctx).Raw(
+		`UPDATE login_codes SET attempt_count = attempt_count + 1 WHERE id = ? RETURNING attempt_count`,
+		id,
+	).Scan(&attemptCount).Error
+	if err != nil {
+		return 0, fmt.Errorf("increment login code attempts: %w", err)
+	}
+	return attemptCount, nil
+}

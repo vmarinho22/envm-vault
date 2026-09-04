@@ -113,7 +113,20 @@ func (s *Service) VerifyLogin(ctx context.Context, rawEmail, code string) (*serv
 		return nil, err
 	}
 
+	if loginCode.AttemptCount >= service.MaxOTPVerifyAttempts {
+		_ = s.loginCodes.MarkUsed(ctx, loginCode.ID)
+		return nil, service.ErrTooManyAttempts
+	}
+
 	if !s.otp.Verify(code, loginCode.CodeHash) {
+		attemptCount, incrErr := s.loginCodes.IncrementAttempts(ctx, loginCode.ID)
+		if incrErr != nil {
+			return nil, incrErr
+		}
+		if attemptCount >= service.MaxOTPVerifyAttempts {
+			_ = s.loginCodes.MarkUsed(ctx, loginCode.ID)
+			return nil, service.ErrTooManyAttempts
+		}
 		return nil, service.ErrInvalidCode
 	}
 

@@ -73,6 +73,7 @@ func main() {
 		AllowHeaders: "Origin, Content-Type, Authorization",
 		AllowMethods: "GET, POST, PUT, PATCH, DELETE, OPTIONS",
 	}))
+	app.Use(middleware.NewRateLimiter(cfg.RateLimitMax, cfg.RateLimitWindow))
 
 	router.Register(app, router.Deps{
 		Health: healthhandler.New(gormDB),

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -12,12 +13,14 @@ import (
 )
 
 type Config struct {
-	AppEnv      string
-	Port        string
-	DatabaseURL string
-	JWTSecret   string
-	JWTExpiry   time.Duration
-	CORSOrigins []string
+	AppEnv          string
+	Port            string
+	DatabaseURL     string
+	JWTSecret       string
+	JWTExpiry       time.Duration
+	CORSOrigins     []string
+	RateLimitMax    int
+	RateLimitWindow time.Duration
 }
 
 func Load() (*Config, error) {
@@ -28,12 +31,27 @@ func Load() (*Config, error) {
 		return nil, fmt.Errorf("parse JWT_EXPIRY: %w", err)
 	}
 
+	rateLimitWindow, err := time.ParseDuration(getEnv("RATE_LIMIT_WINDOW", "1m"))
+	if err != nil {
+		return nil, fmt.Errorf("parse RATE_LIMIT_WINDOW: %w", err)
+	}
+
+	rateLimitMax, err := strconv.Atoi(getEnv("RATE_LIMIT_MAX", "100"))
+	if err != nil {
+		return nil, fmt.Errorf("parse RATE_LIMIT_MAX: %w", err)
+	}
+	if rateLimitMax < 1 {
+		return nil, fmt.Errorf("RATE_LIMIT_MAX must be >= 1")
+	}
+
 	cfg := &Config{
-		AppEnv:      getEnv("APP_ENV", "development"),
-		Port:        getEnv("PORT", "8080"),
-		DatabaseURL: getEnv("DATABASE_URL", ""),
-		JWTSecret:   getEnv("JWT_SECRET", ""),
-		JWTExpiry:   jwtExpiry,
+		AppEnv:          getEnv("APP_ENV", "development"),
+		Port:            getEnv("PORT", "8080"),
+		DatabaseURL:     getEnv("DATABASE_URL", ""),
+		JWTSecret:       getEnv("JWT_SECRET", ""),
+		JWTExpiry:       jwtExpiry,
+		RateLimitMax:    rateLimitMax,
+		RateLimitWindow: rateLimitWindow,
 	}
 
 	origins, err := parseCORSOrigins(os.Getenv("CORS_ORIGINS"))

@@ -14,10 +14,12 @@ Com um token de acesso pessoal, desenvolvedores e pipelines de CI baixam variáv
 |--------|------------|
 | API | Go + Fiber |
 | Banco | PostgreSQL (GORM + AutoMigrate) |
-| Auth | OTP por e-mail + JWT |
+| Auth | OTP por e-mail + JWT (máx. 5 tentativas por código) |
 | UI Admin | Vue 3 + Vite + TypeScript + Tailwind + daisyUI |
 
 Testes da UI: Vitest (`make test-frontend`). Em testes de componente, sempre use `expectComponentSnapshot(wrapper)` e versione os `__snapshots__/`. Detalhes em [frontend/README.md](frontend/README.md).
+
+Rate limit HTTP global por IP: `RATE_LIMIT_MAX` / `RATE_LIMIT_WINDOW` (padrão `100` / `1m`; `/health` isento).
 
 ## Quick Start
 

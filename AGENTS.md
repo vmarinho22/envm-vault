@@ -47,8 +47,9 @@ Always read `docs/architecture.md` before implementing domain logic.
 1. **Never commit secrets** — no real tokens, passwords, or `.env` files with production values.
 2. **Env split** — root `.env` is API + Docker only; `frontend/.env` is `VITE_*` only (public, baked into the browser bundle). Never put `JWT_SECRET` / `DATABASE_URL` in the frontend env.
 3. **Never log secret values** — OTP codes are logged only in `APP_ENV=development`.
-4. **Token scoping** — access tokens must be limited to explicit project/environment pairs.
-5. **Minimal diffs** — do not refactor unrelated code in the same change.
+4. **OTP lockout** — max 5 failed verify attempts per code; HTTP rate limit via `RATE_LIMIT_MAX` / `RATE_LIMIT_WINDOW`.
+5. **Token scoping** — access tokens must be limited to explicit project/environment pairs.
+6. **Minimal diffs** — do not refactor unrelated code in the same change.
 
 ## Conventions
 
