@@ -22,7 +22,7 @@ Nesta fase, a UI cobre autenticação por e-mail (OTP) e o shell autenticado (me
 Arquitetura orientada a módulos:
 
 - `src/app/` — bootstrap, router, layouts, styles
-- `src/shared/` — `HttpClient`, erros compartilhados
+- `src/shared/` — `HttpClient`, `envs`, erros compartilhados
 - `src/modules/` — domínios (`auth`, `user`, `health`, `home`)
 - `tests/unit/` — unitários (services), espelhando `src/`
 - `tests/component/` — componentes (Vue Test Utils), espelhando `src/`; helpers em `component/helpers/`
@@ -54,13 +54,24 @@ O frontend **não** usa o `.env` da API. Configure só variáveis públicas aqui
 | `../.env` | Secrets da API / Docker (nunca `VITE_*`) |
 | `.env` | Só `VITE_*` — vão para o bundle do browser |
 
+Leitura e validação ficam centralizadas em `src/shared/env/envs.ts`:
+
+```ts
+import { envs } from '@/shared/env/envs'
+
+console.log(envs.api.baseUrl)
+```
+
+Não leia `import.meta.env` fora desse módulo.
+
 ```bash
 # Na raiz: make setup  (cria frontend/.env a partir de .env.example)
 cp .env.example .env   # se ainda não existir
 ```
 
 - Em desenvolvimento local, deixe `VITE_API_BASE_URL` vazio (proxy do Vite).
-- Em staging/prod, defina a URL absoluta da API (e alinhe `CORS_ORIGINS` no `.env` da raiz).
+- Em staging/prod, defina a URL absoluta `http(s)://…` da API (e alinhe `CORS_ORIGINS` no `.env` da raiz).
+- Na boot, `assertEnvsValid()` falha se `VITE_API_BASE_URL` estiver setada e não for URL absoluta.
 
 ## Testes
 

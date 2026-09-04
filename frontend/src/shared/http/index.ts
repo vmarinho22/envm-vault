@@ -1,3 +1,4 @@
+import { envs } from '@/shared/env/envs';
 import { ApiError } from './ApiError';
 
 export type TokenGetter = () => string | null;
@@ -16,7 +17,7 @@ const DEFAULT_ERROR_MESSAGE = 'request failed';
 let getAccessToken: TokenGetter = () => null;
 
 function apiBaseUrl(): string {
-  return import.meta.env.VITE_API_BASE_URL ?? '';
+  return envs.api.baseUrl;
 }
 
 function buildRequestHeaders(options: RequestOptions): Headers {

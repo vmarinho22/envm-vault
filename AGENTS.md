@@ -26,7 +26,7 @@ envm-vault/
 ├── api/                   ← Go API (Fiber)
 │   ├── cmd/server/
 │   ├── internal/
-│   │   ├── config/
+│   │   ├── env/           ← Envs singleton + Load()
 │   │   ├── handler/
 │   │   ├── middleware/
 │   │   ├── service/
@@ -64,6 +64,7 @@ Always read `docs/architecture.md` before implementing domain logic.
 ### Go API (`api/`)
 
 - **Go version:** 1.25+ (pinned in root `mise.toml`)
+- **Config / env:** `internal/env` — call `env.Load()` then read nested groups (`env.Envs.Database.URL`, `env.Envs.JWT.Secret`, …). Required: `DATABASE_URL`, `JWT_SECRET`. Do not read `os.Getenv` for app config outside this package.
 - **HTTP:** Fiber v2
 - **Database:** PostgreSQL via GORM + repository layer
 - **Migrations:** GORM AutoMigrate (schema in `internal/model/`)
@@ -73,10 +74,11 @@ Always read `docs/architecture.md` before implementing domain logic.
   ├── cmd/server/main.go       # wiring only — calls router.Register
   ├── cmd/migrate/main.go      # standalone AutoMigrate
   ├── internal/
-  │   ├── router/              # register routes by context (health, auth, user)
+  │   ├── env/               # Envs singleton + Load() validation
+  │   ├── router/            # register routes by context (health, auth, user)
   │   ├── handler/           # subpackages: auth/, user/, health/, httperr/
   │   ├── service/           # subpackages: auth/, user/ + shared.go
-  │   ├── middleware/        # JWT, auth guards
+  │   ├── middleware/        # JWT, auth guards, rate limit
   │   ├── email/             # Email sender interface
   │   ├── database/          # Open, WithTx, Ping
   │   ├── model/             # GORM models (User, LoginCode)
@@ -117,7 +119,7 @@ rtk gain        # check token savings
 - **State:** Pinia (`sessionStorage` for JWT)
 - **UI:** Tailwind CSS v4 + daisyUI 5 + Heroicons
 - **Dev server:** port **3100** (`strictPort`); proxies `/v1` and `/health` to the API on `:8080`
-- **Env:** `frontend/.env` (`VITE_*` only); API secrets stay in root `.env`
+- **Env:** `shared/env/envs.ts` — `import { envs } from '@/shared/env/envs'`; never read `import.meta.env` outside it
 - **Tests:** Vitest under `frontend/tests/{unit,component}/` (`npm test` / `make test-frontend`)
 - **Component snapshots:** every component test must call `expectComponentSnapshot(wrapper)` from `tests/component/helpers/mount` and commit the generated `__snapshots__/` files
 

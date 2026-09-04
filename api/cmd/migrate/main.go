@@ -3,17 +3,16 @@ package main
 import (
 	"log"
 
-	"github.com/envm-vault/envm-vault/api/internal/config"
 	"github.com/envm-vault/envm-vault/api/internal/database"
+	"github.com/envm-vault/envm-vault/api/internal/env"
 )
 
 func main() {
-	cfg, err := config.Load()
-	if err != nil {
-		log.Fatalf("load config: %v", err)
+	if err := env.Load(); err != nil {
+		log.Fatalf("load env: %v", err)
 	}
 
-	db, err := database.Open(cfg.DatabaseURL)
+	db, err := database.Open(env.Envs.Database.URL)
 	if err != nil {
 		log.Fatalf("migrate: %v", err)
 	}

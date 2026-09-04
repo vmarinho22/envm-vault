@@ -81,6 +81,7 @@ envm-vault/
 ├── api/                  # Go API (Fiber)
 │   ├── cmd/server/
 │   ├── internal/
+│   │   ├── env/          # Envs singleton + Load()
 │   │   ├── router/       # Route registration by context (health, auth, user)
 │   │   ├── handler/      # Handlers per domain (auth/, user/, health/)
 │   │   ├── service/      # Business logic per domain (auth/, user/)

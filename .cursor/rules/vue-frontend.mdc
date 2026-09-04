@@ -21,7 +21,7 @@ alwaysApply: false
 ```
 frontend/src/
 ├── app/                 # bootstrap, router, layouts, styles
-├── shared/              # cross-cutting (HttpClient, ApiError, shared types)
+├── shared/              # cross-cutting (HttpClient, envs, ApiError, shared types)
 ├── modules/
 │   ├── auth/            # LoginView, AuthService, auth.store, useLogin
 │   ├── user/            # UserService + user types
@@ -43,6 +43,7 @@ frontend/tests/
 - Keep domain code inside its module; do not reach into another module's internals except via its public services/types/stores
 - Named services: `interface XService` + `const xService: XService = { ... }`
   (`AuthService` / `authService`; same for User, Health, HttpClient)
+- Public env via `import { envs } from '@/shared/env/envs'` — never `import.meta.env` elsewhere
 - Extract reusable logic into composables inside the module
 - Keep components under 200 lines — split if larger
 - JWT lives in memory + `sessionStorage` only (never `localStorage`)

@@ -9,9 +9,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/envm-vault/envm-vault/api/internal/config"
 	"github.com/envm-vault/envm-vault/api/internal/database"
 	"github.com/envm-vault/envm-vault/api/internal/email"
+	"github.com/envm-vault/envm-vault/api/internal/env"
 	authhandler "github.com/envm-vault/envm-vault/api/internal/handler/auth"
 	healthhandler "github.com/envm-vault/envm-vault/api/internal/handler/health"
 	userhandler "github.com/envm-vault/envm-vault/api/internal/handler/user"
@@ -28,12 +28,11 @@ import (
 )
 
 func main() {
-	cfg, err := config.Load()
-	if err != nil {
-		log.Fatalf("load config: %v", err)
+	if err := env.Load(); err != nil {
+		log.Fatalf("load env: %v", err)
 	}
 
-	gormDB, err := database.Open(cfg.DatabaseURL)
+	gormDB, err := database.Open(env.Envs.Database.URL)
 	if err != nil {
 		log.Fatalf("connect database: %v", err)
 	}
@@ -48,14 +47,14 @@ func main() {
 	loginCodeRepo := repository.NewLoginCodeRepository(gormDB)
 
 	var sender email.Sender
-	if cfg.IsDevelopment() {
+	if env.Envs.IsDevelopment() {
 		sender = email.NewLoggerSender()
 	} else {
 		sender = email.NewNoopSender()
 	}
 
 	otpService := service.NewOTPService()
-	authSvc := authservice.New(gormDB, userRepo, loginCodeRepo, otpService, sender, cfg.JWTSecret, cfg.JWTExpiry)
+	authSvc := authservice.New(gormDB, userRepo, loginCodeRepo, otpService, sender, env.Envs.JWT.Secret, env.Envs.JWT.Expiry)
 	userSvc := userservice.New(userRepo)
 
 	app := fiber.New(fiber.Config{
@@ -69,22 +68,22 @@ func main() {
 	app.Use(recover.New())
 	app.Use(logger.New())
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: strings.Join(cfg.CORSOrigins, ","),
+		AllowOrigins: strings.Join(env.Envs.CORS.Origins, ","),
 		AllowHeaders: "Origin, Content-Type, Authorization",
 		AllowMethods: "GET, POST, PUT, PATCH, DELETE, OPTIONS",
 	}))
-	app.Use(middleware.NewRateLimiter(cfg.RateLimitMax, cfg.RateLimitWindow))
+	app.Use(middleware.NewRateLimiter(env.Envs.RateLimit.Max, env.Envs.RateLimit.Window))
 
 	router.Register(app, router.Deps{
 		Health: healthhandler.New(gormDB),
 		Auth:   authhandler.New(authSvc),
 		User:   userhandler.New(userSvc),
-		JWT:    middleware.NewJWTMiddleware(cfg.JWTSecret),
+		JWT:    middleware.NewJWTMiddleware(env.Envs.JWT.Secret),
 	})
 
 	go func() {
-		addr := ":" + cfg.Port
-		log.Printf("server starting on %s (env=%s)", addr, cfg.AppEnv)
+		addr := ":" + env.Envs.App.Port
+		log.Printf("server starting on %s (env=%s)", addr, env.Envs.App.Env)
 		if err := app.Listen(addr); err != nil {
 			log.Fatalf("server error: %v", err)
 		}
