@@ -1,0 +1,11 @@
+{
+  "title": "Entre para gerenciar os ambientes.",
+  "subtitle": "Enviamos um código de 8 dígitos para o seu e-mail.",
+  "email": "E-mail",
+  "sendCode": "Enviar código",
+  "errors": {
+    "tooManyVerification": "Muitas tentativas. Solicite um novo código.",
+    "tooManyRequests": "Muitas requisições. Tente novamente em instantes.",
+    "fallback": "não foi possível concluir o login"
+  }
+}

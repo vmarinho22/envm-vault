@@ -23,6 +23,7 @@ Use this checklist when adding a new screen to the Vue admin UI.
 - [ ] Create or extend Pinia store in the module if shared state is needed
 - [ ] Create composable in modules/{domain}/composables/ for UI flow
 - [ ] Handle loading, error, and empty states
+- [ ] Add JSON copy under `app/translations/pt-BR/` and `en-US/` (same context filename)
 - [ ] Add Vitest coverage: unit under `tests/unit/` (mirrors module), components under `tests/component/` (mirrors src path)
 - [ ] Every component test calls `expectComponentSnapshot(wrapper)` (commit the generated `__snapshots__`)
 - [ ] Add nav item in app/layouts/DefaultLayout.vue if needed
@@ -67,6 +68,7 @@ Commit the generated `__snapshots__/` files. Update with `npm run test:component
 - Use `<script setup lang="ts">` — no Options API
 - Extract logic into module composables, not inline in views
 - Call the API only through typed service instances (`projectService.list()`, etc.)
+- UI strings via `useI18n()` / `t('context.key')`; add matching JSON in `app/translations/pt-BR/` and `en-US/`
 - Never store decrypted secret values in Pinia beyond the current view lifecycle
 - Include accessible labels on form inputs
 - Every component test calls `expectComponentSnapshot(wrapper)`

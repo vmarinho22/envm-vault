@@ -1,0 +1,11 @@
+{
+  "title": "Sign in to manage environments.",
+  "subtitle": "We send an 8-digit code to your email.",
+  "email": "Email",
+  "sendCode": "Send code",
+  "errors": {
+    "tooManyVerification": "Too many attempts. Request a new code.",
+    "tooManyRequests": "Too many requests. Try again in a moment.",
+    "fallback": "could not complete sign-in"
+  }
+}

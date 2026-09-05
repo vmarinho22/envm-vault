@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { EnvelopeIcon, KeyIcon } from '@heroicons/vue/24/outline';
+import { useI18n } from 'vue-i18n';
 import OtpCodeInput from '@/modules/auth/components/OtpCodeInput.vue';
 import { useLogin } from '@/modules/auth/composables/useLogin';
 
+const { t } = useI18n();
 const { step, email, code, loading, error, submitEmail, submitCode, backToEmail } = useLogin();
 </script>
 
@@ -17,10 +19,10 @@ const { step, email, code, loading, error, submitEmail, submitCode, backToEmail 
       <h1
         class="vault-enter-delay mt-8 max-w-md text-2xl font-medium leading-snug text-base-content md:text-3xl"
       >
-        Entre para gerenciar os ambientes.
+        {{ t('login.title') }}
       </h1>
       <p class="vault-enter-delay mt-3 max-w-md text-base text-base-content/70">
-        Enviamos um código de 8 dígitos para o seu e-mail.
+        {{ t('login.subtitle') }}
       </p>
 
       <form
@@ -29,7 +31,7 @@ const { step, email, code, loading, error, submitEmail, submitCode, backToEmail 
         @submit.prevent="submitEmail"
       >
         <label class="flex flex-col gap-2">
-          <span class="text-sm font-medium">E-mail</span>
+          <span class="text-sm font-medium">{{ t('login.email') }}</span>
           <input
             v-model="email"
             class="input input-bordered w-full"
@@ -44,7 +46,7 @@ const { step, email, code, loading, error, submitEmail, submitCode, backToEmail 
         <button class="btn btn-primary w-fit gap-2" type="submit" :disabled="loading">
           <span v-if="loading" class="loading loading-spinner loading-sm" />
           <EnvelopeIcon v-else class="size-5" />
-          Enviar código
+          {{ t('login.sendCode') }}
         </button>
       </form>
 
@@ -54,7 +56,7 @@ const { step, email, code, loading, error, submitEmail, submitCode, backToEmail 
         @submit.prevent="submitCode"
       >
         <div class="flex flex-col gap-2">
-          <span class="text-sm font-medium">Código</span>
+          <span class="text-sm font-medium">{{ t('code.label') }}</span>
           <OtpCodeInput v-model="code" :disabled="loading" />
         </div>
         <p v-if="error" class="text-sm text-error" role="alert">{{ error }}</p>
@@ -66,7 +68,7 @@ const { step, email, code, loading, error, submitEmail, submitCode, backToEmail 
           >
             <span v-if="loading" class="loading loading-spinner loading-sm" />
             <KeyIcon v-else class="size-5" />
-            Entrar
+            {{ t('code.submit') }}
           </button>
           <button
             class="btn btn-ghost btn-sm"
@@ -74,7 +76,7 @@ const { step, email, code, loading, error, submitEmail, submitCode, backToEmail 
             :disabled="loading"
             @click="backToEmail"
           >
-            Usar outro e-mail
+            {{ t('code.backToEmail') }}
           </button>
         </div>
       </form>

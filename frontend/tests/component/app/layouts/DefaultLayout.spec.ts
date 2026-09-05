@@ -89,12 +89,28 @@ describe('DefaultLayout (component)', () => {
       session: adminSession,
     });
 
-    await wrapper.get('header button').trigger('click');
+    await wrapper.get('[data-testid="logout"]').trigger('click');
     await flushPromises();
 
     expect(useAuthStore(pinia).isAuthenticated).toBe(false);
     expect(router.currentRoute.value.name).toBe('login');
     expect(sessionStorage.getItem('envm-vault.auth')).toBeNull();
+    expectComponentSnapshot(wrapper);
+  });
+
+  it('switches UI language when locale is changed', async () => {
+    const { wrapper } = await mountComponent(DefaultLayout, {
+      routes,
+      initialRoute: '/',
+      session: adminSession,
+    });
+
+    const select = wrapper.get('[data-testid="locale-switcher"]');
+    await select.setValue('en-US');
+    await flushPromises();
+
+    expect(wrapper.get('header').text()).toContain('Log out');
+    expect(wrapper.get('aside[aria-label="Main menu"]').text()).toContain('Home');
     expectComponentSnapshot(wrapper);
   });
 });

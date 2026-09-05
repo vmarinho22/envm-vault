@@ -1,10 +1,12 @@
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { tokenService } from '@/modules/token/services/TokenService';
 import { userService } from '@/modules/user/services/UserService';
 import type { UserWithToken } from '@/modules/user/types';
 import { ApiError } from '@/shared/http/ApiError';
 
 export function useUsers() {
+  const { t } = useI18n();
   const users = ref<UserWithToken[]>([]);
   const loading = ref(false);
   const mutatingId = ref<string | null>(null);
@@ -23,7 +25,7 @@ export function useUsers() {
     try {
       users.value = await userService.list();
     } catch (err) {
-      error.value = toErrorMessage(err, 'não foi possível carregar os usuários');
+      error.value = toErrorMessage(err, t('users.errors.loadFailed'));
     } finally {
       loading.value = false;
     }
@@ -36,7 +38,7 @@ export function useUsers() {
       await tokenService.revokeForUser(userId);
       await fetchUsers();
     } catch (err) {
-      error.value = toErrorMessage(err, 'não foi possível revogar a chave');
+      error.value = toErrorMessage(err, t('users.errors.revokeFailed'));
     } finally {
       mutatingId.value = null;
     }

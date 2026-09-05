@@ -1,4 +1,5 @@
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/modules/auth/stores/auth.store';
 import { tokenService } from '@/modules/token/services/TokenService';
@@ -8,6 +9,7 @@ import { ApiError } from '@/shared/http/ApiError';
 export function useApiKey() {
   const router = useRouter();
   const auth = useAuthStore();
+  const { t } = useI18n();
 
   const loading = ref(false);
   const mutating = ref(false);
@@ -33,18 +35,14 @@ export function useApiKey() {
       status.value = await tokenService.getMine();
       auth.setHasApiToken(status.value.active);
     } catch (err) {
-      error.value = toErrorMessage(err, 'não foi possível carregar a chave');
+      error.value = toErrorMessage(err, t('apiKey.errors.loadFailed'));
     } finally {
       loading.value = false;
     }
   }
 
   async function rotate(): Promise<void> {
-    if (
-      !window.confirm(
-        'Rotacionar gera uma chave nova e invalida a atual. Quem ainda usa a chave antiga vai falhar. Continuar?',
-      )
-    ) {
+    if (!window.confirm(t('apiKey.rotateConfirm'))) {
       return;
     }
 
@@ -60,7 +58,7 @@ export function useApiKey() {
       };
       auth.setHasApiToken(true);
     } catch (err) {
-      error.value = toErrorMessage(err, 'não foi possível rotacionar a chave');
+      error.value = toErrorMessage(err, t('apiKey.errors.rotateFailed'));
     } finally {
       mutating.value = false;
     }
@@ -78,7 +76,7 @@ export function useApiKey() {
       auth.setHasApiToken(false);
       await router.push({ name: 'setup-token' });
     } catch (err) {
-      error.value = toErrorMessage(err, 'não foi possível revogar a chave');
+      error.value = toErrorMessage(err, t('apiKey.errors.revokeFailed'));
     } finally {
       mutating.value = false;
     }

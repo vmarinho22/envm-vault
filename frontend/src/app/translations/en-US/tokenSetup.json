@@ -1,0 +1,9 @@
+{
+  "title": "Generate your API key",
+  "description": "This key identifies you when requesting environment variables. You will only see the full value once.",
+  "generate": "Generate key",
+  "continue": "Continue",
+  "errors": {
+    "generateFailed": "could not generate the key"
+  }
+}

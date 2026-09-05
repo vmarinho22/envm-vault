@@ -5,9 +5,12 @@ import {
   KeyIcon,
   UsersIcon,
 } from '@heroicons/vue/24/outline';
+import { useI18n } from 'vue-i18n';
 import { RouterLink, RouterView, useRouter } from 'vue-router';
+import LocaleSwitcher from '@/app/components/LocaleSwitcher.vue';
 import { useAuthStore } from '@/modules/auth/stores/auth.store';
 
+const { t } = useI18n();
 const auth = useAuthStore();
 const router = useRouter();
 
@@ -25,7 +28,7 @@ function logout(): void {
   <div class="vault-bg flex min-h-svh">
     <aside
       class="flex w-56 shrink-0 flex-col border-r border-base-300/80 bg-base-200/50 md:w-60"
-      aria-label="Menu principal"
+      :aria-label="t('nav.menuAriaLabel')"
     >
       <div class="flex h-14 items-center px-5">
         <p class="font-brand text-xl leading-none tracking-tight">envm-vault</p>
@@ -38,7 +41,7 @@ function logout(): void {
           :exact-active-class="navActiveClass"
         >
           <HomeIcon class="size-5 shrink-0" aria-hidden="true" />
-          Início
+          {{ t('nav.home') }}
         </RouterLink>
         <RouterLink
           :to="{ name: 'api-key' }"
@@ -46,7 +49,7 @@ function logout(): void {
           :exact-active-class="navActiveClass"
         >
           <KeyIcon class="size-5 shrink-0" aria-hidden="true" />
-          Chave de API
+          {{ t('nav.apiKey') }}
         </RouterLink>
         <RouterLink
           v-if="auth.isAdmin"
@@ -55,21 +58,27 @@ function logout(): void {
           :exact-active-class="navActiveClass"
         >
           <UsersIcon class="size-5 shrink-0" aria-hidden="true" />
-          Usuários
+          {{ t('nav.users') }}
         </RouterLink>
       </nav>
     </aside>
 
     <div class="flex min-w-0 flex-1 flex-col">
       <header
-        class="flex h-14 shrink-0 items-center justify-end gap-4 border-b border-base-300/80 bg-base-200/40 px-6 md:px-8"
+        class="flex h-14 shrink-0 items-center justify-end gap-3 border-b border-base-300/80 bg-base-200/40 px-6 md:gap-4 md:px-8"
       >
         <p v-if="auth.user" class="truncate text-sm text-base-content/70">
           {{ auth.user.email }}
         </p>
-        <button class="btn btn-ghost btn-sm gap-2" type="button" @click="logout">
+        <LocaleSwitcher />
+        <button
+          class="btn btn-ghost btn-sm gap-2"
+          type="button"
+          data-testid="logout"
+          @click="logout"
+        >
           <ArrowRightStartOnRectangleIcon class="size-4" aria-hidden="true" />
-          Sair
+          {{ t('common.logout') }}
         </button>
       </header>
 

@@ -116,9 +116,10 @@ rtk gain        # check token savings
 - **Node:** version pinned in root `mise.toml` (`mise install`); do not use `.nvmrc`
 - **Vue 3** with Composition API and `<script setup lang="ts">`
 - **Build:** Vite + TypeScript (strict, `noUncheckedIndexedAccess`)
-- **Architecture:** module-oriented (`app/`, `shared/`, `modules/{domain}/`)
+- **Architecture:** module-oriented (`app/` including `translations/`, `shared/`, `modules/{domain}/`)
 - **Services:** typed interfaces + instances — `authService`, `userService`, `healthService`, `tokenService`, `httpClient`
 - **State:** Pinia (`sessionStorage` for JWT)
+- **i18n:** vue-i18n Composition API; locales `pt-BR` / `en-US` under `app/translations/{locale}/*.json` (one file per context); browser locale detection at boot
 - **UI:** Tailwind CSS v4 + daisyUI 5 + Heroicons
 - **Dev server:** port **3100** (`strictPort`); proxies `/v1` and `/health` to the API on `:8080`
 - **Env:** `shared/env/envs.ts` — `import { envs } from '@/shared/env/envs'`; never read `import.meta.env` outside it

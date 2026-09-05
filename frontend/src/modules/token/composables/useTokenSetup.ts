@@ -1,4 +1,5 @@
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/modules/auth/stores/auth.store';
 import { tokenService } from '@/modules/token/services/TokenService';
@@ -7,6 +8,7 @@ import { ApiError } from '@/shared/http/ApiError';
 export function useTokenSetup() {
   const router = useRouter();
   const auth = useAuthStore();
+  const { t } = useI18n();
 
   const loading = ref(false);
   const error = ref<string | null>(null);
@@ -16,7 +18,7 @@ export function useTokenSetup() {
     if (err instanceof ApiError) {
       return err.message;
     }
-    return 'não foi possível gerar a chave';
+    return t('tokenSetup.errors.generateFailed');
   }
 
   async function generate(): Promise<void> {

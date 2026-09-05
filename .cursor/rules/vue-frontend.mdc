@@ -20,7 +20,7 @@ alwaysApply: false
 
 ```
 frontend/src/
-├── app/                 # bootstrap, router, layouts, styles
+├── app/                 # bootstrap, router, layouts, styles, translations
 ├── shared/              # cross-cutting (HttpClient, envs, ApiError, shared types)
 ├── modules/
 │   ├── auth/            # LoginView, AuthService, auth.store, useLogin
@@ -29,14 +29,12 @@ frontend/src/
 │   ├── health/          # HealthService
 │   └── home/            # HomeView
 
-frontend/tests/
-├── unit/                # service / pure unit tests (mirrors src)
-│   ├── shared/
-│   └── modules/
-└── component/           # Vue component tests (mirrors src)
-    ├── helpers/         # mount helpers (component-only)
-    ├── app/
-    └── modules/
+frontend/src/app/translations/
+├── index.ts             # createI18n plugin
+├── detectLocale.ts
+├── loadLocaleMessages.ts
+├── pt-BR/               # JSON contexts (login, code, nav, …)
+└── en-US/               # same context filenames
 ```
 
 ## Standards
@@ -49,7 +47,7 @@ frontend/tests/
 - Keep components under 200 lines — split if larger
 - JWT lives in memory + `sessionStorage` only (never `localStorage`)
 - Handle loading and error states in every data-fetching view
-- UI copy in Portuguese; identifiers in English
+- UI copy via vue-i18n (`pt-BR` / `en-US`); identifiers in English. Add the same context filename under both `app/translations/pt-BR/` and `en-US/`
 
 ## Testing
 

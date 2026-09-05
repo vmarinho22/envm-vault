@@ -1,0 +1,7 @@
+{
+  "label": "Code",
+  "submit": "Sign in",
+  "backToEmail": "Use another email",
+  "groupAriaLabel": "Verification code",
+  "digitAriaLabel": "Digit {n}"
+}

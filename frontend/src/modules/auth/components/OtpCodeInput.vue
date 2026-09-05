@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const CODE_LENGTH = 8;
 
@@ -8,6 +9,8 @@ const model = defineModel<string>({ default: '' });
 const props = defineProps<{
   disabled?: boolean;
 }>();
+
+const { t } = useI18n();
 
 const digits = ref<string[]>(Array.from({ length: CODE_LENGTH }, () => ''));
 const inputRefs = ref<(HTMLInputElement | null)[]>([]);
@@ -120,7 +123,7 @@ function onPaste(index: number, event: ClipboardEvent): void {
   <div
     class="flex flex-wrap gap-2"
     role="group"
-    aria-label="Código de verificação"
+    :aria-label="t('code.groupAriaLabel')"
   >
     <input
       v-for="(_, index) in digits"
@@ -133,7 +136,7 @@ function onPaste(index: number, event: ClipboardEvent): void {
       pattern="[0-9]"
       :name="index === 0 ? 'code' : undefined"
       :autocomplete="index === 0 ? 'one-time-code' : 'off'"
-      :aria-label="`Dígito ${index + 1}`"
+      :aria-label="t('code.digitAriaLabel', { n: index + 1 })"
       :value="digits[index]"
       :disabled="props.disabled"
       @input="onInput(index, $event)"

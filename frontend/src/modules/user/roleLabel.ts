@@ -1,11 +1,7 @@
 import type { UserRole } from '@/modules/user/types';
 
-const ROLE_LABELS: Record<UserRole, string> = {
-  super_admin: 'Super admin',
-  admin: 'Admin',
-  user: 'Usuário',
-};
+type TranslateFn = (key: string) => string;
 
-export function roleLabel(role: UserRole): string {
-  return ROLE_LABELS[role];
+export function roleLabel(role: UserRole, t: TranslateFn): string {
+  return t(`users.roles.${role}`);
 }

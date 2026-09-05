@@ -13,6 +13,7 @@ Nesta fase, a UI cobre autenticação por e-mail (OTP), geração obrigatória d
 | Build     | Vite                                                              |
 | Estilo    | Tailwind CSS v4 + daisyUI 5                                       |
 | Estado    | Pinia (`sessionStorage` para JWT)                                 |
+| i18n      | vue-i18n (`pt-BR` / `en-US`, detecção do navegador)               |
 | Testes    | Vitest + Vue Test Utils                                           |
 | Runtime   | Node 24 (via [mise](https://mise.jdx.dev/) — `mise.toml` na raiz) |
 
@@ -21,7 +22,8 @@ Nesta fase, a UI cobre autenticação por e-mail (OTP), geração obrigatória d
 
 Arquitetura orientada a módulos:
 
-- `src/app/` — bootstrap, router, layouts, styles
+- `src/app/` — bootstrap, router, layouts, styles, `translations/`
+- `src/app/translations/{pt-BR,en-US}/` — JSON por contexto (`login.json`, `nav.json`, …)
 - `src/shared/` — `HttpClient`, `envs`, erros compartilhados
 - `src/modules/` — domínios (`auth`, `user`, `token`, `health`, `home`)
 - `tests/unit/` — unitários (services), espelhando `src/`

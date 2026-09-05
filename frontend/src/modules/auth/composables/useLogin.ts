@@ -1,4 +1,5 @@
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { authService } from '@/modules/auth/services/AuthService';
 import { useAuthStore } from '@/modules/auth/stores/auth.store';
@@ -9,6 +10,7 @@ export type LoginStep = 'email' | 'code';
 export function useLogin() {
   const router = useRouter();
   const auth = useAuthStore();
+  const { t } = useI18n();
 
   const step = ref<LoginStep>('email');
   const email = ref('');
@@ -20,13 +22,13 @@ export function useLogin() {
     if (err instanceof ApiError) {
       if (err.status === 429) {
         if (err.message.includes('verification')) {
-          return 'Muitas tentativas. Solicite um novo código.';
+          return t('login.errors.tooManyVerification');
         }
-        return 'Muitas requisições. Tente novamente em instantes.';
+        return t('login.errors.tooManyRequests');
       }
       return err.message;
     }
-    return 'não foi possível concluir o login';
+    return t('login.errors.fallback');
   }
 
   async function submitEmail(): Promise<void> {

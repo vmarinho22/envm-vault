@@ -1,0 +1,9 @@
+{
+  "title": "Gere sua chave de API",
+  "description": "Esta chave identifica você nas requisições de variáveis de ambiente. Você só verá o valor completo uma vez.",
+  "generate": "Gerar chave",
+  "continue": "Continuar",
+  "errors": {
+    "generateFailed": "não foi possível gerar a chave"
+  }
+}

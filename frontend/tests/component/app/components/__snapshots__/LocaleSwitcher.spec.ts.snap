@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`LocaleSwitcher (component) > renders supported locales and keeps pt-BR selected by default 1`] = `
+"<label class="sr-only" for="locale-switcher">Idioma</label>
+<select id="locale-switcher" class="select select-bordered select-sm w-auto min-w-28" data-testid="locale-switcher" aria-label="Idioma">
+  <option value="pt-BR">Português</option>
+  <option value="en-US">English</option>
+</select>"
+`;
+
+exports[`LocaleSwitcher (component) > updates labels when locale changes 1`] = `
+"<label class="sr-only" for="locale-switcher">Language</label>
+<select id="locale-switcher" class="select select-bordered select-sm w-auto min-w-28" data-testid="locale-switcher" aria-label="Language">
+  <option value="pt-BR">Português</option>
+  <option value="en-US">English</option>
+</select>"
+`;

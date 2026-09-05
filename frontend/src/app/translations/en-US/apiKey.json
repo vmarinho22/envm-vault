@@ -1,0 +1,18 @@
+{
+  "title": "API key",
+  "description": "The full value appears only when you generate or rotate. Rotating invalidates the previous key.",
+  "prefix": "Prefix",
+  "createdAt": "Created at",
+  "status": "Status",
+  "active": "Active",
+  "revoked": "Revoked",
+  "dismissPlaintext": "I saved the key",
+  "rotate": "Rotate",
+  "revoke": "Revoke",
+  "rotateConfirm": "Rotating creates a new key and invalidates the current one. Anyone still using the old key will fail. Continue?",
+  "errors": {
+    "loadFailed": "could not load the key",
+    "rotateFailed": "could not rotate the key",
+    "revokeFailed": "could not revoke the key"
+  }
+}

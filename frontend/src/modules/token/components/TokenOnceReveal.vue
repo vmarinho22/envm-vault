@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ClipboardDocumentIcon } from '@heroicons/vue/24/outline';
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps<{
   token: string;
 }>();
 
+const { t } = useI18n();
 const copied = ref(false);
 
 async function copyToken(): Promise<void> {
@@ -21,7 +23,7 @@ async function copyToken(): Promise<void> {
 <template>
   <div class="rounded-lg border border-warning/40 bg-warning/10 p-4">
     <p class="text-sm font-medium text-warning">
-      Guarde esta chave agora. Ela não será exibida novamente.
+      {{ t('tokenReveal.warning') }}
     </p>
     <div class="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
       <input
@@ -38,7 +40,7 @@ async function copyToken(): Promise<void> {
         @click.stop.prevent="copyToken"
       >
         <ClipboardDocumentIcon class="size-4" aria-hidden="true" />
-        {{ copied ? 'Copiada' : 'Copiar' }}
+        {{ copied ? t('common.copied') : t('common.copy') }}
       </button>
     </div>
   </div>

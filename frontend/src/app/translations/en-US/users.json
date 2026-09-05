@@ -1,0 +1,23 @@
+{
+  "title": "Users",
+  "description": "Revoke a user's API key. They will need to generate a new one to continue.",
+  "columns": {
+    "email": "Email",
+    "role": "Role",
+    "key": "Key",
+    "actions": "Actions"
+  },
+  "empty": "No users found.",
+  "noKey": "No key",
+  "revoked": "Revoked",
+  "revoke": "Revoke",
+  "roles": {
+    "super_admin": "Super admin",
+    "admin": "Admin",
+    "user": "User"
+  },
+  "errors": {
+    "loadFailed": "could not load users",
+    "revokeFailed": "could not revoke the key"
+  }
+}

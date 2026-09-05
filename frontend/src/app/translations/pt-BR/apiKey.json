@@ -1,0 +1,18 @@
+{
+  "title": "Chave de API",
+  "description": "O valor completo só aparece na geração ou ao rotacionar. Rotacionar invalida a chave antiga.",
+  "prefix": "Prefixo",
+  "createdAt": "Criada em",
+  "status": "Status",
+  "active": "Ativa",
+  "revoked": "Revogada",
+  "dismissPlaintext": "Já guardei a chave",
+  "rotate": "Rotacionar",
+  "revoke": "Revogar",
+  "rotateConfirm": "Rotacionar gera uma chave nova e invalida a atual. Quem ainda usa a chave antiga vai falhar. Continuar?",
+  "errors": {
+    "loadFailed": "não foi possível carregar a chave",
+    "rotateFailed": "não foi possível rotacionar a chave",
+    "revokeFailed": "não foi possível revogar a chave"
+  }
+}
