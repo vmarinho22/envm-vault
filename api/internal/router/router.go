@@ -7,6 +7,7 @@ func Register(app *fiber.App, deps Deps) {
 	registerHealthRoutes(v1, deps)
 	registerAuthRoutes(v1, deps)
 	registerUserRoutes(v1, deps)
+	registerTokenRoutes(v1, deps)
 
 	app.Get("/health", deps.Health.Check)
 }

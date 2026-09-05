@@ -3,6 +3,7 @@ package service
 import (
 	"net/mail"
 	"strings"
+	"time"
 
 	"github.com/envm-vault/envm-vault/api/internal/model"
 )
@@ -17,6 +18,19 @@ type UserResponse struct {
 	ID    string `json:"id"`
 	Email string `json:"email"`
 	Role  string `json:"role"`
+}
+
+type TokenStatusResponse struct {
+	Prefix    string     `json:"prefix"`
+	CreatedAt time.Time  `json:"created_at"`
+	RevokedAt *time.Time `json:"revoked_at,omitempty"`
+}
+
+type UserWithTokenResponse struct {
+	ID    string               `json:"id"`
+	Email string               `json:"email"`
+	Role  string               `json:"role"`
+	Token *TokenStatusResponse `json:"token"`
 }
 
 type VerifyResponse struct {

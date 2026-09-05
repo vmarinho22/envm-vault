@@ -14,12 +14,15 @@ import (
 	"github.com/envm-vault/envm-vault/api/internal/env"
 	authhandler "github.com/envm-vault/envm-vault/api/internal/handler/auth"
 	healthhandler "github.com/envm-vault/envm-vault/api/internal/handler/health"
+	"github.com/envm-vault/envm-vault/api/internal/handler/httperr"
+	tokenhandler "github.com/envm-vault/envm-vault/api/internal/handler/token"
 	userhandler "github.com/envm-vault/envm-vault/api/internal/handler/user"
 	"github.com/envm-vault/envm-vault/api/internal/middleware"
 	"github.com/envm-vault/envm-vault/api/internal/repository"
 	"github.com/envm-vault/envm-vault/api/internal/router"
 	"github.com/envm-vault/envm-vault/api/internal/service"
 	authservice "github.com/envm-vault/envm-vault/api/internal/service/auth"
+	tokenservice "github.com/envm-vault/envm-vault/api/internal/service/token"
 	userservice "github.com/envm-vault/envm-vault/api/internal/service/user"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -45,6 +48,7 @@ func main() {
 
 	userRepo := repository.NewUserRepository(gormDB)
 	loginCodeRepo := repository.NewLoginCodeRepository(gormDB)
+	tokenRepo := repository.NewAccessTokenRepository(gormDB)
 
 	var sender email.Sender
 	if env.Envs.IsDevelopment() {
@@ -55,14 +59,11 @@ func main() {
 
 	otpService := service.NewOTPService()
 	authSvc := authservice.New(gormDB, userRepo, loginCodeRepo, otpService, sender, env.Envs.JWT.Secret, env.Envs.JWT.Expiry)
-	userSvc := userservice.New(userRepo)
+	userSvc := userservice.New(userRepo, tokenRepo)
+	tokenSvc := tokenservice.New(tokenRepo, userRepo)
 
 	app := fiber.New(fiber.Config{
-		ErrorHandler: func(c *fiber.Ctx, err error) error {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": "internal server error",
-			})
-		},
+		ErrorHandler: httperr.AppHandler,
 	})
 
 	app.Use(recover.New())
@@ -78,6 +79,7 @@ func main() {
 		Health: healthhandler.New(gormDB),
 		Auth:   authhandler.New(authSvc),
 		User:   userhandler.New(userSvc),
+		Token:  tokenhandler.New(tokenSvc),
 		JWT:    middleware.NewJWTMiddleware(env.Envs.JWT.Secret),
 	})
 

@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/envm-vault/envm-vault/api/internal/database"
-	"github.com/envm-vault/envm-vault/api/internal/model"
 	"github.com/envm-vault/envm-vault/api/internal/email"
+	"github.com/envm-vault/envm-vault/api/internal/model"
 	"github.com/envm-vault/envm-vault/api/internal/repository"
 	"github.com/envm-vault/envm-vault/api/internal/service"
 	"github.com/golang-jwt/jwt/v5"
@@ -16,13 +16,13 @@ import (
 )
 
 type Service struct {
-	db           *gorm.DB
-	users        *repository.UserRepository
-	loginCodes   *repository.LoginCodeRepository
-	otp          *service.OTPService
-	email        email.Sender
-	jwtSecret    []byte
-	jwtExpiry    time.Duration
+	db         *gorm.DB
+	users      *repository.UserRepository
+	loginCodes *repository.LoginCodeRepository
+	otp        *service.OTPService
+	email      email.Sender
+	jwtSecret  []byte
+	jwtExpiry  time.Duration
 }
 
 func New(

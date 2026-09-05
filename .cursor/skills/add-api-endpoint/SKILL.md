@@ -12,7 +12,7 @@ Use this checklist when adding a new endpoint to the Go API.
 1. Read [docs/architecture.md](../../docs/architecture.md) for domain context.
 2. Confirm the endpoint fits under `/v1/{context}/...`.
 3. Identify required auth: access token, JWT session, or public.
-4. Choose the route context: `health`, `auth`, `user`, or create a new `router/{context}.go`.
+4. Choose the route context: `health`, `auth`, `user`, `token`, or create a new `router/{context}.go`.
 
 ## Implementation checklist
 
@@ -23,7 +23,7 @@ Use this checklist when adding a new endpoint to the Go API.
 - [ ] Add handler method in internal/handler/{context}/
 - [ ] Register route in internal/router/{context}.go
 - [ ] Map errors via httperr.Write(c, err)
-- [ ] Add tests
+- [ ] Add tests under `api/tests/unit/` mirroring `internal/`
 - [ ] Update docs if endpoint is user-facing
 ```
 
@@ -48,6 +48,6 @@ registerProjectRoutes(v1, deps)
 
 - [ ] Input validated and sanitized
 - [ ] Auth middleware applied if required
-- [ ] Token scope verified for secret-related endpoints
+- [ ] API key identifies the user for secret-related endpoints (membership checked when projects exist)
 - [ ] No secret values in response unless explicitly requested
 - [ ] No secret values in error messages or logs

@@ -19,30 +19,30 @@ A named deployment target within a Project (e.g. `dev`, `staging`, `prod`). Full
 A key-value pair scoped to Project + Environment. Values encrypted at rest (Phase 2).
 
 ### User
-Account that owns projects and manages access tokens via the admin UI.
+Account that owns projects and manages a unique API key via the admin UI.
 
 ### AccessToken
-Programmatic credential for downloading env vars. Scoped to specific project/environment pairs. Sent as `Authorization: Bearer <token>`.
+Programmatic credential for downloading env vars. **One active key per user.** Stored hashed (SHA-256); plaintext shown only at generate/rotate. Sent as `Authorization: Bearer <token>`. Access to a given project/environment is determined by the user's membership, not by scopes on the token.
 
 ## Primary Flow
 
 ```
 GET /v1/projects/{project}/environments/{env}
 Authorization: Bearer <access_token>
-→ Returns env vars for that project+environment
+→ Identifies the user, then returns env vars for that project+environment
 ```
 
 ## Key Rules
 
-1. Tokens are scoped — a token for `my-app/dev` cannot access `my-app/prod`.
-2. Secret values never appear in logs.
+1. One active API key per user — generate rotates and invalidates the previous hash.
+2. Secret values and API key plaintext never appear in logs.
 3. Environments are per-project — `dev` in project A is independent from `dev` in project B.
 
 ## Relationships
 
 ```
 User → has many → Project
-User → has many → AccessToken
+User → has one → AccessToken
 Project → has many → Environment
 Environment → has many → Secret
 ```

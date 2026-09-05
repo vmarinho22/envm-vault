@@ -3,6 +3,9 @@ import DefaultLayout from '@/app/layouts/DefaultLayout.vue';
 import { useAuthStore } from '@/modules/auth/stores/auth.store';
 import LoginView from '@/modules/auth/views/LoginView.vue';
 import HomeView from '@/modules/home/views/HomeView.vue';
+import ApiKeyView from '@/modules/token/views/ApiKeyView.vue';
+import TokenSetupView from '@/modules/token/views/TokenSetupView.vue';
+import UsersView from '@/modules/user/views/UsersView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,30 +16,57 @@ const router = createRouter({
       component: LoginView,
     },
     {
+      path: '/setup-token',
+      name: 'setup-token',
+      component: TokenSetupView,
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/',
       component: DefaultLayout,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, requiresApiToken: true },
       children: [
         {
           path: '',
           name: 'home',
           component: HomeView,
         },
+        {
+          path: 'api-key',
+          name: 'api-key',
+          component: ApiKeyView,
+        },
+        {
+          path: 'users',
+          name: 'users',
+          component: UsersView,
+          meta: { requiresAdmin: true },
+        },
       ],
     },
   ],
 });
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   const auth = useAuthStore();
 
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
     return { name: 'login' };
   }
 
-  if (to.name === 'login' && auth.isAuthenticated) {
-    return { name: 'home' };
+  if (auth.isAuthenticated) {
+    await auth.ensureHasApiToken();
+
+    if (!auth.hasApiToken && to.name !== 'setup-token') return { name: 'setup-token' };
+    if (auth.hasApiToken && to.name === 'setup-token') return { name: 'home' };
   }
+
+  if (to.name === 'login' && auth.isAuthenticated) {
+    const name = auth.hasApiToken ? 'home' : 'setup-token';
+    return { name };
+  }
+
+  if (to.meta.requiresAdmin && !auth.isAdmin) return { name: 'home' };
 
   return true;
 });

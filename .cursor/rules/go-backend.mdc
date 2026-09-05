@@ -12,18 +12,21 @@ alwaysApply: false
 api/
 ├── cmd/server/main.go       # wiring + router.Register
 ├── cmd/migrate/main.go      # standalone AutoMigrate
+├── tests/unit/              # unit tests; mirrors internal/ (package xxx_test)
 ├── internal/
 │   ├── router/              # Route registration by context
 │   │   ├── router.go        # Register(app, Deps)
 │   │   ├── health.go        # /v1/health
 │   │   ├── auth.go          # /v1/auth/login, verify
-│   │   └── user.go          # /v1/auth/register
+│   │   ├── user.go          # /v1/auth/register, /v1/users
+│   │   └── token.go         # /v1/tokens
 │   ├── handler/             # One subpackage per domain
 │   │   ├── auth/
 │   │   ├── user/
+│   │   ├── token/
 │   │   ├── health/
 │   │   └── httperr/         # Shared error mapping
-│   ├── service/             # auth/, user/ + shared.go
+│   ├── service/             # auth/, user/, token/ + shared.go
 │   ├── middleware/
 │   ├── email/
 │   ├── database/            # Open, WithTx, Ping
@@ -47,7 +50,13 @@ api/
 3. Add service method in `internal/service/{context}/`
 4. Add handler method in `internal/handler/{context}/`
 5. Register route in `internal/router/{context}.go`
-6. Add tests
+6. Add tests under `api/tests/unit/` mirroring `internal/`
+
+## Testing
+
+- Unit tests live in `api/tests/unit/` and mirror `internal/` (e.g. `internal/service/token/` → `tests/unit/service/token/`)
+- Use `package xxx_test` (external test packages); do not co-locate `*_test.go` next to production code
+- Run with `cd api && go test ./...` or `make test`
 
 ## Secrets
 

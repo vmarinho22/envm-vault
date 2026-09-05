@@ -8,7 +8,7 @@ Instructions for AI coding agents working on **envm-vault**.
 
 envm-vault is an open-source environment variable vault. Users download environment variables for projects across customizable environments using a personal access token.
 
-**Current status:** Phase 1 — API with auth + Vue login UI.
+**Current status:** Phase 1 — API with auth, unique API key per user, and Vue login/onboarding UI.
 
 **Stack:**
 - API: Go + Fiber (`api/`)
@@ -34,10 +34,11 @@ envm-vault/
 │   │   ├── database/      ← GORM connection + AutoMigrate
 │   │   ├── model/         ← GORM models
 │   │   ├── repository/    ← data access layer
+│   └── tests/unit/        ← unit tests (mirrors internal/)
 ├── docs/
 ├── docker-compose.yml
 ├── Makefile
-└── frontend/              ← Vue 3 admin UI (Vite, login OTP)
+└── frontend/              ← Vue 3 admin UI (Vite, login + API key)
 ```
 
 Always read `docs/architecture.md` before implementing domain logic.
@@ -48,7 +49,7 @@ Always read `docs/architecture.md` before implementing domain logic.
 2. **Env split** — root `.env` is API + Docker only; `frontend/.env` is `VITE_*` only (public, baked into the browser bundle). Never put `JWT_SECRET` / `DATABASE_URL` in the frontend env.
 3. **Never log secret values** — OTP codes are logged only in `APP_ENV=development`.
 4. **OTP lockout** — max 5 failed verify attempts per code; HTTP rate limit via `RATE_LIMIT_MAX` / `RATE_LIMIT_WINDOW`.
-5. **Token scoping** — access tokens must be limited to explicit project/environment pairs.
+5. **API keys** — one active key per user, hashed at rest; plaintext returned only from `POST /v1/tokens`.
 6. **Minimal diffs** — do not refactor unrelated code in the same change.
 
 ## Conventions
@@ -75,17 +76,18 @@ Always read `docs/architecture.md` before implementing domain logic.
   ├── cmd/migrate/main.go      # standalone AutoMigrate
   ├── internal/
   │   ├── env/               # Envs singleton + Load() validation
-  │   ├── router/            # register routes by context (health, auth, user)
-  │   ├── handler/           # subpackages: auth/, user/, health/, httperr/
-  │   ├── service/           # subpackages: auth/, user/ + shared.go
+  │   ├── router/            # register routes by context (health, auth, user, token)
+  │   ├── handler/           # subpackages: auth/, user/, token/, health/, httperr/
+  │   ├── service/           # subpackages: auth/, user/, token/ + shared.go
   │   ├── middleware/        # JWT, auth guards, rate limit
   │   ├── email/             # Email sender interface
   │   ├── database/          # Open, WithTx, Ping
-  │   ├── model/             # GORM models (User, LoginCode)
-  │   └── repository/        # data access (UserRepository, LoginCodeRepository)
+  │   ├── model/             # GORM models (User, LoginCode, AccessToken)
+  │   └── repository/        # data access (UserRepository, LoginCodeRepository, AccessTokenRepository)
+  └── tests/unit/            # unit tests; mirrors internal/ (package xxx_test)
   ```
 - **Error handling:** Wrap errors with context; use sentinel errors in service layer
-- **Tests:** Co-located `*_test.go`; integration tests use `//go:build integration` and require Postgres
+- **Tests:** `api/tests/unit/` mirroring `internal/` (`package xxx_test`); no co-located `*_test.go`
 
 ### Commands
 
@@ -96,8 +98,8 @@ make migrate    # run GORM AutoMigrate
 make db-reset   # reset database volume + AutoMigrate
 make dev        # run API server
 make frontend-dev  # Vue UI on :3100
-make test       # unit + integration tests
-make test-unit  # API + frontend unit tests (used by pre-commit hook)
+make test       # API + frontend unit tests
+make test-unit  # same as make test (used by pre-commit hook)
 make hooks-install  # install lefthook git hooks
 ```
 
@@ -115,7 +117,7 @@ rtk gain        # check token savings
 - **Vue 3** with Composition API and `<script setup lang="ts">`
 - **Build:** Vite + TypeScript (strict, `noUncheckedIndexedAccess`)
 - **Architecture:** module-oriented (`app/`, `shared/`, `modules/{domain}/`)
-- **Services:** typed interfaces + instances — `authService`, `userService`, `healthService`, `httpClient`
+- **Services:** typed interfaces + instances — `authService`, `userService`, `healthService`, `tokenService`, `httpClient`
 - **State:** Pinia (`sessionStorage` for JWT)
 - **UI:** Tailwind CSS v4 + daisyUI 5 + Heroicons
 - **Dev server:** port **3100** (`strictPort`); proxies `/v1` and `/health` to the API on `:8080`
@@ -136,9 +138,8 @@ Project skills live in `.cursor/skills/`:
 
 ## Testing
 
-- Run `make test` before finishing any task (unit + integration).
-- Run `make test-unit` for fast feedback without Postgres (API + frontend).
-- Integration tests use build tag `integration` and require `DATABASE_URL` + running PostgreSQL.
+- Run `make test` before finishing any task (API + frontend unit tests).
+- API tests live in `api/tests/unit/` and mirror `internal/` (e.g. `internal/service/token/` → `tests/unit/service/token/`).
 - Pre-commit hook runs API unit tests when Go files are staged, and frontend Vitest + `npm run type-check` when Vue/TS files are staged.
 - Frontend component tests always include a HTML snapshot via `expectComponentSnapshot(wrapper)`.
 

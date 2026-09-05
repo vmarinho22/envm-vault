@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/envm-vault/envm-vault/api/internal/model"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -55,4 +56,24 @@ func (r *UserRepository) Create(ctx context.Context, user *model.User) (*model.U
 		return nil, fmt.Errorf("create user: %w", err)
 	}
 	return user, nil
+}
+
+func (r *UserRepository) FindByID(ctx context.Context, id uuid.UUID) (*model.User, error) {
+	var user model.User
+	err := r.db.WithContext(ctx).Where("id = ?", id).First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, gorm.ErrRecordNotFound
+		}
+		return nil, fmt.Errorf("find user by id: %w", err)
+	}
+	return &user, nil
+}
+
+func (r *UserRepository) List(ctx context.Context) ([]model.User, error) {
+	var users []model.User
+	if err := r.db.WithContext(ctx).Order("created_at ASC").Find(&users).Error; err != nil {
+		return nil, fmt.Errorf("list users: %w", err)
+	}
+	return users, nil
 }

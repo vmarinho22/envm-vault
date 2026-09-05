@@ -6,7 +6,7 @@ Com um token de acesso pessoal, desenvolvedores e pipelines de CI baixam variáv
 
 ## Status
 
-**Fase 1** — API com autenticação por e-mail (OTP) e UI de login.
+**Fase 1** — API com autenticação por e-mail (OTP), chave de API única por usuário e UI de login/onboarding.
 
 ## Stack
 
@@ -72,6 +72,15 @@ curl -X POST http://localhost:8080/v1/auth/register \
   -d '{"email": "user@example.com", "role": "user"}'
 ```
 
+### Gerar chave de API (requer JWT)
+
+```bash
+curl -X POST http://localhost:8080/v1/tokens \
+  -H "Authorization: Bearer <jwt>"
+# Resposta: { "token": "ev_…", "prefix": "ev_a1b2c3d4", "created_at": "…" }
+# O valor completo só aparece nesta resposta.
+```
+
 ## Endpoints
 
 | Método | Rota | Auth | Descrição |
@@ -81,6 +90,11 @@ curl -X POST http://localhost:8080/v1/auth/register \
 | `POST` | `/v1/auth/login` | — | Solicita OTP por e-mail |
 | `POST` | `/v1/auth/verify` | — | Valida OTP, retorna JWT |
 | `POST` | `/v1/auth/register` | JWT (admin+) | Cadastra usuário |
+| `GET` | `/v1/tokens/me` | JWT | Status da chave de API (sem o secret) |
+| `POST` | `/v1/tokens` | JWT | Gera ou rotaciona a chave (plaintext uma vez) |
+| `DELETE` | `/v1/tokens` | JWT | Revoga a própria chave |
+| `GET` | `/v1/users` | JWT (admin+) | Lista usuários e status da chave |
+| `DELETE` | `/v1/users/:id/token` | JWT (admin+) | Revoga a chave de outro usuário |
 
 ## Agentes de IA e RTK
 
@@ -122,4 +136,4 @@ Contribuições são bem-vindas! Leia [CONTRIBUTING.md](CONTRIBUTING.md) para co
 
 ## English Summary
 
-**envm-vault** is an open-source environment variable vault. Built with Go (Fiber API), Vue 3, and PostgreSQL. Currently in Phase 1 with email OTP authentication. See [docs/architecture.md](docs/architecture.md) for details.
+**envm-vault** is an open-source environment variable vault. Built with Go (Fiber API), Vue 3, and PostgreSQL. Currently in Phase 1 with email OTP authentication and a unique API key per user. See [docs/architecture.md](docs/architecture.md) for details.

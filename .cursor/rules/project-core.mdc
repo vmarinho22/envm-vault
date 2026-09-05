@@ -9,7 +9,7 @@ alwaysApply: true
 
 - Never commit real secrets, tokens, passwords, or production `.env` values.
 - Never log environment variable values — redact in all output.
-- Access tokens must be scoped to explicit project/environment pairs.
+- Access tokens are unique per user, hashed at rest, and never logged.
 
 ## Scope
 

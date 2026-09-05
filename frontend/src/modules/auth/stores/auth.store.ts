@@ -1,5 +1,6 @@
 import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
+import { tokenService } from '@/modules/token/services/TokenService';
 import type { User, UserRole } from '@/modules/user/types';
 
 const STORAGE_KEY = 'envm-vault.auth';
@@ -57,20 +58,53 @@ export const useAuthStore = defineStore('auth', () => {
   const restoredSession = loadSessionFromStorage();
   const token = ref<string | null>(restoredSession?.token ?? null);
   const user = ref<User | null>(restoredSession?.user ?? null);
+  const hasApiToken = ref<boolean | null>(null);
 
   const isAuthenticated = computed(() => token.value !== null && user.value !== null);
+  const isAdmin = computed(() => user.value?.role === 'admin' || user.value?.role === 'super_admin');
 
   function setSession(session: AuthSession): void {
     token.value = session.token;
     user.value = session.user;
+    hasApiToken.value = null;
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+  }
+
+  function setHasApiToken(value: boolean): void {
+    hasApiToken.value = value;
+  }
+
+  async function ensureHasApiToken(): Promise<boolean> {
+    if (hasApiToken.value !== null) {
+      return hasApiToken.value;
+    }
+
+    try {
+      const status = await tokenService.getMine();
+      hasApiToken.value = status.active;
+    } catch {
+      hasApiToken.value = false;
+    }
+
+    return hasApiToken.value;
   }
 
   function logout(): void {
     token.value = null;
     user.value = null;
+    hasApiToken.value = null;
     sessionStorage.removeItem(STORAGE_KEY);
   }
 
-  return { token, user, isAuthenticated, setSession, logout };
+  return {
+    token,
+    user,
+    hasApiToken,
+    isAuthenticated,
+    isAdmin,
+    setSession,
+    setHasApiToken,
+    ensureHasApiToken,
+    logout,
+  };
 });

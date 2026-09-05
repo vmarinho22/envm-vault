@@ -49,7 +49,8 @@ export function useLogin() {
     try {
       const result = await authService.verifyLogin(email.value.trim(), code.value.trim());
       auth.setSession({ token: result.token, user: result.user });
-      await router.push({ name: 'home' });
+      const hasToken = await auth.ensureHasApiToken();
+      await router.push({ name: hasToken ? 'home' : 'setup-token' });
     } catch (err) {
       error.value = toErrorMessage(err);
       if (

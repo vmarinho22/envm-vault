@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { authService } from '@/modules/auth/services/AuthService';
 import LoginView from '@/modules/auth/views/LoginView.vue';
 import HomeView from '@/modules/home/views/HomeView.vue';
+import { tokenService } from '@/modules/token/services/TokenService';
 import { ApiError } from '@/shared/http/ApiError';
 import { expectComponentSnapshot, mountComponent } from '../../../helpers/mount';
 
@@ -13,8 +14,18 @@ vi.mock('@/modules/auth/services/AuthService', () => ({
   },
 }));
 
+vi.mock('@/modules/token/services/TokenService', () => ({
+  tokenService: {
+    getMine: vi.fn(),
+    create: vi.fn(),
+    revokeOwn: vi.fn(),
+    revokeForUser: vi.fn(),
+  },
+}));
+
 const requestLoginMock = vi.mocked(authService.requestLogin);
 const verifyLoginMock = vi.mocked(authService.verifyLogin);
+const getMineMock = vi.mocked(tokenService.getMine);
 
 async function fillOtpCode(wrapper: VueWrapper, code: string): Promise<void> {
   const digitInputs = wrapper.findAll('input[aria-label^="Dígito"]');
@@ -33,6 +44,8 @@ describe('LoginView (component)', () => {
   beforeEach(() => {
     requestLoginMock.mockReset();
     verifyLoginMock.mockReset();
+    getMineMock.mockReset();
+    getMineMock.mockResolvedValue({ active: true, prefix: 'ev_a1b2c3d4' });
   });
 
   it('renders email step with brand and send CTA', async () => {
@@ -40,6 +53,7 @@ describe('LoginView (component)', () => {
       routes: [
         { path: '/login', name: 'login', component: LoginView },
         { path: '/', name: 'home', component: HomeView },
+        { path: '/setup-token', name: 'setup-token', component: { template: '<div />' } },
       ],
       initialRoute: '/login',
     });
@@ -56,6 +70,7 @@ describe('LoginView (component)', () => {
       routes: [
         { path: '/login', name: 'login', component: LoginView },
         { path: '/', name: 'home', component: HomeView },
+        { path: '/setup-token', name: 'setup-token', component: { template: '<div />' } },
       ],
       initialRoute: '/login',
     });
@@ -76,6 +91,7 @@ describe('LoginView (component)', () => {
       routes: [
         { path: '/login', name: 'login', component: LoginView },
         { path: '/', name: 'home', component: HomeView },
+        { path: '/setup-token', name: 'setup-token', component: { template: '<div />' } },
       ],
       initialRoute: '/login',
     });
@@ -98,6 +114,7 @@ describe('LoginView (component)', () => {
       routes: [
         { path: '/login', name: 'login', component: LoginView },
         { path: '/', name: 'home', component: HomeView },
+        { path: '/setup-token', name: 'setup-token', component: { template: '<div />' } },
       ],
       initialRoute: '/login',
     });
@@ -111,6 +128,7 @@ describe('LoginView (component)', () => {
     await flushPromises();
 
     expect(verifyLoginMock).toHaveBeenCalledWith('admin@example.com', '12345678');
+    expect(getMineMock).toHaveBeenCalled();
     expect(sessionStorage.getItem('envm-vault.auth')).toContain('jwt-token');
     expectComponentSnapshot(wrapper);
   });

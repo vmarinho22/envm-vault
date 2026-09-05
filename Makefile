@@ -1,4 +1,4 @@
-.PHONY: help setup db-up db-down db-reset migrate dev frontend-dev test test-unit test-integration test-frontend test-rtk rtk-trust hooks-install hooks-uninstall
+.PHONY: help setup db-up db-down db-reset migrate dev frontend-dev test test-unit test-frontend test-rtk rtk-trust hooks-install hooks-uninstall
 
 help:
 	@echo "Available commands:"
@@ -9,10 +9,9 @@ help:
 	@echo "  make migrate           - Run database migrations (GORM AutoMigrate)"
 	@echo "  make dev               - Run API server"
 	@echo "  make frontend-dev      - Run Vue admin UI (port 3100)"
-	@echo "  make test              - Run unit + integration tests"
-	@echo "  make test-unit         - Run API + frontend unit tests (no Postgres)"
+	@echo "  make test              - Run API + frontend unit tests"
+	@echo "  make test-unit         - Same as make test"
 	@echo "  make test-frontend     - Run frontend unit tests (Vitest)"
-	@echo "  make test-integration  - Run API integration tests (requires Postgres)"
 	@echo "  make test-rtk          - Run tests via RTK (token-optimized output)"
 	@echo "  make hooks-install     - Install git hooks via lefthook"
 	@echo "  make hooks-uninstall   - Remove git hooks installed by lefthook"
@@ -43,7 +42,7 @@ dev:
 frontend-dev:
 	cd frontend && npm run dev
 
-test: test-unit test-integration
+test: test-unit
 
 test-unit:
 	cd api && go test ./...
@@ -51,9 +50,6 @@ test-unit:
 
 test-frontend:
 	cd frontend && npm test
-
-test-integration:
-	@set -a && . ./.env 2>/dev/null; set +a && cd api && go test -tags=integration ./...
 
 test-rtk:
 	cd api && rtk go test ./...

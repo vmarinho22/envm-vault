@@ -1,6 +1,10 @@
-package service
+package service_test
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/envm-vault/envm-vault/api/internal/service"
+)
 
 func TestNormalizeEmail(t *testing.T) {
 	tests := []struct {
@@ -38,7 +42,7 @@ func TestNormalizeEmail(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NormalizeEmail(tt.input)
+			got, err := service.NormalizeEmail(tt.input)
 			if tt.wantErr {
 				if err == nil {
 					t.Error("NormalizeEmail() expected error")

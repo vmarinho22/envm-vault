@@ -24,7 +24,7 @@ docker compose logs
 Use RTK with project Makefile targets and API workflows:
 
 ```bash
-rtk go test ./internal/...          # from api/
+rtk go test ./...                   # from api/ (includes tests/unit/)
 rtk go build ./cmd/server           # from api/
 rtk docker compose up -d postgres   # from repo root
 rtk docker compose logs postgres

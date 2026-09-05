@@ -1,10 +1,11 @@
-import type { User, UserRole } from '@/modules/user/types';
+import type { User, UserRole, UserWithToken } from '@/modules/user/types';
 import { httpClient } from '@/shared/http';
 
 export type RegisterableRole = Exclude<UserRole, 'super_admin'>;
 
 export interface UserService {
   register(email: string, role: RegisterableRole): Promise<User>;
+  list(): Promise<UserWithToken[]>;
 }
 
 export const userService: UserService = {
@@ -13,5 +14,9 @@ export const userService: UserService = {
       method: 'POST',
       body: { email, role },
     });
+  },
+
+  list(): Promise<UserWithToken[]> {
+    return httpClient.request<UserWithToken[]>('/v1/users');
   },
 };

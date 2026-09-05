@@ -1,4 +1,4 @@
-package middleware
+package middleware_test
 
 import (
 	"io"
@@ -7,12 +7,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/envm-vault/envm-vault/api/internal/middleware"
 	"github.com/gofiber/fiber/v2"
 )
 
 func TestRateLimiter_BlocksAfterMax(t *testing.T) {
 	app := fiber.New()
-	app.Use(NewRateLimiter(2, time.Minute))
+	app.Use(middleware.NewRateLimiter(2, time.Minute))
 	app.Get("/v1/ping", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{"ok": true})
 	})

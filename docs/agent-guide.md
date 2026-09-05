@@ -86,7 +86,7 @@ When code exists (Phase 1+):
 - **Commits:** Conventional commits (`feat:`, `fix:`, `docs:`, `chore:`).
 - **Scope:** Minimal diffs — do not refactor unrelated code.
 - **Security:** Never commit secrets, tokens, or real `.env` values.
-- **Tests:** Add tests for new behavior; do not add trivial tests.
+- **Tests:** Add API tests under `api/tests/unit/` mirroring `internal/`; do not add trivial tests.
 
 ## Reporting Issues with Agent Output
 

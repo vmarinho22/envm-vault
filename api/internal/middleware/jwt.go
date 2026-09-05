@@ -85,3 +85,8 @@ func GetUserRole(c *fiber.Ctx) string {
 	role, _ := c.Locals(string(UserRoleKey)).(string)
 	return role
 }
+
+func GetUserID(c *fiber.Ctx) string {
+	id, _ := c.Locals(string(UserIDKey)).(string)
+	return id
+}

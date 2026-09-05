@@ -1,10 +1,19 @@
 <script setup lang="ts">
-import { ArrowRightStartOnRectangleIcon, HomeIcon } from '@heroicons/vue/24/outline';
+import {
+  ArrowRightStartOnRectangleIcon,
+  HomeIcon,
+  KeyIcon,
+  UsersIcon,
+} from '@heroicons/vue/24/outline';
 import { RouterLink, RouterView, useRouter } from 'vue-router';
 import { useAuthStore } from '@/modules/auth/stores/auth.store';
 
 const auth = useAuthStore();
 const router = useRouter();
+
+const navLinkClass =
+  'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm text-base-content/75 transition-colors hover:bg-base-300/60 hover:text-base-content';
+const navActiveClass = '!bg-base-300 !text-primary';
 
 function logout(): void {
   auth.logout();
@@ -25,11 +34,28 @@ function logout(): void {
       <nav class="flex flex-1 flex-col gap-1 px-3 pt-2">
         <RouterLink
           :to="{ name: 'home' }"
-          class="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm text-base-content/75 transition-colors hover:bg-base-300/60 hover:text-base-content"
-          active-class="!bg-base-300 !text-primary"
+          :class="navLinkClass"
+          :exact-active-class="navActiveClass"
         >
           <HomeIcon class="size-5 shrink-0" aria-hidden="true" />
           Início
+        </RouterLink>
+        <RouterLink
+          :to="{ name: 'api-key' }"
+          :class="navLinkClass"
+          :exact-active-class="navActiveClass"
+        >
+          <KeyIcon class="size-5 shrink-0" aria-hidden="true" />
+          Chave de API
+        </RouterLink>
+        <RouterLink
+          v-if="auth.isAdmin"
+          :to="{ name: 'users' }"
+          :class="navLinkClass"
+          :exact-active-class="navActiveClass"
+        >
+          <UsersIcon class="size-5 shrink-0" aria-hidden="true" />
+          Usuários
         </RouterLink>
       </nav>
     </aside>

@@ -36,3 +36,11 @@ func (h *Handler) Register(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusCreated).JSON(user)
 }
+
+func (h *Handler) List(c *fiber.Ctx) error {
+	users, err := h.user.List(c.Context(), middleware.GetUserRole(c))
+	if err != nil {
+		return httperr.Write(c, err)
+	}
+	return c.JSON(users)
+}

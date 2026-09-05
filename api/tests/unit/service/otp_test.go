@@ -1,11 +1,13 @@
-package service
+package service_test
 
 import (
 	"testing"
+
+	"github.com/envm-vault/envm-vault/api/internal/service"
 )
 
 func TestOTPService_GenerateAndVerify(t *testing.T) {
-	otp := NewOTPService()
+	otp := service.NewOTPService()
 
 	code, err := otp.Generate()
 	if err != nil {
@@ -31,7 +33,7 @@ func TestOTPService_GenerateAndVerify(t *testing.T) {
 }
 
 func TestOTPService_HashIsDeterministic(t *testing.T) {
-	otp := NewOTPService()
+	otp := service.NewOTPService()
 
 	h1 := otp.Hash("12345678")
 	h2 := otp.Hash("12345678")
@@ -42,7 +44,7 @@ func TestOTPService_HashIsDeterministic(t *testing.T) {
 }
 
 func TestOTPService_ExpiryMinutes(t *testing.T) {
-	otp := NewOTPService()
+	otp := service.NewOTPService()
 	if otp.ExpiryMinutes() != 10 {
 		t.Errorf("ExpiryMinutes() = %d, want 10", otp.ExpiryMinutes())
 	}

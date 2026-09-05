@@ -6,14 +6,16 @@ import (
 	"github.com/envm-vault/envm-vault/api/internal/model"
 	"github.com/envm-vault/envm-vault/api/internal/repository"
 	"github.com/envm-vault/envm-vault/api/internal/service"
+	"github.com/google/uuid"
 )
 
 type Service struct {
-	users *repository.UserRepository
+	users  *repository.UserRepository
+	tokens *repository.AccessTokenRepository
 }
 
-func New(users *repository.UserRepository) *Service {
-	return &Service{users: users}
+func New(users *repository.UserRepository, tokens *repository.AccessTokenRepository) *Service {
+	return &Service{users: users, tokens: tokens}
 }
 
 func (s *Service) Register(ctx context.Context, actorRole, rawEmail, role string) (*service.UserResponse, error) {
@@ -48,4 +50,49 @@ func (s *Service) Register(ctx context.Context, actorRole, rawEmail, role string
 
 	resp := service.ToUserResponse(*user)
 	return &resp, nil
+}
+
+func (s *Service) List(ctx context.Context, actorRole string) ([]service.UserWithTokenResponse, error) {
+	if actorRole != service.RoleSuperAdmin && actorRole != service.RoleAdmin {
+		return nil, service.ErrForbidden
+	}
+
+	users, err := s.users.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	ids := make([]uuid.UUID, 0, len(users))
+	for _, user := range users {
+		ids = append(ids, user.ID)
+	}
+
+	tokens, err := s.tokens.FindByUserIDs(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+
+	byUser := make(map[uuid.UUID]*model.AccessToken, len(tokens))
+	for i := range tokens {
+		token := &tokens[i]
+		byUser[token.UserID] = token
+	}
+
+	out := make([]service.UserWithTokenResponse, 0, len(users))
+	for _, user := range users {
+		item := service.UserWithTokenResponse{
+			ID:    user.ID.String(),
+			Email: user.Email,
+			Role:  user.Role,
+		}
+		if token := byUser[user.ID]; token != nil {
+			item.Token = &service.TokenStatusResponse{
+				Prefix:    token.Prefix,
+				CreatedAt: token.CreatedAt,
+				RevokedAt: token.RevokedAt,
+			}
+		}
+		out = append(out, item)
+	}
+	return out, nil
 }

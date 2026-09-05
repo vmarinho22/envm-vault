@@ -10,16 +10,16 @@ Use this checklist when reviewing changes that touch authentication, tokens, or 
 ## Authentication & Tokens
 
 - [ ] Access tokens are hashed before storage (never store plaintext tokens)
-- [ ] Token scope is enforced — request for `project/env` rejects out-of-scope tokens
-- [ ] Expired and revoked tokens are rejected
 - [ ] Token values are never returned in API responses after creation (show once pattern)
+- [ ] Revoked tokens cannot authenticate (revoked_at set; hash replaced on rotate)
+- [ ] Env download authorization (when implemented) identifies the user via the API key, then checks membership
 
 ## Secret Handling
 
 - [ ] Secret values are encrypted at rest (Phase 2+)
 - [ ] Secret values never appear in logs, error messages, or stack traces
 - [ ] List endpoints do not return decrypted secret values
-- [ ] Download endpoint requires valid scoped token
+- [ ] Download endpoint requires a valid (non-revoked) API key
 
 ## Input Validation
 

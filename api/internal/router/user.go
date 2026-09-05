@@ -6,10 +6,14 @@ import (
 )
 
 func registerUserRoutes(v1 fiber.Router, deps Deps) {
-	g := v1.Group("/auth")
-	g.Post("/register",
+	auth := v1.Group("/auth")
+	auth.Post("/register",
 		deps.JWT.Protect(),
 		middleware.RequireAdmin(),
 		deps.User.Register,
 	)
+
+	users := v1.Group("/users", deps.JWT.Protect(), middleware.RequireAdmin())
+	users.Get("", deps.User.List)
+	users.Delete("/:id/token", deps.Token.RevokeForUser)
 }

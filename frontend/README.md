@@ -2,7 +2,7 @@
 
 Interface web do [envm-vault](../README.md): vault open source para gerenciar e distribuir variáveis de ambiente entre projetos e ambientes customizáveis.
 
-Nesta fase, a UI cobre autenticação por e-mail (OTP) e o shell autenticado (menu + início). Telas de projetos, secrets e tokens virão nas próximas fases.
+Nesta fase, a UI cobre autenticação por e-mail (OTP), geração obrigatória da chave de API e gestão da chave (incluindo revogação por admin). Telas de projetos e secrets virão nas próximas fases.
 
 ## Stack
 
@@ -23,7 +23,7 @@ Arquitetura orientada a módulos:
 
 - `src/app/` — bootstrap, router, layouts, styles
 - `src/shared/` — `HttpClient`, `envs`, erros compartilhados
-- `src/modules/` — domínios (`auth`, `user`, `health`, `home`)
+- `src/modules/` — domínios (`auth`, `user`, `token`, `health`, `home`)
 - `tests/unit/` — unitários (services), espelhando `src/`
 - `tests/component/` — componentes (Vue Test Utils), espelhando `src/`; helpers em `component/helpers/`
 
