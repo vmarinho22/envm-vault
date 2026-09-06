@@ -46,7 +46,7 @@ Always read `docs/architecture.md` before implementing domain logic.
 ## Security Rules (always apply)
 
 1. **Never commit secrets** — no real tokens, passwords, or `.env` files with production values.
-2. **Env split** — root `.env` is API + Docker only; `frontend/.env` is `VITE_*` only (public, baked into the browser bundle). Never put `JWT_SECRET` / `DATABASE_URL` in the frontend env.
+2. **Env split** — `api/.env` is API secrets; `.docker/db/.env` is PostgreSQL/Docker Compose (`POSTGRES_*`); `frontend/.env` is `VITE_*` only (public, baked into the browser bundle). Never put `JWT_SECRET` / `DATABASE_URL` in the frontend env.
 3. **Never log secret values** — OTP codes are logged only in `APP_ENV=development`.
 4. **OTP lockout** — max 5 failed verify attempts per code; HTTP rate limit via `RATE_LIMIT_MAX` / `RATE_LIMIT_WINDOW`.
 5. **API keys** — one active key per user, hashed at rest; plaintext returned only from `POST /v1/tokens`.
@@ -94,7 +94,7 @@ Always read `docs/architecture.md` before implementing domain logic.
 ### Commands
 
 ```bash
-make setup      # copy root + frontend .env.example → .env if missing
+make setup      # copy api/, frontend/, and .docker/db .env.example → .env if missing
 make db-up      # start PostgreSQL
 make migrate    # run GORM AutoMigrate
 make db-reset   # reset database volume + AutoMigrate

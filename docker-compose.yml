@@ -2,16 +2,14 @@ services:
   postgres:
     image: postgres:16-alpine
     container_name: envm-vault-postgres
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-envm}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-envm_dev}
-      POSTGRES_DB: ${POSTGRES_DB:-envm_vault}
+    env_file:
+      - .docker/db/.env
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-envm} -d ${POSTGRES_DB:-envm_vault}"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5

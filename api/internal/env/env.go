@@ -18,7 +18,7 @@ import (
 //
 // Required: DATABASE_URL, JWT_SECRET.
 // Optional (defaults): APP_ENV, PORT, JWT_EXPIRY, CORS_ORIGINS, RATE_LIMIT_*.
-// POSTGRES_* are Docker Compose / Makefile only — not loaded here.
+// POSTGRES_* are Docker Compose / .docker/db/.env only — not loaded here.
 var Envs Vars
 
 // Vars holds validated environment values after Load(), grouped by context.

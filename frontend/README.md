@@ -53,7 +53,8 @@ O frontend **não** usa o `.env` da API. Configure só variáveis públicas aqui
 
 | Arquivo | Conteúdo |
 |---------|----------|
-| `../.env` | Secrets da API / Docker (nunca `VITE_*`) |
+| `../api/.env` | Secrets da API (nunca `VITE_*`) |
+| `../.docker/db/.env` | PostgreSQL / Docker Compose (`POSTGRES_*`) |
 | `.env` | Só `VITE_*` — vão para o bundle do browser |
 
 Leitura e validação ficam centralizadas em `src/shared/env/envs.ts`:
@@ -67,12 +68,11 @@ console.log(envs.api.baseUrl)
 Não leia `import.meta.env` fora desse módulo.
 
 ```bash
-# Na raiz: make setup  (cria frontend/.env a partir de .env.example)
-cp .env.example .env   # se ainda não existir
+# Na raiz: make setup  (cria api/.env e frontend/.env a partir dos .env.example)
 ```
 
 - Em desenvolvimento local, deixe `VITE_API_BASE_URL` vazio (proxy do Vite).
-- Em staging/prod, defina a URL absoluta `http(s)://…` da API (e alinhe `CORS_ORIGINS` no `.env` da raiz).
+- Em staging/prod, defina a URL absoluta `http(s)://…` da API (e alinhe `CORS_ORIGINS` em `api/.env`).
 - Na boot, `assertEnvsValid()` falha se `VITE_API_BASE_URL` estiver setada e não for URL absoluta.
 
 ## Testes

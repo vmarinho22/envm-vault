@@ -2,7 +2,7 @@
 
 help:
 	@echo "Available commands:"
-	@echo "  make setup             - Copy root and frontend .env.example files if missing"
+	@echo "  make setup             - Copy api/, frontend/, and .docker/db .env.example files if missing"
 	@echo "  make db-up             - Start PostgreSQL via docker compose"
 	@echo "  make db-down           - Stop PostgreSQL"
 	@echo "  make db-reset          - Reset database volume and run AutoMigrate"
@@ -17,27 +17,30 @@ help:
 	@echo "  make hooks-uninstall   - Remove git hooks installed by lefthook"
 	@echo "  make rtk-trust         - Trust project RTK filters (.rtk/filters.toml)"
 
+COMPOSE_ENV := --env-file .docker/db/.env
+
 setup:
-	@test -f .env || cp .env.example .env
+	@test -f api/.env || cp api/.env.example api/.env
 	@test -f frontend/.env || cp frontend/.env.example frontend/.env
-	@echo "Setup complete. Edit .env (API) and frontend/.env (UI) if needed."
+	@test -f .docker/db/.env || cp .docker/db/.env.example .docker/db/.env
+	@echo "Setup complete. Edit api/.env (API), frontend/.env (UI), and .docker/db/.env (Postgres) if needed."
 
 db-up:
-	docker compose up -d postgres
+	docker compose $(COMPOSE_ENV) up -d postgres
 
 db-down:
-	docker compose down
+	docker compose $(COMPOSE_ENV) down
 
 db-reset:
-	docker compose down -v && docker compose up -d postgres
+	docker compose $(COMPOSE_ENV) down -v && docker compose $(COMPOSE_ENV) up -d postgres
 	@sleep 2
 	@$(MAKE) migrate
 
 migrate:
-	@set -a && . ./.env 2>/dev/null; set +a && cd api && go run ./cmd/migrate
+	cd api && go run ./cmd/migrate
 
 dev:
-	@set -a && . ./.env 2>/dev/null; set +a && cd api && go run ./cmd/server
+	cd api && go run ./cmd/server
 
 frontend-dev:
 	cd frontend && npm run dev
