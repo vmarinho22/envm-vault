@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/envm-vault/envm-vault/api/internal/service"
+	"github.com/envm-vault/envm-vault/api/internal/service/audit"
 	"github.com/envm-vault/envm-vault/api/internal/service/token"
 )
 
@@ -73,7 +74,7 @@ func TestCanRevokeTarget(t *testing.T) {
 }
 
 func TestGetMine_UnauthorizedActor(t *testing.T) {
-	svc := token.New(nil, nil)
+	svc := token.New(nil, nil, nil)
 	_, err := svc.GetMine(t.Context(), "not-a-uuid")
 	if err != service.ErrUnauthorized {
 		t.Errorf("GetMine() error = %v, want ErrUnauthorized", err)
@@ -81,15 +82,19 @@ func TestGetMine_UnauthorizedActor(t *testing.T) {
 }
 
 func TestCreate_UnauthorizedActor(t *testing.T) {
-	svc := token.New(nil, nil)
+	spy := &audit.Spy{}
+	svc := token.New(nil, nil, spy)
 	_, err := svc.Create(t.Context(), "")
 	if err != service.ErrUnauthorized {
 		t.Errorf("Create() error = %v, want ErrUnauthorized", err)
 	}
+	if len(spy.Events) != 0 {
+		t.Errorf("expected no audit events on unauthorized Create, got %d", len(spy.Events))
+	}
 }
 
 func TestRevokeOwn_UnauthorizedActor(t *testing.T) {
-	svc := token.New(nil, nil)
+	svc := token.New(nil, nil, nil)
 	err := svc.RevokeOwn(t.Context(), "bad")
 	if err != service.ErrUnauthorized {
 		t.Errorf("RevokeOwn() error = %v, want ErrUnauthorized", err)
@@ -97,7 +102,7 @@ func TestRevokeOwn_UnauthorizedActor(t *testing.T) {
 }
 
 func TestRevokeForUser_ForbiddenForUserRole(t *testing.T) {
-	svc := token.New(nil, nil)
+	svc := token.New(nil, nil, nil)
 	err := svc.RevokeForUser(t.Context(), "ignored", service.RoleUser, "ignored")
 	if err != service.ErrForbidden {
 		t.Errorf("RevokeForUser() error = %v, want ErrForbidden", err)
@@ -105,7 +110,7 @@ func TestRevokeForUser_ForbiddenForUserRole(t *testing.T) {
 }
 
 func TestRevokeForUser_InvalidTargetID(t *testing.T) {
-	svc := token.New(nil, nil)
+	svc := token.New(nil, nil, nil)
 	err := svc.RevokeForUser(t.Context(), "00000000-0000-0000-0000-000000000001", service.RoleAdmin, "not-a-uuid")
 	if err != service.ErrUserNotFound {
 		t.Errorf("RevokeForUser() error = %v, want ErrUserNotFound", err)

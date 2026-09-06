@@ -8,6 +8,7 @@ import (
 	"github.com/envm-vault/envm-vault/api/internal/model"
 	"github.com/envm-vault/envm-vault/api/internal/repository"
 	"github.com/envm-vault/envm-vault/api/internal/service"
+	"github.com/envm-vault/envm-vault/api/internal/service/audit"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -15,10 +16,11 @@ import (
 type Service struct {
 	tokens *repository.AccessTokenRepository
 	users  *repository.UserRepository
+	audit  audit.Logger
 }
 
-func New(tokens *repository.AccessTokenRepository, users *repository.UserRepository) *Service {
-	return &Service{tokens: tokens, users: users}
+func New(tokens *repository.AccessTokenRepository, users *repository.UserRepository, auditLog audit.Logger) *Service {
+	return &Service{tokens: tokens, users: users, audit: audit.OrNop(auditLog)}
 }
 
 type MeResponse struct {
@@ -75,6 +77,8 @@ func (s *Service) Create(ctx context.Context, actorID string) (*CreateResponse, 
 		return nil, err
 	}
 
+	actorEmail, actorRole := s.actorIdentity(ctx, userID)
+
 	if existing == nil {
 		created, err := s.tokens.Create(ctx, &model.AccessToken{
 			UserID:    userID,
@@ -85,6 +89,13 @@ func (s *Service) Create(ctx context.Context, actorID string) (*CreateResponse, 
 		if err != nil {
 			return nil, err
 		}
+		s.audit.Record(ctx, audit.Event{
+			Action:      audit.ActionPersonalTokenCreated,
+			Summary:     audit.SummaryPersonalTokenCreated,
+			ActorUserID: &userID,
+			ActorEmail:  actorEmail,
+			ActorRole:   actorRole,
+		})
 		return &CreateResponse{
 			Token:     plaintext,
 			Prefix:    created.Prefix,
@@ -95,6 +106,14 @@ func (s *Service) Create(ctx context.Context, actorID string) (*CreateResponse, 
 	if err := s.tokens.Rotate(ctx, existing.ID, hash, prefix, now); err != nil {
 		return nil, err
 	}
+
+	s.audit.Record(ctx, audit.Event{
+		Action:      audit.ActionPersonalTokenRotated,
+		Summary:     audit.SummaryPersonalTokenRotated,
+		ActorUserID: &userID,
+		ActorEmail:  actorEmail,
+		ActorRole:   actorRole,
+	})
 
 	return &CreateResponse{
 		Token:     plaintext,
@@ -108,7 +127,18 @@ func (s *Service) RevokeOwn(ctx context.Context, actorID string) error {
 	if err != nil {
 		return err
 	}
-	return s.revokeActive(ctx, userID, userID)
+	if err := s.revokeActive(ctx, userID, userID); err != nil {
+		return err
+	}
+	actorEmail, actorRole := s.actorIdentity(ctx, userID)
+	s.audit.Record(ctx, audit.Event{
+		Action:      audit.ActionPersonalTokenRevoked,
+		Summary:     audit.SummaryPersonalTokenRevoked,
+		ActorUserID: &userID,
+		ActorEmail:  actorEmail,
+		ActorRole:   actorRole,
+	})
+	return nil
 }
 
 func (s *Service) RevokeForUser(ctx context.Context, actorID, actorRole, targetUserID string) error {
@@ -138,7 +168,20 @@ func (s *Service) RevokeForUser(ctx context.Context, actorID, actorRole, targetU
 		return service.ErrForbidden
 	}
 
-	return s.revokeActive(ctx, targetUUID, actorUUID)
+	if err := s.revokeActive(ctx, targetUUID, actorUUID); err != nil {
+		return err
+	}
+
+	actorEmail, _ := s.actorIdentity(ctx, actorUUID)
+	s.audit.Record(ctx, audit.Event{
+		Action:       audit.ActionPersonalTokenRevokedAdmin,
+		Summary:      audit.SummaryPersonalTokenRevokedAdmin,
+		ActorUserID:  &actorUUID,
+		ActorEmail:   actorEmail,
+		ActorRole:    actorRole,
+		TargetUserID: &targetUUID,
+	})
+	return nil
 }
 
 func (s *Service) revokeActive(ctx context.Context, userID, revokedBy uuid.UUID) error {
@@ -154,6 +197,17 @@ func (s *Service) revokeActive(ctx context.Context, userID, revokedBy uuid.UUID)
 	}
 
 	return s.tokens.Revoke(ctx, token.ID, revokedBy, time.Now().UTC())
+}
+
+func (s *Service) actorIdentity(ctx context.Context, userID uuid.UUID) (email, role string) {
+	if s.users == nil {
+		return "", ""
+	}
+	user, err := s.users.FindByID(ctx, userID)
+	if err != nil || user == nil {
+		return "", ""
+	}
+	return user.Email, user.Role
 }
 
 func parseActorID(actorID string) (uuid.UUID, error) {

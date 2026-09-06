@@ -21,6 +21,7 @@ import (
 	"github.com/envm-vault/envm-vault/api/internal/repository"
 	"github.com/envm-vault/envm-vault/api/internal/router"
 	"github.com/envm-vault/envm-vault/api/internal/service"
+	auditservice "github.com/envm-vault/envm-vault/api/internal/service/audit"
 	authservice "github.com/envm-vault/envm-vault/api/internal/service/auth"
 	tokenservice "github.com/envm-vault/envm-vault/api/internal/service/token"
 	userservice "github.com/envm-vault/envm-vault/api/internal/service/user"
@@ -49,6 +50,8 @@ func main() {
 	userRepo := repository.NewUserRepository(gormDB)
 	loginCodeRepo := repository.NewLoginCodeRepository(gormDB)
 	tokenRepo := repository.NewAccessTokenRepository(gormDB)
+	auditRepo := repository.NewAuditLogRepository(gormDB)
+	auditSvc := auditservice.New(auditRepo)
 
 	var sender email.Sender
 	if env.Envs.IsDevelopment() {
@@ -58,9 +61,9 @@ func main() {
 	}
 
 	otpService := service.NewOTPService()
-	authSvc := authservice.New(gormDB, userRepo, loginCodeRepo, otpService, sender, env.Envs.JWT.Secret, env.Envs.JWT.Expiry)
-	userSvc := userservice.New(userRepo, tokenRepo)
-	tokenSvc := tokenservice.New(tokenRepo, userRepo)
+	authSvc := authservice.New(gormDB, userRepo, loginCodeRepo, otpService, sender, env.Envs.JWT.Secret, env.Envs.JWT.Expiry, auditSvc)
+	userSvc := userservice.New(userRepo, tokenRepo, auditSvc)
+	tokenSvc := tokenservice.New(tokenRepo, userRepo, auditSvc)
 
 	app := fiber.New(fiber.Config{
 		ErrorHandler: httperr.AppHandler,
@@ -73,6 +76,7 @@ func main() {
 		AllowHeaders: "Origin, Content-Type, Authorization",
 		AllowMethods: "GET, POST, PUT, PATCH, DELETE, OPTIONS",
 	}))
+	app.Use(middleware.NewAudit(auditSvc))
 	app.Use(middleware.NewRateLimiter(env.Envs.RateLimit.Max, env.Envs.RateLimit.Window))
 
 	router.Register(app, router.Deps{
@@ -80,7 +84,7 @@ func main() {
 		Auth:   authhandler.New(authSvc),
 		User:   userhandler.New(userSvc),
 		Token:  tokenhandler.New(tokenSvc),
-		JWT:    middleware.NewJWTMiddleware(env.Envs.JWT.Secret),
+		JWT:    middleware.NewJWTMiddleware(env.Envs.JWT.Secret, auditSvc),
 	})
 
 	go func() {

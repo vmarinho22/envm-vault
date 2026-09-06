@@ -11,6 +11,7 @@ import (
 	"github.com/envm-vault/envm-vault/api/internal/model"
 	"github.com/envm-vault/envm-vault/api/internal/repository"
 	"github.com/envm-vault/envm-vault/api/internal/service"
+	"github.com/envm-vault/envm-vault/api/internal/service/audit"
 	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/gorm"
 )
@@ -21,6 +22,7 @@ type Service struct {
 	loginCodes *repository.LoginCodeRepository
 	otp        *service.OTPService
 	email      email.Sender
+	audit      audit.Logger
 	jwtSecret  []byte
 	jwtExpiry  time.Duration
 }
@@ -33,6 +35,7 @@ func New(
 	sender email.Sender,
 	jwtSecret string,
 	jwtExpiry time.Duration,
+	auditLog audit.Logger,
 ) *Service {
 	return &Service{
 		db:         db,
@@ -40,6 +43,7 @@ func New(
 		loginCodes: loginCodes,
 		otp:        otp,
 		email:      sender,
+		audit:      audit.OrNop(auditLog),
 		jwtSecret:  []byte(jwtSecret),
 		jwtExpiry:  jwtExpiry,
 	}
@@ -92,6 +96,12 @@ func (s *Service) RequestLogin(ctx context.Context, rawEmail string) error {
 		return fmt.Errorf("send login code: %w", err)
 	}
 
+	s.audit.Record(ctx, audit.Event{
+		Action:     audit.ActionLoginRequested,
+		Summary:    audit.SummaryLoginRequested,
+		ActorEmail: emailAddr,
+	})
+
 	return nil
 }
 
@@ -102,12 +112,14 @@ func (s *Service) VerifyLogin(ctx context.Context, rawEmail, code string) (*serv
 	}
 
 	if len(code) != 8 {
+		s.recordLoginFailed(ctx, emailAddr)
 		return nil, service.ErrInvalidCode
 	}
 
 	loginCode, err := s.loginCodes.FindLatestValid(ctx, emailAddr)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
+			s.recordLoginFailed(ctx, emailAddr)
 			return nil, service.ErrInvalidCode
 		}
 		return nil, err
@@ -115,6 +127,7 @@ func (s *Service) VerifyLogin(ctx context.Context, rawEmail, code string) (*serv
 
 	if loginCode.AttemptCount >= service.MaxOTPVerifyAttempts {
 		_ = s.loginCodes.MarkUsed(ctx, loginCode.ID)
+		s.recordLoginFailed(ctx, emailAddr)
 		return nil, service.ErrTooManyAttempts
 	}
 
@@ -125,12 +138,15 @@ func (s *Service) VerifyLogin(ctx context.Context, rawEmail, code string) (*serv
 		}
 		if attemptCount >= service.MaxOTPVerifyAttempts {
 			_ = s.loginCodes.MarkUsed(ctx, loginCode.ID)
+			s.recordLoginFailed(ctx, emailAddr)
 			return nil, service.ErrTooManyAttempts
 		}
+		s.recordLoginFailed(ctx, emailAddr)
 		return nil, service.ErrInvalidCode
 	}
 
 	var user *model.User
+	bootstrapped := false
 	err = database.WithTx(ctx, s.db, func(tx *gorm.DB) error {
 		loginCodes := s.loginCodes.WithDB(tx)
 		users := s.users.WithDB(tx)
@@ -160,9 +176,16 @@ func (s *Service) VerifyLogin(ctx context.Context, rawEmail, code string) (*serv
 			Email: emailAddr,
 			Role:  service.RoleSuperAdmin,
 		})
-		return err
+		if err != nil {
+			return err
+		}
+		bootstrapped = true
+		return nil
 	})
 	if err != nil {
+		if errors.Is(err, service.ErrUserNotFound) {
+			s.recordLoginFailed(ctx, emailAddr)
+		}
 		return nil, err
 	}
 
@@ -171,10 +194,37 @@ func (s *Service) VerifyLogin(ctx context.Context, rawEmail, code string) (*serv
 		return nil, fmt.Errorf("generate jwt: %w", err)
 	}
 
+	actorID := user.ID
+	if bootstrapped {
+		s.audit.Record(ctx, audit.Event{
+			Action:      audit.ActionUserBootstrapSuperAdmin,
+			Summary:     audit.SummaryUserBootstrapSuperAdmin,
+			ActorUserID: &actorID,
+			ActorEmail:  user.Email,
+			ActorRole:   user.Role,
+		})
+	}
+
+	s.audit.Record(ctx, audit.Event{
+		Action:      audit.ActionLoginSucceeded,
+		Summary:     audit.SummaryLoginSucceeded,
+		ActorUserID: &actorID,
+		ActorEmail:  user.Email,
+		ActorRole:   user.Role,
+	})
+
 	return &service.VerifyResponse{
 		Token: token,
 		User:  service.ToUserResponse(*user),
 	}, nil
+}
+
+func (s *Service) recordLoginFailed(ctx context.Context, emailAddr string) {
+	s.audit.Record(ctx, audit.Event{
+		Action:     audit.ActionLoginFailed,
+		Summary:    audit.SummaryLoginFailed,
+		ActorEmail: emailAddr,
+	})
 }
 
 func (s *Service) generateJWT(user *model.User) (string, error) {

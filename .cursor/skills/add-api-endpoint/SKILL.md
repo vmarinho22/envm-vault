@@ -20,6 +20,7 @@ Use this checklist when adding a new endpoint to the Go API.
 - [ ] Add GORM model in internal/model/ (if new table)
 - [ ] Add repository methods in internal/repository/
 - [ ] Add service method in internal/service/{context}/
+- [ ] For security-relevant mutations: call `audit.Logger.Record(ctx, audit.Event{…})` after success (inject `audit.Logger` via constructor; do not invent business events in middleware)
 - [ ] Add handler method in internal/handler/{context}/
 - [ ] Register route in internal/router/{context}.go
 - [ ] Map errors via httperr.Write(c, err)
@@ -50,4 +51,5 @@ registerProjectRoutes(v1, deps)
 - [ ] Auth middleware applied if required
 - [ ] API key identifies the user for secret-related endpoints (membership checked when projects exist)
 - [ ] No secret values in response unless explicitly requested
-- [ ] No secret values in error messages or logs
+- [ ] No secret values in error messages, logs, or audit rows (no OTP, JWT, or full personal token plaintext)
+- [ ] Mutating security actions emit audit events (`login.*`, `user.*`, `personal_token.*`, or a new action constant in `service/audit`)

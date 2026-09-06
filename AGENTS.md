@@ -50,7 +50,8 @@ Always read `docs/architecture.md` before implementing domain logic.
 3. **Never log secret values** — OTP codes are logged only in `APP_ENV=development`.
 4. **OTP lockout** — max 5 failed verify attempts per code; HTTP rate limit via `RATE_LIMIT_MAX` / `RATE_LIMIT_WINDOW`.
 5. **API keys** — one active key per user, hashed at rest; plaintext returned only from `POST /v1/tokens`.
-6. **Minimal diffs** — do not refactor unrelated code in the same change.
+6. **Audit** — `audit_logs` via `service/audit`; never include OTP, JWT, or full personal token plaintext.
+7. **Minimal diffs** — do not refactor unrelated code in the same change.
 
 ## Conventions
 
@@ -78,15 +79,16 @@ Always read `docs/architecture.md` before implementing domain logic.
   │   ├── env/               # Envs singleton + Load() validation
   │   ├── router/            # register routes by context (health, auth, user, token)
   │   ├── handler/           # subpackages: auth/, user/, token/, health/, httperr/
-  │   ├── service/           # subpackages: auth/, user/, token/ + shared.go
-  │   ├── middleware/        # JWT, auth guards, rate limit
+  │   ├── service/           # subpackages: auth/, user/, token/, audit/ + shared.go
+  │   ├── middleware/        # JWT, auth guards, rate limit, audit origin
   │   ├── email/             # Email sender interface
   │   ├── database/          # Open, WithTx, Ping
-  │   ├── model/             # GORM models (User, LoginCode, AccessToken)
-  │   └── repository/        # data access (UserRepository, LoginCodeRepository, AccessTokenRepository)
+  │   ├── model/             # GORM models (User, LoginCode, AccessToken, AuditLog)
+  │   └── repository/        # data access (User, LoginCode, AccessToken, AuditLog)
   └── tests/unit/            # unit tests; mirrors internal/ (package xxx_test)
   ```
 - **Error handling:** Wrap errors with context; use sentinel errors in service layer
+- **Audit:** Security-relevant mutations call `audit.Logger.Record` after success. Middleware attaches IP/UA/Origin/channel; JWT Protect sets `logged_in_user`. Persist failures must not fail the HTTP response. Never put OTP, JWT, or full personal token plaintext in audit rows.
 - **Tests:** `api/tests/unit/` mirroring `internal/` (`package xxx_test`); no co-located `*_test.go`
 
 ### Commands

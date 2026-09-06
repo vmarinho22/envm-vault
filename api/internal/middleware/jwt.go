@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/envm-vault/envm-vault/api/internal/service"
+	auditservice "github.com/envm-vault/envm-vault/api/internal/service/audit"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -16,10 +17,11 @@ const UserEmailKey contextKey = "userEmail"
 
 type JWTMiddleware struct {
 	secret []byte
+	audit  auditservice.Logger
 }
 
-func NewJWTMiddleware(secret string) *JWTMiddleware {
-	return &JWTMiddleware{secret: []byte(secret)}
+func NewJWTMiddleware(secret string, audit auditservice.Logger) *JWTMiddleware {
+	return &JWTMiddleware{secret: []byte(secret), audit: auditservice.OrNop(audit)}
 }
 
 func (m *JWTMiddleware) Protect() fiber.Handler {
@@ -64,6 +66,7 @@ func (m *JWTMiddleware) Protect() fiber.Handler {
 		c.Locals(string(UserRoleKey), role)
 		c.Locals(string(UserIDKey), userID)
 		c.Locals(string(UserEmailKey), email)
+		c.SetUserContext(m.audit.WithChannel(c.UserContext(), auditservice.ChannelLoggedInUser))
 
 		return c.Next()
 	}
@@ -89,4 +92,9 @@ func GetUserRole(c *fiber.Ctx) string {
 func GetUserID(c *fiber.Ctx) string {
 	id, _ := c.Locals(string(UserIDKey)).(string)
 	return id
+}
+
+func GetUserEmail(c *fiber.Ctx) string {
+	email, _ := c.Locals(string(UserEmailKey)).(string)
+	return email
 }

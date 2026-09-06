@@ -6,19 +6,21 @@ import (
 	"github.com/envm-vault/envm-vault/api/internal/model"
 	"github.com/envm-vault/envm-vault/api/internal/repository"
 	"github.com/envm-vault/envm-vault/api/internal/service"
+	"github.com/envm-vault/envm-vault/api/internal/service/audit"
 	"github.com/google/uuid"
 )
 
 type Service struct {
 	users  *repository.UserRepository
 	tokens *repository.AccessTokenRepository
+	audit  audit.Logger
 }
 
-func New(users *repository.UserRepository, tokens *repository.AccessTokenRepository) *Service {
-	return &Service{users: users, tokens: tokens}
+func New(users *repository.UserRepository, tokens *repository.AccessTokenRepository, auditLog audit.Logger) *Service {
+	return &Service{users: users, tokens: tokens, audit: audit.OrNop(auditLog)}
 }
 
-func (s *Service) Register(ctx context.Context, actorRole, rawEmail, role string) (*service.UserResponse, error) {
+func (s *Service) Register(ctx context.Context, actorID, actorEmail, actorRole, rawEmail, role string) (*service.UserResponse, error) {
 	if actorRole != service.RoleSuperAdmin && actorRole != service.RoleAdmin {
 		return nil, service.ErrForbidden
 	}
@@ -47,6 +49,20 @@ func (s *Service) Register(ctx context.Context, actorRole, rawEmail, role string
 	if err != nil {
 		return nil, err
 	}
+
+	var actorPtr *uuid.UUID
+	if actorUUID, parseErr := uuid.Parse(actorID); parseErr == nil {
+		actorPtr = &actorUUID
+	}
+
+	s.audit.Record(ctx, audit.Event{
+		Action:       audit.ActionUserRegistered,
+		Summary:      audit.SummaryUserRegistered,
+		ActorUserID:  actorPtr,
+		ActorEmail:   actorEmail,
+		ActorRole:    actorRole,
+		TargetUserID: &user.ID,
+	})
 
 	resp := service.ToUserResponse(*user)
 	return &resp, nil

@@ -56,7 +56,7 @@ func TestRegister_TokensMeRequiresAuth(t *testing.T) {
 		Auth:   &authhandler.Handler{},
 		User:   &userhandler.Handler{},
 		Token:  &tokenhandler.Handler{},
-		JWT:    middleware.NewJWTMiddleware("test-secret"),
+		JWT:    middleware.NewJWTMiddleware("test-secret", nil),
 	})
 
 	req := httptest.NewRequest(fiber.MethodGet, "/v1/tokens/me", nil)

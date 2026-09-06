@@ -33,6 +33,13 @@ Use this checklist when reviewing changes that touch authentication, tokens, or 
 - [ ] No `.env` files with production values committed
 - [ ] Environment-specific config loaded from env vars, not hardcoded
 
+## Audit logging
+
+- [ ] Security-relevant mutations call `audit.Logger.Record` after success (not on unauthorized/forbidden early returns unless intentionally auditing failures, e.g. `login.failed`)
+- [ ] Audit rows/slog never include OTP codes, JWTs, or full personal token plaintext (`ev_…`)
+- [ ] New actions use constants in `internal/service/audit` (action + summary); no ad-hoc metadata JSON
+- [ ] Persist failures are best-effort (must not break the HTTP success path)
+
 ## Reporting
 
 Format findings as:

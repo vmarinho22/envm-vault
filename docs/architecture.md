@@ -93,7 +93,7 @@ envm-vault/
 │   │   ├── env/          # Envs singleton + Load()
 │   │   ├── router/       # Route registration by context (health, auth, user, token)
 │   │   ├── handler/      # Handlers per domain (auth/, user/, token/, health/)
-│   │   ├── service/      # Business logic per domain (auth/, user/, token/)
+│   │   ├── service/      # Business logic per domain (auth/, user/, token/, audit/)
 │   │   ├── middleware/
 │   │   ├── database/     # GORM connection + AutoMigrate
 │   │   ├── model/        # GORM models
@@ -110,6 +110,7 @@ envm-vault/
 erDiagram
   User ||--o{ LoginCode : requests
   User ||--o| AccessToken : has
+  User ||--o{ AuditLog : acts
   User ||--o{ Project : owns
   Project ||--o{ Environment : contains
   Environment ||--o{ Secret : stores
@@ -139,6 +140,21 @@ erDiagram
     uuid revoked_by
     timestamp created_at
   }
+
+  AuditLog {
+    uuid id PK
+    timestamp occurred_at
+    string action
+    string summary
+    uuid actor_user_id
+    string actor_email
+    string actor_role
+    uuid target_user_id
+    string auth_channel
+    string ip
+    string user_agent
+    string origin
+  }
 ```
 
 ### User Roles
@@ -153,12 +169,13 @@ erDiagram
 
 1. **Never store plaintext OTP codes** — only SHA-256 hashes in `login_codes`.
 2. **Never store plaintext API keys** — only SHA-256 hashes in `access_tokens`. The plaintext is returned only from `POST /v1/tokens`.
-3. **Never log secret values** — OTP codes are logged only in development. API keys are never logged.
+3. **Never log secret values** — OTP codes are logged only in development. API keys are never logged. Audit rows must not contain OTP, JWT, or full `ev_…` plaintext.
 4. **OTP verify lockout** — max 5 failed attempts per code (`attempt_count`); then the code is invalidated and the user must request a new OTP.
 5. **Global HTTP rate limit** — per-IP limiter (`RATE_LIMIT_MAX` / `RATE_LIMIT_WINDOW`, defaults 100/1m). `/health` and `/v1/health` are exempt. In-memory store (single instance); shared store needed for multi-replica later.
 6. **Env authorization** — future env download identifies the user via the API key; access to a project/environment is based on membership, not token scopes.
 7. **No secrets in the repository** — never commit real tokens or `.env` files.
 8. **JWT expiry** — configurable via `JWT_EXPIRY` (default 24h).
+9. **Audit trail** — security-relevant mutations write to `audit_logs` via `internal/service/audit` (best-effort). Middleware attaches IP/UA/Origin/channel; domain services call `Record` after success. Channels: `login_attempt`, `logged_in_user`, `personal_token` (reserved). No metadata JSON column.
 
 ## Open Decisions
 
