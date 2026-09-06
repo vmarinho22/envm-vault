@@ -36,7 +36,6 @@ func TestRecord_DoesNotPanicWithoutRepository(t *testing.T) {
 	actor := uuid.MustParse("00000000-0000-0000-0000-000000000001")
 	svc.Record(context.Background(), audit.Event{
 		Action:      audit.ActionPersonalTokenCreated,
-		Summary:     audit.SummaryPersonalTokenCreated,
 		ActorUserID: &actor,
 		ActorEmail:  "user@example.com",
 	})

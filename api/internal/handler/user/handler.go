@@ -30,7 +30,7 @@ func (h *Handler) Register(c *fiber.Ctx) error {
 
 	role := middleware.GetUserRole(c)
 	user, err := h.user.Register(
-		c.Context(),
+		c.UserContext(),
 		middleware.GetUserID(c),
 		middleware.GetUserEmail(c),
 		role,
@@ -45,7 +45,7 @@ func (h *Handler) Register(c *fiber.Ctx) error {
 }
 
 func (h *Handler) List(c *fiber.Ctx) error {
-	users, err := h.user.List(c.Context(), middleware.GetUserRole(c))
+	users, err := h.user.List(c.UserContext(), middleware.GetUserRole(c))
 	if err != nil {
 		return httperr.Write(c, err)
 	}

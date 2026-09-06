@@ -16,7 +16,7 @@ func New(tokens *tokenservice.Service) *Handler {
 }
 
 func (h *Handler) GetMine(c *fiber.Ctx) error {
-	resp, err := h.tokens.GetMine(c.Context(), middleware.GetUserID(c))
+	resp, err := h.tokens.GetMine(c.UserContext(), middleware.GetUserID(c))
 	if err != nil {
 		return httperr.Write(c, err)
 	}
@@ -24,7 +24,7 @@ func (h *Handler) GetMine(c *fiber.Ctx) error {
 }
 
 func (h *Handler) Create(c *fiber.Ctx) error {
-	resp, err := h.tokens.Create(c.Context(), middleware.GetUserID(c))
+	resp, err := h.tokens.Create(c.UserContext(), middleware.GetUserID(c))
 	if err != nil {
 		return httperr.Write(c, err)
 	}
@@ -32,7 +32,7 @@ func (h *Handler) Create(c *fiber.Ctx) error {
 }
 
 func (h *Handler) RevokeOwn(c *fiber.Ctx) error {
-	if err := h.tokens.RevokeOwn(c.Context(), middleware.GetUserID(c)); err != nil {
+	if err := h.tokens.RevokeOwn(c.UserContext(), middleware.GetUserID(c)); err != nil {
 		return httperr.Write(c, err)
 	}
 	return c.SendStatus(fiber.StatusNoContent)
@@ -40,7 +40,7 @@ func (h *Handler) RevokeOwn(c *fiber.Ctx) error {
 
 func (h *Handler) RevokeForUser(c *fiber.Ctx) error {
 	err := h.tokens.RevokeForUser(
-		c.Context(),
+		c.UserContext(),
 		middleware.GetUserID(c),
 		middleware.GetUserRole(c),
 		c.Params("id"),

@@ -98,7 +98,6 @@ func (s *Service) RequestLogin(ctx context.Context, rawEmail string) error {
 
 	s.audit.Record(ctx, audit.Event{
 		Action:     audit.ActionLoginRequested,
-		Summary:    audit.SummaryLoginRequested,
 		ActorEmail: emailAddr,
 	})
 
@@ -198,7 +197,6 @@ func (s *Service) VerifyLogin(ctx context.Context, rawEmail, code string) (*serv
 	if bootstrapped {
 		s.audit.Record(ctx, audit.Event{
 			Action:      audit.ActionUserBootstrapSuperAdmin,
-			Summary:     audit.SummaryUserBootstrapSuperAdmin,
 			ActorUserID: &actorID,
 			ActorEmail:  user.Email,
 			ActorRole:   user.Role,
@@ -207,7 +205,6 @@ func (s *Service) VerifyLogin(ctx context.Context, rawEmail, code string) (*serv
 
 	s.audit.Record(ctx, audit.Event{
 		Action:      audit.ActionLoginSucceeded,
-		Summary:     audit.SummaryLoginSucceeded,
 		ActorUserID: &actorID,
 		ActorEmail:  user.Email,
 		ActorRole:   user.Role,
@@ -222,7 +219,6 @@ func (s *Service) VerifyLogin(ctx context.Context, rawEmail, code string) (*serv
 func (s *Service) recordLoginFailed(ctx context.Context, emailAddr string) {
 	s.audit.Record(ctx, audit.Event{
 		Action:     audit.ActionLoginFailed,
-		Summary:    audit.SummaryLoginFailed,
 		ActorEmail: emailAddr,
 	})
 }

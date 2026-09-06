@@ -24,6 +24,13 @@ func Open(dsn string) (*gorm.DB, error) {
 		return nil, fmt.Errorf("auto migrate: %w", err)
 	}
 
+	// AutoMigrate does not drop removed columns; drop audit_logs.summary if present.
+	if db.Migrator().HasColumn(&model.AuditLog{}, "summary") {
+		if err := db.Migrator().DropColumn(&model.AuditLog{}, "summary"); err != nil {
+			return nil, fmt.Errorf("drop audit_logs.summary: %w", err)
+		}
+	}
+
 	return db, nil
 }
 

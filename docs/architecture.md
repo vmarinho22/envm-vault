@@ -145,7 +145,6 @@ erDiagram
     uuid id PK
     timestamp occurred_at
     string action
-    string summary
     uuid actor_user_id
     string actor_email
     string actor_role
@@ -175,7 +174,7 @@ erDiagram
 6. **Env authorization** — future env download identifies the user via the API key; access to a project/environment is based on membership, not token scopes.
 7. **No secrets in the repository** — never commit real tokens or `.env` files.
 8. **JWT expiry** — configurable via `JWT_EXPIRY` (default 24h).
-9. **Audit trail** — security-relevant mutations write to `audit_logs` via `internal/service/audit` (best-effort). Middleware attaches IP/UA/Origin/channel; domain services call `Record` after success. Channels: `login_attempt`, `logged_in_user`, `personal_token` (reserved). No metadata JSON column.
+9. **Audit trail** — security-relevant mutations write to `audit_logs` via `internal/service/audit` (best-effort). Middleware attaches IP/UA/Origin/channel; domain services call `Record` after success. Persist `action` only (UI maps labels). Channels: `login_attempt`, `logged_in_user`, `personal_token` (reserved). No metadata JSON column.
 
 ## Open Decisions
 

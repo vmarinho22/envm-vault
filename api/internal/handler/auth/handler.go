@@ -31,7 +31,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := h.auth.RequestLogin(c.Context(), req.Email); err != nil {
+	if err := h.auth.RequestLogin(c.UserContext(), req.Email); err != nil {
 		return httperr.Write(c, err)
 	}
 
@@ -48,7 +48,7 @@ func (h *Handler) Verify(c *fiber.Ctx) error {
 		})
 	}
 
-	resp, err := h.auth.VerifyLogin(c.Context(), req.Email, req.Code)
+	resp, err := h.auth.VerifyLogin(c.UserContext(), req.Email, req.Code)
 	if err != nil {
 		return httperr.Write(c, err)
 	}

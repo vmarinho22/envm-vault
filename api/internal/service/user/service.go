@@ -57,7 +57,6 @@ func (s *Service) Register(ctx context.Context, actorID, actorEmail, actorRole, 
 
 	s.audit.Record(ctx, audit.Event{
 		Action:       audit.ActionUserRegistered,
-		Summary:      audit.SummaryUserRegistered,
 		ActorUserID:  actorPtr,
 		ActorEmail:   actorEmail,
 		ActorRole:    actorRole,

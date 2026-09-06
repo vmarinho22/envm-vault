@@ -91,7 +91,6 @@ func (s *Service) Create(ctx context.Context, actorID string) (*CreateResponse, 
 		}
 		s.audit.Record(ctx, audit.Event{
 			Action:      audit.ActionPersonalTokenCreated,
-			Summary:     audit.SummaryPersonalTokenCreated,
 			ActorUserID: &userID,
 			ActorEmail:  actorEmail,
 			ActorRole:   actorRole,
@@ -109,7 +108,6 @@ func (s *Service) Create(ctx context.Context, actorID string) (*CreateResponse, 
 
 	s.audit.Record(ctx, audit.Event{
 		Action:      audit.ActionPersonalTokenRotated,
-		Summary:     audit.SummaryPersonalTokenRotated,
 		ActorUserID: &userID,
 		ActorEmail:  actorEmail,
 		ActorRole:   actorRole,
@@ -133,7 +131,6 @@ func (s *Service) RevokeOwn(ctx context.Context, actorID string) error {
 	actorEmail, actorRole := s.actorIdentity(ctx, userID)
 	s.audit.Record(ctx, audit.Event{
 		Action:      audit.ActionPersonalTokenRevoked,
-		Summary:     audit.SummaryPersonalTokenRevoked,
 		ActorUserID: &userID,
 		ActorEmail:  actorEmail,
 		ActorRole:   actorRole,
@@ -175,7 +172,6 @@ func (s *Service) RevokeForUser(ctx context.Context, actorID, actorRole, targetU
 	actorEmail, _ := s.actorIdentity(ctx, actorUUID)
 	s.audit.Record(ctx, audit.Event{
 		Action:       audit.ActionPersonalTokenRevokedAdmin,
-		Summary:      audit.SummaryPersonalTokenRevokedAdmin,
 		ActorUserID:  &actorUUID,
 		ActorEmail:   actorEmail,
 		ActorRole:    actorRole,

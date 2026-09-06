@@ -43,16 +43,12 @@ func (s *Service) Record(ctx context.Context, event Event) {
 	if event.Action == "" {
 		return
 	}
-	if event.Summary == "" {
-		event.Summary = event.Action
-	}
 
 	origin := OriginFromContext(ctx)
 	now := time.Now().UTC()
 	row := &model.AuditLog{
 		OccurredAt:   now,
 		Action:       event.Action,
-		Summary:      event.Summary,
 		ActorUserID:  event.ActorUserID,
 		ActorEmail:   event.ActorEmail,
 		ActorRole:    event.ActorRole,
@@ -64,7 +60,7 @@ func (s *Service) Record(ctx context.Context, event Event) {
 		CreatedAt:    now,
 	}
 
-	slog.Info(event.Summary,
+	slog.Info("audit",
 		"action", event.Action,
 		"auth_channel", origin.AuthChannel,
 		"actor_email", event.ActorEmail,
