@@ -12,4 +12,17 @@ func registerProjectRoutes(v1 fiber.Router, deps Deps) {
 	projects.Post("", deps.Project.Create)
 	projects.Patch("/:id", deps.Project.Update)
 	projects.Delete("/:id", middleware.RequireAdmin(), deps.Project.Delete)
+
+	projects.Get("/:id/secrets", deps.Secret.List)
+	projects.Post("/:id/secrets", deps.Secret.Create)
+	projects.Patch("/:id/secrets/:secretId", deps.Secret.UpdateName)
+	projects.Delete("/:id/secrets/:secretId", deps.Secret.Delete)
+	projects.Put("/:id/secrets/:secretId/values/:environmentId", deps.Secret.SetValue)
+	projects.Get("/:id/secrets/:secretId/values/:environmentId", deps.Secret.RevealValue)
+	projects.Delete("/:id/secrets/:secretId/values/:environmentId", deps.Secret.ClearValue)
+	projects.Get("/:id/environments/:environmentId/values", deps.Secret.ExportEnvironment)
+
+	// API-key download (personal token). Register outside JWT group.
+	download := v1.Group("/projects", deps.APIKey.Protect())
+	download.Get("/:slug/environments/:envTitle", deps.Secret.DownloadBySlug)
 }

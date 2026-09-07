@@ -66,6 +66,15 @@ The API lives in `api/` and provides authentication via email OTP plus a unique 
 | `POST` | `/v1/projects` | JWT | Create project (title + teams + environments + tags) |
 | `PATCH` | `/v1/projects/:id` | JWT | Update project |
 | `DELETE` | `/v1/projects/:id` | JWT (admin+) | Delete project |
+| `GET` | `/v1/projects/:id/secrets` | JWT | List secrets (names + which envs have values; no plaintext) |
+| `POST` | `/v1/projects/:id/secrets` | JWT | Create secret (optional initial values per env) |
+| `PATCH` | `/v1/projects/:id/secrets/:secretId` | JWT | Rename secret |
+| `DELETE` | `/v1/projects/:id/secrets/:secretId` | JWT | Delete secret and all values |
+| `PUT` | `/v1/projects/:id/secrets/:secretId/values/:environmentId` | JWT | Upsert encrypted value |
+| `GET` | `/v1/projects/:id/secrets/:secretId/values/:environmentId` | JWT | Reveal one decrypted value |
+| `DELETE` | `/v1/projects/:id/secrets/:secretId/values/:environmentId` | JWT | Clear value for one env |
+| `GET` | `/v1/projects/:id/environments/:environmentId/values` | JWT | Export all values for an env (JSON or `?format=env`) |
+| `GET` | `/v1/projects/:slug/environments/:envTitle` | API key (`ev_…`) | Download env vars (JSON default; dotenv via `?format=env` or `Accept: text/plain`) |
 
 ### Auth Flow
 
@@ -93,7 +102,11 @@ A global catalog of deployment targets with a unique `title` (e.g. `dev`, `stagi
 
 ### Secret / EnvVar
 
-A key-value pair scoped to a **Project + Environment** combination (planned).
+A named key scoped to a **Project**. Values are stored per **Environment** (sparse: missing row = no value). Values are encrypted at rest with AES-256-GCM using `ENCRYPTION_KEY` (32-byte hex, separate from `JWT_SECRET`). Ciphertext is `nonce || ciphertext+tag` with AAD bound to `secret_id || environment_id`. Column `key_version` records which key encrypted the blob.
+
+Tables: `secrets` (project + name) and `secret_values` (secret + environment + ciphertext).
+
+List/UI endpoints never return plaintext except explicit reveal and export/download. Removing an environment from a project deletes that environment's secret values for the project.
 
 ### User
 
@@ -148,6 +161,9 @@ erDiagram
   Environment ||--o{ ProjectEnvironment : in
   Project ||--o{ ProjectTag : has
   Tag ||--o{ ProjectTag : in
+  Project ||--o{ Secret : has
+  Secret ||--o{ SecretValue : has
+  Environment ||--o{ SecretValue : for
   Tag {
     uuid id PK
     string title UK
@@ -165,6 +181,22 @@ erDiagram
     uuid id PK
     string title
     string slug UK
+    timestamp created_at
+    timestamp updated_at
+  }
+  Secret {
+    uuid id PK
+    uuid project_id FK
+    string name
+    timestamp created_at
+    timestamp updated_at
+  }
+  SecretValue {
+    uuid id PK
+    uuid secret_id FK
+    uuid environment_id FK
+    bytes ciphertext
+    int key_version
     timestamp created_at
     timestamp updated_at
   }
@@ -223,7 +255,7 @@ erDiagram
   }
 ```
 
-Project↔Secret linking is planned (not yet in schema).
+Project↔Secret linking is implemented (`secrets` + `secret_values`). Team membership for access control remains TBD — any authenticated (non-blocked) user may manage secrets; API-key download uses the same broad access until membership exists.
 
 ### User Roles
 
@@ -240,15 +272,15 @@ Project↔Secret linking is planned (not yet in schema).
 3. **Never log secret values** — OTP codes are logged only in development. API keys are never logged. Audit rows must not contain OTP, JWT, or full `ev_…` plaintext.
 4. **OTP verify lockout** — max 5 failed attempts per code (`attempt_count`); then the code is invalidated and the user must request a new OTP.
 5. **Global HTTP rate limit** — per-IP limiter (`RATE_LIMIT_MAX` / `RATE_LIMIT_WINDOW`, defaults 100/1m). `/health` and `/v1/health` are exempt. In-memory store (single instance); shared store needed for multi-replica later.
-6. **Env authorization** — future env download identifies the user via the API key; access to a project/environment is based on membership, not token scopes.
+6. **Env authorization** — env download identifies the user via the API key; project/environment access will be based on membership (TBD). Until then, any valid non-revoked key for a non-blocked user can download.
 7. **No secrets in the repository** — never commit real tokens or `.env` files.
 8. **JWT expiry** — configurable via `JWT_EXPIRY` (default 24h).
-9. **Audit trail** — security-relevant mutations write to `audit_logs` via `internal/service/audit` (best-effort). Middleware attaches IP/UA/Origin/channel; domain services call `Record` after success. Persist `action` (UI maps labels) plus optional typed snapshots (e.g. `project_id` / `project_title` / `project_slug` for `project.*`). Channels: `login_attempt`, `logged_in_user`, `personal_token` (reserved). No metadata JSON column.
+9. **Audit trail** — security-relevant mutations write to `audit_logs` via `internal/service/audit` (best-effort). Middleware attaches IP/UA/Origin/channel; domain services call `Record` after success. Persist `action` (UI maps labels) plus optional typed snapshots (e.g. `project_id` / `project_title` / `project_slug` for `project.*` / `secret.*`). Channels: `login_attempt`, `logged_in_user`, `personal_token`. No metadata JSON column.
+10. **Secret encryption at rest** — AES-256-GCM with `ENCRYPTION_KEY` (required hex, 32 bytes) and `ENCRYPTION_KEY_VERSION`. Never log plaintext secret values.
 
 ## Open Decisions
 
 | Decision | Status |
 |----------|--------|
-| Response format (`.env` vs JSON) | TBD (Phase 2) |
 | SMTP provider for production email | TBD |
-| Encryption at rest for secrets | TBD (Phase 2) |
+| Team membership for project/secret access | TBD |

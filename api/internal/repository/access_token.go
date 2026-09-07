@@ -31,6 +31,18 @@ func (r *AccessTokenRepository) FindByUserID(ctx context.Context, userID uuid.UU
 	return &token, nil
 }
 
+func (r *AccessTokenRepository) FindByHash(ctx context.Context, tokenHash string) (*model.AccessToken, error) {
+	var token model.AccessToken
+	err := r.db.WithContext(ctx).Where("token_hash = ?", tokenHash).First(&token).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, gorm.ErrRecordNotFound
+		}
+		return nil, fmt.Errorf("find access token by hash: %w", err)
+	}
+	return &token, nil
+}
+
 func (r *AccessTokenRepository) FindByUserIDs(ctx context.Context, userIDs []uuid.UUID) ([]model.AccessToken, error) {
 	if len(userIDs) == 0 {
 		return nil, nil

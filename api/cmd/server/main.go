@@ -18,6 +18,7 @@ import (
 	healthhandler "github.com/envm-vault/envm-vault/api/internal/handler/health"
 	"github.com/envm-vault/envm-vault/api/internal/handler/httperr"
 	projecthandler "github.com/envm-vault/envm-vault/api/internal/handler/project"
+	secrethandler "github.com/envm-vault/envm-vault/api/internal/handler/secret"
 	taghandler "github.com/envm-vault/envm-vault/api/internal/handler/tag"
 	teamhandler "github.com/envm-vault/envm-vault/api/internal/handler/team"
 	tokenhandler "github.com/envm-vault/envm-vault/api/internal/handler/token"
@@ -25,11 +26,13 @@ import (
 	"github.com/envm-vault/envm-vault/api/internal/middleware"
 	"github.com/envm-vault/envm-vault/api/internal/repository"
 	"github.com/envm-vault/envm-vault/api/internal/router"
+	"github.com/envm-vault/envm-vault/api/internal/secretcrypto"
 	"github.com/envm-vault/envm-vault/api/internal/service"
 	auditservice "github.com/envm-vault/envm-vault/api/internal/service/audit"
 	authservice "github.com/envm-vault/envm-vault/api/internal/service/auth"
 	environmentservice "github.com/envm-vault/envm-vault/api/internal/service/environment"
 	projectservice "github.com/envm-vault/envm-vault/api/internal/service/project"
+	secretservice "github.com/envm-vault/envm-vault/api/internal/service/secret"
 	tagservice "github.com/envm-vault/envm-vault/api/internal/service/tag"
 	teamservice "github.com/envm-vault/envm-vault/api/internal/service/team"
 	tokenservice "github.com/envm-vault/envm-vault/api/internal/service/token"
@@ -64,7 +67,13 @@ func main() {
 	tagRepo := repository.NewTagRepository(gormDB)
 	environmentRepo := repository.NewEnvironmentRepository(gormDB)
 	projectRepo := repository.NewProjectRepository(gormDB)
+	secretRepo := repository.NewSecretRepository(gormDB)
 	auditSvc := auditservice.New(auditRepo, userRepo)
+
+	crypter, err := secretcrypto.NewAESGCM(env.Envs.Crypto.Key, env.Envs.Crypto.Version)
+	if err != nil {
+		log.Fatalf("init encryption: %v", err)
+	}
 
 	var sender email.Sender
 	if env.Envs.IsDevelopment() {
@@ -80,7 +89,8 @@ func main() {
 	teamSvc := teamservice.New(teamRepo, userRepo, auditSvc)
 	tagSvc := tagservice.New(tagRepo, auditSvc)
 	environmentSvc := environmentservice.New(environmentRepo, auditSvc)
-	projectSvc := projectservice.New(projectRepo, teamRepo, environmentRepo, tagRepo, auditSvc)
+	projectSvc := projectservice.New(projectRepo, teamRepo, environmentRepo, tagRepo, secretRepo, auditSvc)
+	secretSvc := secretservice.New(secretRepo, projectRepo, crypter, auditSvc)
 
 	app := fiber.New(fiber.Config{
 		ErrorHandler: httperr.AppHandler,
@@ -106,7 +116,9 @@ func main() {
 		Tag:         taghandler.New(tagSvc),
 		Environment: environmenthandler.New(environmentSvc),
 		Project:     projecthandler.New(projectSvc),
+		Secret:      secrethandler.New(secretSvc),
 		JWT:         middleware.NewJWTMiddleware(env.Envs.JWT.Secret, userRepo, auditSvc),
+		APIKey:      middleware.NewAPIKeyMiddleware(tokenRepo, userRepo, auditSvc),
 	})
 
 	go func() {

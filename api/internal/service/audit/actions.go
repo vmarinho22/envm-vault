@@ -28,4 +28,10 @@ const (
 	ActionProjectCreated            = "project.created"
 	ActionProjectUpdated            = "project.updated"
 	ActionProjectDeleted            = "project.deleted"
+	ActionSecretCreated             = "secret.created"
+	ActionSecretUpdated             = "secret.updated"
+	ActionSecretDeleted             = "secret.deleted"
+	ActionSecretValueSet            = "secret_value.set"
+	ActionSecretValueCleared        = "secret_value.cleared"
+	ActionSecretDownloaded          = "secret.downloaded"
 )

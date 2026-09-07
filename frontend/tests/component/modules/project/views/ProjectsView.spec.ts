@@ -72,6 +72,11 @@ const userSession = {
   user: { id: '2', email: 'user@example.com', role: 'user' as const },
 };
 
+const projectRoutes = [
+  { path: '/', name: 'home', component: ProjectsView },
+  { path: '/project/:slug', name: 'project-detail', component: { template: '<div />' } },
+];
+
 const sampleProjects = {
   items: [
     {
@@ -123,7 +128,10 @@ describe('ProjectsView (component)', () => {
   });
 
   it('renders projects with create/edit and delete for admin', async () => {
-    const { wrapper } = await mountComponent(ProjectsView, { session: adminSession });
+    const { wrapper } = await mountComponent(ProjectsView, {
+      session: adminSession,
+      routes: projectRoutes,
+    });
     await flushPromises();
 
     expect(wrapper.get('h1').text()).toBe('Projetos');
@@ -136,7 +144,10 @@ describe('ProjectsView (component)', () => {
   });
 
   it('hides delete for standard user but keeps create/edit', async () => {
-    const { wrapper } = await mountComponent(ProjectsView, { session: userSession });
+    const { wrapper } = await mountComponent(ProjectsView, {
+      session: userSession,
+      routes: projectRoutes,
+    });
     await flushPromises();
 
     expect(wrapper.text()).toContain('Payment');
@@ -151,7 +162,10 @@ describe('ProjectsView (component)', () => {
       .mockResolvedValueOnce(sampleProjects)
       .mockResolvedValueOnce({ items: [], page: 1, page_size: 12, total: 0 });
 
-    const { wrapper } = await mountComponent(ProjectsView, { session: userSession });
+    const { wrapper } = await mountComponent(ProjectsView, {
+      session: userSession,
+      routes: projectRoutes,
+    });
     await flushPromises();
 
     await wrapper.get('input[name="project-title-search"]').setValue('pay');
@@ -170,7 +184,10 @@ describe('ProjectsView (component)', () => {
   });
 
   it('shows catalog add buttons by role and creates tag from project form', async () => {
-    const { wrapper } = await mountComponent(ProjectsView, { session: userSession });
+    const { wrapper } = await mountComponent(ProjectsView, {
+      session: userSession,
+      routes: projectRoutes,
+    });
     await flushPromises();
 
     await wrapper.get('button.btn-primary').trigger('click');
@@ -206,7 +223,10 @@ describe('ProjectsView (component)', () => {
   });
 
   it('lets admin create environment from project form and selects it', async () => {
-    const { wrapper } = await mountComponent(ProjectsView, { session: adminSession });
+    const { wrapper } = await mountComponent(ProjectsView, {
+      session: adminSession,
+      routes: projectRoutes,
+    });
     await flushPromises();
 
     await wrapper.get('button.btn-primary').trigger('click');
@@ -239,7 +259,10 @@ describe('ProjectsView (component)', () => {
   });
 
   it('lets admin create team from project form and selects it', async () => {
-    const { wrapper } = await mountComponent(ProjectsView, { session: adminSession });
+    const { wrapper } = await mountComponent(ProjectsView, {
+      session: adminSession,
+      routes: projectRoutes,
+    });
     await flushPromises();
 
     await wrapper.get('button.btn-primary').trigger('click');

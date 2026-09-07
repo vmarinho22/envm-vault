@@ -2,6 +2,7 @@
 import { PencilSquareIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/outline';
 import { computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { RouterLink } from 'vue-router';
 import CatalogMultiSelect from '@/modules/project/components/CatalogMultiSelect.vue';
 import ProjectFormModal from '@/modules/project/components/ProjectFormModal.vue';
 import { useProjects } from '@/modules/project/composables/useProjects';
@@ -147,7 +148,14 @@ onMounted(() => {
             </td>
           </tr>
           <tr v-for="project in projects" :key="project.id">
-            <td>{{ project.title }}</td>
+            <td>
+              <RouterLink
+                class="link link-hover font-medium"
+                :to="{ name: 'project-detail', params: { slug: project.slug } }"
+              >
+                {{ project.title }}
+              </RouterLink>
+            </td>
             <td>
               <span class="flex flex-wrap gap-1">
                 <span v-for="team in project.teams" :key="team.id" class="badge badge-ghost badge-sm">

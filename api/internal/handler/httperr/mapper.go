@@ -77,6 +77,16 @@ func Write(c *fiber.Ctx, err error) error {
 		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"error": "project slug already taken"})
 	case errors.Is(err, service.ErrInvalidProjectRelations):
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "project requires at least one team and one environment"})
+	case errors.Is(err, service.ErrInvalidSecretName):
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid secret name"})
+	case errors.Is(err, service.ErrSecretNotFound):
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "secret not found"})
+	case errors.Is(err, service.ErrSecretNameTaken):
+		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"error": "secret name already taken"})
+	case errors.Is(err, service.ErrSecretValueNotFound):
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "secret value not found"})
+	case errors.Is(err, service.ErrEnvironmentNotInProject):
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "environment is not linked to this project"})
 	default:
 		log.Printf("unhandled error method=%s path=%s: %v", c.Method(), c.Path(), err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "internal server error"})

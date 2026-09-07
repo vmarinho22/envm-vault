@@ -48,7 +48,7 @@ exports[`ProjectsView (component) > hides delete for standard user but keeps cre
       <tbody>
         <!--v-if-->
         <tr>
-          <td>Payment</td>
+          <td><a href="/project/payment" class="link link-hover font-medium">Payment</a></td>
           <td><span class="flex flex-wrap gap-1"><span class="badge badge-ghost badge-sm">Platform</span>
             <!--v-if--></span>
           </td>
@@ -160,7 +160,7 @@ exports[`ProjectsView (component) > lets admin create environment from project f
       <tbody>
         <!--v-if-->
         <tr>
-          <td>Payment</td>
+          <td><a href="/project/payment" class="link link-hover font-medium">Payment</a></td>
           <td><span class="flex flex-wrap gap-1"><span class="badge badge-ghost badge-sm">Platform</span>
             <!--v-if--></span>
           </td>
@@ -274,7 +274,7 @@ exports[`ProjectsView (component) > lets admin create team from project form and
       <tbody>
         <!--v-if-->
         <tr>
-          <td>Payment</td>
+          <td><a href="/project/payment" class="link link-hover font-medium">Payment</a></td>
           <td><span class="flex flex-wrap gap-1"><span class="badge badge-ghost badge-sm">Platform</span>
             <!--v-if--></span>
           </td>
@@ -388,7 +388,7 @@ exports[`ProjectsView (component) > renders projects with create/edit and delete
       <tbody>
         <!--v-if-->
         <tr>
-          <td>Payment</td>
+          <td><a href="/project/payment" class="link link-hover font-medium">Payment</a></td>
           <td><span class="flex flex-wrap gap-1"><span class="badge badge-ghost badge-sm">Platform</span>
             <!--v-if--></span>
           </td>
@@ -596,7 +596,7 @@ exports[`ProjectsView (component) > shows catalog add buttons by role and create
       <tbody>
         <!--v-if-->
         <tr>
-          <td>Payment</td>
+          <td><a href="/project/payment" class="link link-hover font-medium">Payment</a></td>
           <td><span class="flex flex-wrap gap-1"><span class="badge badge-ghost badge-sm">Platform</span>
             <!--v-if--></span>
           </td>

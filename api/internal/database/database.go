@@ -24,6 +24,8 @@ func Open(dsn string) (*gorm.DB, error) {
 		&model.Tag{},
 		&model.Environment{},
 		&model.Project{},
+		&model.Secret{},
+		&model.SecretValue{},
 	); err != nil {
 		return nil, fmt.Errorf("auto migrate: %w", err)
 	}

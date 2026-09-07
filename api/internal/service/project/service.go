@@ -26,6 +26,7 @@ type Service struct {
 	teams        *repository.TeamRepository
 	environments *repository.EnvironmentRepository
 	tags         *repository.TagRepository
+	secrets      *repository.SecretRepository
 	audit        audit.Logger
 }
 
@@ -34,6 +35,7 @@ func New(
 	teams *repository.TeamRepository,
 	environments *repository.EnvironmentRepository,
 	tags *repository.TagRepository,
+	secrets *repository.SecretRepository,
 	auditLog audit.Logger,
 ) *Service {
 	return &Service{
@@ -41,6 +43,7 @@ func New(
 		teams:        teams,
 		environments: environments,
 		tags:         tags,
+		secrets:      secrets,
 		audit:        audit.OrNop(auditLog),
 	}
 }
@@ -385,6 +388,25 @@ func (s *Service) Update(
 		if relErr != nil {
 			return nil, relErr
 		}
+
+		if environmentIDs != nil {
+			keep := make(map[uuid.UUID]struct{}, len(envs))
+			for _, e := range envs {
+				keep[e.ID] = struct{}{}
+			}
+			var removed []uuid.UUID
+			for _, e := range project.Environments {
+				if _, ok := keep[e.ID]; !ok {
+					removed = append(removed, e.ID)
+				}
+			}
+			if len(removed) > 0 && s.secrets != nil {
+				if err := s.secrets.DeleteValuesForEnvironments(ctx, project.ID, removed); err != nil {
+					return nil, err
+				}
+			}
+		}
+
 		if err := s.projects.ReplaceAssociations(ctx, project, teams, envs, tags); err != nil {
 			return nil, err
 		}
@@ -426,6 +448,12 @@ func (s *Service) Delete(ctx context.Context, actorID, actorEmail, actorRole, pr
 			return service.ErrProjectNotFound
 		}
 		return err
+	}
+
+	if s.secrets != nil {
+		if err := s.secrets.DeleteByProjectID(ctx, id); err != nil {
+			return err
+		}
 	}
 
 	if err := s.projects.Delete(ctx, id); err != nil {

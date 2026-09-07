@@ -11,7 +11,7 @@ import (
 
 func TestDelete_ForbiddenForUserRole(t *testing.T) {
 	spy := &audit.Spy{}
-	svc := project.New(nil, nil, nil, nil, spy)
+	svc := project.New(nil, nil, nil, nil, nil, spy)
 
 	err := svc.Delete(t.Context(), "00000000-0000-0000-0000-000000000001", "user@example.com", service.RoleUser, "00000000-0000-0000-0000-000000000099")
 	if err != service.ErrForbidden {
@@ -24,7 +24,7 @@ func TestDelete_ForbiddenForUserRole(t *testing.T) {
 
 func TestCreate_AllowsUserRole_InvalidTitle(t *testing.T) {
 	spy := &audit.Spy{}
-	svc := project.New(nil, nil, nil, nil, spy)
+	svc := project.New(nil, nil, nil, nil, nil, spy)
 
 	_, err := svc.Create(t.Context(), "00000000-0000-0000-0000-000000000001", "user@example.com", service.RoleUser, "!!!", []string{"00000000-0000-0000-0000-000000000002"}, []string{"00000000-0000-0000-0000-000000000003"}, nil)
 	if err != service.ErrInvalidProjectTitle {
@@ -36,7 +36,7 @@ func TestCreate_AllowsUserRole_InvalidTitle(t *testing.T) {
 }
 
 func TestCreate_TitleTooLong(t *testing.T) {
-	svc := project.New(nil, nil, nil, nil, nil)
+	svc := project.New(nil, nil, nil, nil, nil, nil)
 	long := strings.Repeat("a", 81)
 
 	_, err := svc.Create(t.Context(), "00000000-0000-0000-0000-000000000001", "user@example.com", service.RoleUser, long, []string{"00000000-0000-0000-0000-000000000002"}, []string{"00000000-0000-0000-0000-000000000003"}, nil)
@@ -46,7 +46,7 @@ func TestCreate_TitleTooLong(t *testing.T) {
 }
 
 func TestCreate_MissingRelations(t *testing.T) {
-	svc := project.New(nil, nil, nil, nil, nil)
+	svc := project.New(nil, nil, nil, nil, nil, nil)
 
 	_, err := svc.Create(t.Context(), "00000000-0000-0000-0000-000000000001", "user@example.com", service.RoleUser, "My App", nil, []string{"00000000-0000-0000-0000-000000000003"}, nil)
 	if err != service.ErrInvalidProjectRelations {
@@ -55,7 +55,7 @@ func TestCreate_MissingRelations(t *testing.T) {
 }
 
 func TestUpdate_InvalidProjectID(t *testing.T) {
-	svc := project.New(nil, nil, nil, nil, nil)
+	svc := project.New(nil, nil, nil, nil, nil, nil)
 	title := "My App"
 
 	_, err := svc.Update(t.Context(), "00000000-0000-0000-0000-000000000001", "user@example.com", service.RoleUser, "bad-id", &title, nil, nil, nil)
@@ -65,7 +65,7 @@ func TestUpdate_InvalidProjectID(t *testing.T) {
 }
 
 func TestDelete_InvalidProjectID(t *testing.T) {
-	svc := project.New(nil, nil, nil, nil, nil)
+	svc := project.New(nil, nil, nil, nil, nil, nil)
 
 	err := svc.Delete(t.Context(), "00000000-0000-0000-0000-000000000001", "admin@example.com", service.RoleAdmin, "bad-id")
 	if err != service.ErrProjectNotFound {

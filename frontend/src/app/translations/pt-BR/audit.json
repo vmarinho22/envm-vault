@@ -47,7 +47,13 @@
     "environmentDeleted": "Ambiente excluído",
     "projectCreated": "Projeto criado",
     "projectUpdated": "Projeto atualizado",
-    "projectDeleted": "Projeto excluído"
+    "projectDeleted": "Projeto excluído",
+    "secretCreated": "Secret criada",
+    "secretUpdated": "Secret atualizada",
+    "secretDeleted": "Secret excluída",
+    "secretValueSet": "Valor de secret definido",
+    "secretValueCleared": "Valor de secret removido",
+    "secretDownloaded": "Secrets baixadas"
   },
   "channels": {
     "web": "Web",

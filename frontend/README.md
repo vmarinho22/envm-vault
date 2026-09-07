@@ -2,7 +2,7 @@
 
 Interface web do [envm-vault](../README.md): vault open source para gerenciar e distribuir variáveis de ambiente entre projetos e ambientes customizáveis.
 
-Nesta fase, a UI cobre autenticação por e-mail (OTP), geração obrigatória da chave de API e gestão da chave (incluindo revogação por admin). Telas de projetos e secrets virão nas próximas fases.
+Nesta fase, a UI cobre autenticação por e-mail (OTP), chave de API, projetos, times, tags, ambientes e a matriz de secrets em `/project/:slug`.
 
 ## Stack
 

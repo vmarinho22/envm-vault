@@ -34,12 +34,12 @@ type AccountableResponse struct {
 }
 
 type TeamResponse struct {
-	ID          string               `json:"id"`
-	Name        string               `json:"name"`
-	Slug        string               `json:"slug"`
-	Accountable AccountableResponse  `json:"accountable"`
-	CreatedAt   time.Time            `json:"created_at"`
-	UpdatedAt   time.Time            `json:"updated_at"`
+	ID          string              `json:"id"`
+	Name        string              `json:"name"`
+	Slug        string              `json:"slug"`
+	Accountable AccountableResponse `json:"accountable"`
+	CreatedAt   time.Time           `json:"created_at"`
+	UpdatedAt   time.Time           `json:"updated_at"`
 }
 
 func toResponse(t model.Team) TeamResponse {

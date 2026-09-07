@@ -9,6 +9,7 @@ import (
 	environmenthandler "github.com/envm-vault/envm-vault/api/internal/handler/environment"
 	healthhandler "github.com/envm-vault/envm-vault/api/internal/handler/health"
 	projecthandler "github.com/envm-vault/envm-vault/api/internal/handler/project"
+	secrethandler "github.com/envm-vault/envm-vault/api/internal/handler/secret"
 	taghandler "github.com/envm-vault/envm-vault/api/internal/handler/tag"
 	teamhandler "github.com/envm-vault/envm-vault/api/internal/handler/team"
 	tokenhandler "github.com/envm-vault/envm-vault/api/internal/handler/token"
@@ -18,9 +19,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func TestRegister_RoutesRegistered(t *testing.T) {
-	app := fiber.New()
-	router.Register(app, router.Deps{
+func emptyDeps(jwt *middleware.JWTMiddleware, apiKey *middleware.APIKeyMiddleware) router.Deps {
+	return router.Deps{
 		Health:      &healthhandler.Handler{},
 		Auth:        &authhandler.Handler{},
 		User:        &userhandler.Handler{},
@@ -30,7 +30,18 @@ func TestRegister_RoutesRegistered(t *testing.T) {
 		Tag:         &taghandler.Handler{},
 		Environment: &environmenthandler.Handler{},
 		Project:     &projecthandler.Handler{},
-	})
+		Secret:      &secrethandler.Handler{},
+		JWT:         jwt,
+		APIKey:      apiKey,
+	}
+}
+
+func TestRegister_RoutesRegistered(t *testing.T) {
+	app := fiber.New()
+	router.Register(app, emptyDeps(
+		middleware.NewJWTMiddleware("test-secret", nil, nil),
+		middleware.NewAPIKeyMiddleware(nil, nil, nil),
+	))
 
 	want := map[string]bool{
 		"GET /v1/health":                 false,
@@ -63,6 +74,9 @@ func TestRegister_RoutesRegistered(t *testing.T) {
 		"POST /v1/projects":              false,
 		"PATCH /v1/projects/:id":         false,
 		"DELETE /v1/projects/:id":        false,
+		"GET /v1/projects/:id/secrets":   false,
+		"POST /v1/projects/:id/secrets":  false,
+		"GET /v1/projects/:slug/environments/:envTitle": false,
 	}
 
 	for _, route := range app.GetRoutes() {
@@ -81,18 +95,10 @@ func TestRegister_RoutesRegistered(t *testing.T) {
 
 func TestRegister_TokensMeRequiresAuth(t *testing.T) {
 	app := fiber.New()
-	router.Register(app, router.Deps{
-		Health:      &healthhandler.Handler{},
-		Auth:        &authhandler.Handler{},
-		User:        &userhandler.Handler{},
-		Token:       &tokenhandler.Handler{},
-		Audit:       &audithandler.Handler{},
-		Team:        &teamhandler.Handler{},
-		Tag:         &taghandler.Handler{},
-		Environment: &environmenthandler.Handler{},
-		Project:     &projecthandler.Handler{},
-		JWT:         middleware.NewJWTMiddleware("test-secret", nil, nil),
-	})
+	router.Register(app, emptyDeps(
+		middleware.NewJWTMiddleware("test-secret", nil, nil),
+		middleware.NewAPIKeyMiddleware(nil, nil, nil),
+	))
 
 	req := httptest.NewRequest(fiber.MethodGet, "/v1/tokens/me", nil)
 	resp, err := app.Test(req, -1)
@@ -114,5 +120,24 @@ func TestRegister_TokensMeRequiresAuth(t *testing.T) {
 
 	if postResp.StatusCode != fiber.StatusUnauthorized {
 		t.Fatalf("POST status = %d, want %d", postResp.StatusCode, fiber.StatusUnauthorized)
+	}
+}
+
+func TestRegister_DownloadRequiresAPIKey(t *testing.T) {
+	app := fiber.New()
+	router.Register(app, emptyDeps(
+		middleware.NewJWTMiddleware("test-secret", nil, nil),
+		middleware.NewAPIKeyMiddleware(nil, nil, nil),
+	))
+
+	req := httptest.NewRequest(fiber.MethodGet, "/v1/projects/my-app/environments/dev", nil)
+	resp, err := app.Test(req, -1)
+	if err != nil {
+		t.Fatalf("request: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != fiber.StatusUnauthorized {
+		t.Fatalf("status = %d, want %d", resp.StatusCode, fiber.StatusUnauthorized)
 	}
 }

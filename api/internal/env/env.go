@@ -1,6 +1,7 @@
 package env
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -16,8 +17,8 @@ import (
 // Envs is the central process environment for the Go API.
 // Usage: env.Load() then env.Envs.Database.URL (same idea as `import { envs } from 'env'`).
 //
-// Required: DATABASE_URL, JWT_SECRET.
-// Optional (defaults): APP_ENV, PORT, JWT_EXPIRY, CORS_ORIGINS, RATE_LIMIT_*.
+// Required: DATABASE_URL, JWT_SECRET, ENCRYPTION_KEY.
+// Optional (defaults): APP_ENV, PORT, JWT_EXPIRY, CORS_ORIGINS, RATE_LIMIT_*, ENCRYPTION_KEY_VERSION.
 // POSTGRES_* are Docker Compose / .docker/db/.env only — not loaded here.
 var Envs Vars
 
@@ -26,6 +27,7 @@ type Vars struct {
 	App       AppEnv
 	Database  DatabaseEnv
 	JWT       JWTEnv
+	Crypto    CryptoEnv
 	CORS      CORSEnv
 	RateLimit RateLimitEnv
 }
@@ -42,6 +44,11 @@ type DatabaseEnv struct {
 type JWTEnv struct {
 	Secret string
 	Expiry time.Duration
+}
+
+type CryptoEnv struct {
+	Key     []byte // 32 bytes from ENCRYPTION_KEY hex
+	Version int    // ENCRYPTION_KEY_VERSION
 }
 
 type CORSEnv struct {
@@ -63,19 +70,24 @@ func Load() error {
 
 	databaseURL, errDatabaseURL := requireString("DATABASE_URL")
 	jwtSecret, errJWTSecret := requireString("JWT_SECRET")
+	encKey, errEncKey := requireEncryptionKey("ENCRYPTION_KEY")
 
 	jwtExpiry, errJWTExpiry := optionalDuration("JWT_EXPIRY", "24h")
 	rateLimitWindow, errRateLimitWindow := optionalDuration("RATE_LIMIT_WINDOW", "1m")
 	rateLimitMax, errRateLimitMax := optionalInt("RATE_LIMIT_MAX", "100")
+	encKeyVersion, errEncKeyVersion := optionalInt("ENCRYPTION_KEY_VERSION", "1")
 
 	origins, errCORS := parseCORSOrigins(os.Getenv("CORS_ORIGINS"))
 
-	if err := joinErrors(errDatabaseURL, errJWTSecret, errJWTExpiry, errRateLimitWindow, errRateLimitMax, errCORS); err != nil {
+	if err := joinErrors(errDatabaseURL, errJWTSecret, errEncKey, errJWTExpiry, errRateLimitWindow, errRateLimitMax, errEncKeyVersion, errCORS); err != nil {
 		return err
 	}
 
 	if rateLimitMax < 1 {
 		return fmt.Errorf("RATE_LIMIT_MAX must be >= 1")
+	}
+	if encKeyVersion < 1 {
+		return fmt.Errorf("ENCRYPTION_KEY_VERSION must be >= 1")
 	}
 
 	Envs = Vars{
@@ -89,6 +101,10 @@ func Load() error {
 		JWT: JWTEnv{
 			Secret: jwtSecret,
 			Expiry: jwtExpiry,
+		},
+		Crypto: CryptoEnv{
+			Key:     encKey,
+			Version: encKeyVersion,
 		},
 		CORS: CORSEnv{
 			Origins: origins,
@@ -133,6 +149,21 @@ func requireString(key string) (string, error) {
 		return "", fmt.Errorf("%s is required", key)
 	}
 	return v, nil
+}
+
+func requireEncryptionKey(key string) ([]byte, error) {
+	raw, err := requireString(key)
+	if err != nil {
+		return nil, err
+	}
+	decoded, err := hex.DecodeString(raw)
+	if err != nil {
+		return nil, fmt.Errorf("%s must be hex-encoded: %w", key, err)
+	}
+	if len(decoded) != 32 {
+		return nil, fmt.Errorf("%s must decode to exactly 32 bytes (got %d)", key, len(decoded))
+	}
+	return decoded, nil
 }
 
 func optionalString(key, fallback string) string {

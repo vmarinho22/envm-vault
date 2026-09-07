@@ -11,6 +11,8 @@ describe('actionLabel', () => {
     expect(actionLabel('tag.created', t)).toBe('audit.actions.tagCreated');
     expect(actionLabel('environment.created', t)).toBe('audit.actions.environmentCreated');
     expect(actionLabel('project.created', t)).toBe('audit.actions.projectCreated');
+    expect(actionLabel('secret.created', t)).toBe('audit.actions.secretCreated');
+    expect(actionLabel('secret_value.set', t)).toBe('audit.actions.secretValueSet');
     expect(actionLabel('user.blocked', t)).toBe('audit.actions.userBlocked');
   });
 

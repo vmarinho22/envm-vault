@@ -47,7 +47,13 @@
     "environmentDeleted": "Environment deleted",
     "projectCreated": "Project created",
     "projectUpdated": "Project updated",
-    "projectDeleted": "Project deleted"
+    "projectDeleted": "Project deleted",
+    "secretCreated": "Secret created",
+    "secretUpdated": "Secret updated",
+    "secretDeleted": "Secret deleted",
+    "secretValueSet": "Secret value set",
+    "secretValueCleared": "Secret value cleared",
+    "secretDownloaded": "Secrets downloaded"
   },
   "channels": {
     "web": "Web",

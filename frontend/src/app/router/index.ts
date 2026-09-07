@@ -10,6 +10,7 @@ import TeamsView from '@/modules/team/views/TeamsView.vue';
 import TagsView from '@/modules/tag/views/TagsView.vue';
 import EnvironmentsView from '@/modules/environment/views/EnvironmentsView.vue';
 import ProjectsView from '@/modules/project/views/ProjectsView.vue';
+import ProjectDetailView from '@/modules/secret/views/ProjectDetailView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -34,6 +35,11 @@ const router = createRouter({
           path: '',
           name: 'home',
           component: ProjectsView,
+        },
+        {
+          path: 'project/:slug',
+          name: 'project-detail',
+          component: ProjectDetailView,
         },
         {
           path: 'api-key',

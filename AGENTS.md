@@ -46,12 +46,13 @@ Always read `docs/architecture.md` before implementing domain logic.
 ## Security Rules (always apply)
 
 1. **Never commit secrets** — no real tokens, passwords, or `.env` files with production values.
-2. **Env split** — `api/.env` is API secrets; `.docker/db/.env` is PostgreSQL/Docker Compose (`POSTGRES_*`); `frontend/.env` is `VITE_*` only (public, baked into the browser bundle). Never put `JWT_SECRET` / `DATABASE_URL` in the frontend env.
+2. **Env split** — `api/.env` is API secrets; `.docker/db/.env` is PostgreSQL/Docker Compose (`POSTGRES_*`); `frontend/.env` is `VITE_*` only (public, baked into the browser bundle). Never put `JWT_SECRET` / `DATABASE_URL` / `ENCRYPTION_KEY` in the frontend env.
 3. **Never log secret values** — OTP codes are logged only in `APP_ENV=development`.
 4. **OTP lockout** — max 5 failed verify attempts per code; HTTP rate limit via `RATE_LIMIT_MAX` / `RATE_LIMIT_WINDOW`.
 5. **API keys** — one active key per user, hashed at rest; plaintext returned only from `POST /v1/tokens`.
-6. **Audit** — `audit_logs` via `service/audit`; never include OTP, JWT, or full personal token plaintext.
-7. **Minimal diffs** — do not refactor unrelated code in the same change.
+6. **Secret encryption** — `ENCRYPTION_KEY` (32-byte hex) encrypts secret values at rest (AES-256-GCM); separate from `JWT_SECRET`.
+7. **Audit** — `audit_logs` via `service/audit`; never include OTP, JWT, or full personal token plaintext.
+8. **Minimal diffs** — do not refactor unrelated code in the same change.
 
 ## Conventions
 
