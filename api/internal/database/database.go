@@ -33,6 +33,10 @@ func Open(dsn string) (*gorm.DB, error) {
 		}
 	}
 
+	if err := EnsureDefaultTags(db); err != nil {
+		return nil, fmt.Errorf("seed default tags: %w", err)
+	}
+
 	return db, nil
 }
 

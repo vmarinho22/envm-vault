@@ -100,7 +100,7 @@ An organizational unit with a display `name`, URL `slug` (derived from the name)
 
 ### Tag
 
-A global catalog label with a unique `title` and hex `color` (`#RRGGBB`) used to identify projects later. Any authenticated user can list, create, update, or delete tags. Tags are not yet linked to projects.
+A global catalog label with a unique `title` and hex `color` (`#RRGGBB`) used to identify projects later. Any authenticated user can list, create, update, or delete tags. Tags are not yet linked to projects. On migrate/startup the catalog seeds three defaults when missing: `backend` (`#000000`), `frontend` (`#FFFFFF`), `infra` (`#F97316`).
 
 ## Repository Structure
 

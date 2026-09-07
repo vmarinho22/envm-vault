@@ -28,7 +28,7 @@ Programmatic credential for downloading env vars. **One active key per user.** S
 Organizational unit with `name`, unique `slug` (from name via shared slug helper), and one accountable `User` (for future notifications). No memberships yet; not linked to Project yet. Any authenticated user may list/search; only `admin` / `super_admin` mutate.
 
 ### Tag
-Global catalog label with unique `title` and hex `color` (`#RRGGBB`) for identifying projects later. Not linked to Project yet. Any authenticated user may list, create, update, or delete.
+Global catalog label with unique `title` and hex `color` (`#RRGGBB`) for identifying projects later. Not linked to Project yet. Any authenticated user may list, create, update, or delete. Seeded defaults (idempotent on migrate/startup): `backend` `#000000`, `frontend` `#FFFFFF`, `infra` `#F97316`.
 
 ## Primary Flow
 
