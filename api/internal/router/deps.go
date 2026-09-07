@@ -1,9 +1,10 @@
 package router
 
 import (
-	authhandler "github.com/envm-vault/envm-vault/api/internal/handler/auth"
 	audithandler "github.com/envm-vault/envm-vault/api/internal/handler/audit"
+	authhandler "github.com/envm-vault/envm-vault/api/internal/handler/auth"
 	healthhandler "github.com/envm-vault/envm-vault/api/internal/handler/health"
+	taghandler "github.com/envm-vault/envm-vault/api/internal/handler/tag"
 	teamhandler "github.com/envm-vault/envm-vault/api/internal/handler/team"
 	tokenhandler "github.com/envm-vault/envm-vault/api/internal/handler/token"
 	userhandler "github.com/envm-vault/envm-vault/api/internal/handler/user"
@@ -17,5 +18,6 @@ type Deps struct {
 	Token  *tokenhandler.Handler
 	Audit  *audithandler.Handler
 	Team   *teamhandler.Handler
+	Tag    *taghandler.Handler
 	JWT    *middleware.JWTMiddleware
 }

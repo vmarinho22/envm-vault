@@ -8,6 +8,7 @@ import TokenSetupView from '@/modules/token/views/TokenSetupView.vue';
 import UsersView from '@/modules/user/views/UsersView.vue';
 import AuditLogsView from '@/modules/audit/views/AuditLogsView.vue';
 import TeamsView from '@/modules/team/views/TeamsView.vue';
+import TagsView from '@/modules/tag/views/TagsView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -42,6 +43,11 @@ const router = createRouter({
           path: 'teams',
           name: 'teams',
           component: TeamsView,
+        },
+        {
+          path: 'tags',
+          name: 'tags',
+          component: TagsView,
         },
         {
           path: 'users',

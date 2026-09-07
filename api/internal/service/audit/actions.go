@@ -19,4 +19,7 @@ const (
 	ActionTeamCreated               = "team.created"
 	ActionTeamUpdated               = "team.updated"
 	ActionTeamDeleted               = "team.deleted"
+	ActionTagCreated                = "tag.created"
+	ActionTagUpdated                = "tag.updated"
+	ActionTagDeleted                = "tag.deleted"
 )

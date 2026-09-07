@@ -55,6 +55,14 @@ func Write(c *fiber.Ctx, err error) error {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "team not found"})
 	case errors.Is(err, service.ErrTeamSlugTaken):
 		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"error": "team slug already taken"})
+	case errors.Is(err, service.ErrInvalidTagTitle):
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid tag title"})
+	case errors.Is(err, service.ErrInvalidTagColor):
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid tag color"})
+	case errors.Is(err, service.ErrTagNotFound):
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "tag not found"})
+	case errors.Is(err, service.ErrTagTitleTaken):
+		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"error": "tag title already taken"})
 	default:
 		log.Printf("unhandled error method=%s path=%s: %v", c.Method(), c.Path(), err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "internal server error"})

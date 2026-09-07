@@ -35,7 +35,10 @@
     "personalTokenRevokedByAdmin": "Personal token revoked by admin",
     "teamCreated": "Team created",
     "teamUpdated": "Team updated",
-    "teamDeleted": "Team deleted"
+    "teamDeleted": "Team deleted",
+    "tagCreated": "Tag created",
+    "tagUpdated": "Tag updated",
+    "tagDeleted": "Tag deleted"
   },
   "channels": {
     "web": "Web",

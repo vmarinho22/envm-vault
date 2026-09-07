@@ -1,0 +1,41 @@
+{
+  "title": "Tags",
+  "description": "Labels used to identify projects. Any authenticated user can create, edit, and delete.",
+  "create": "Create tag",
+  "edit": "Edit",
+  "delete": "Delete",
+  "empty": "No tags yet.",
+  "emptySearch": "No tags matched that search.",
+  "confirmDelete": "Delete tag \"{title}\"? This cannot be undone.",
+  "columns": {
+    "title": "Title",
+    "color": "Color",
+    "createdAt": "Created at",
+    "updatedAt": "Updated at",
+    "actions": "Actions"
+  },
+  "search": {
+    "label": "Search by title",
+    "placeholder": "e.g. backend",
+    "apply": "Search",
+    "clear": "Clear"
+  },
+  "form": {
+    "createTitle": "New tag",
+    "editTitle": "Edit tag",
+    "title": "Title",
+    "color": "Color",
+    "colorPicker": "Color picker",
+    "colorHex": "Hex color",
+    "randomizeColor": "Randomize color",
+    "cancel": "Cancel",
+    "create": "Create",
+    "save": "Save"
+  },
+  "errors": {
+    "loadFailed": "could not load tags",
+    "createFailed": "could not create tag",
+    "updateFailed": "could not update tag",
+    "deleteFailed": "could not delete tag"
+  }
+}

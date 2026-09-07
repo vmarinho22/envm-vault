@@ -4,6 +4,7 @@ import {
   ClipboardDocumentListIcon,
   HomeIcon,
   KeyIcon,
+  TagIcon,
   UserGroupIcon,
   UsersIcon,
 } from '@heroicons/vue/24/outline';
@@ -61,6 +62,14 @@ function logout(): void {
         >
           <UserGroupIcon class="size-5 shrink-0" aria-hidden="true" />
           {{ t('nav.teams') }}
+        </RouterLink>
+        <RouterLink
+          :to="{ name: 'tags' }"
+          :class="navLinkClass"
+          :exact-active-class="navActiveClass"
+        >
+          <TagIcon class="size-5 shrink-0" aria-hidden="true" />
+          {{ t('nav.tags') }}
         </RouterLink>
         <RouterLink
           v-if="auth.isAdmin"

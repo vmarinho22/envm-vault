@@ -1,6 +1,6 @@
 ---
 name: env-vault-domain
-description: Describes the envm-vault domain model including Project, Environment, Secret, User, AccessToken, and Team entities. Use when implementing features, designing APIs, writing migrations, or discussing vault behavior.
+description: Describes the envm-vault domain model including Project, Environment, Secret, User, AccessToken, Team, and Tag entities. Use when implementing features, designing APIs, writing migrations, or discussing vault behavior.
 ---
 
 # envm-vault Domain
@@ -27,6 +27,9 @@ Programmatic credential for downloading env vars. **One active key per user.** S
 ### Team
 Organizational unit with `name`, unique `slug` (from name via shared slug helper), and one accountable `User` (for future notifications). No memberships yet; not linked to Project yet. Any authenticated user may list/search; only `admin` / `super_admin` mutate.
 
+### Tag
+Global catalog label with unique `title` and hex `color` (`#RRGGBB`) for identifying projects later. Not linked to Project yet. Any authenticated user may list, create, update, or delete.
+
 ## Primary Flow
 
 ```
@@ -50,4 +53,5 @@ User → has one → AccessToken
 User → accountable for many → Team
 Project → has many → Environment
 Environment → has many → Secret
+Tag (catalog; Project link TBD)
 ```

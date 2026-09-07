@@ -14,6 +14,9 @@ export const AUDIT_ACTIONS = [
   'team.created',
   'team.updated',
   'team.deleted',
+  'tag.created',
+  'tag.updated',
+  'tag.deleted',
 ] as const;
 
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];
@@ -33,6 +36,9 @@ const ACTION_I18N_KEYS: Record<string, string> = {
   'team.created': 'audit.actions.teamCreated',
   'team.updated': 'audit.actions.teamUpdated',
   'team.deleted': 'audit.actions.teamDeleted',
+  'tag.created': 'audit.actions.tagCreated',
+  'tag.updated': 'audit.actions.tagUpdated',
+  'tag.deleted': 'audit.actions.tagDeleted',
 };
 
 export function actionLabel(action: string, t: (key: string) => string): string {

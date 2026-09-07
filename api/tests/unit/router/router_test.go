@@ -7,6 +7,7 @@ import (
 	audithandler "github.com/envm-vault/envm-vault/api/internal/handler/audit"
 	authhandler "github.com/envm-vault/envm-vault/api/internal/handler/auth"
 	healthhandler "github.com/envm-vault/envm-vault/api/internal/handler/health"
+	taghandler "github.com/envm-vault/envm-vault/api/internal/handler/tag"
 	teamhandler "github.com/envm-vault/envm-vault/api/internal/handler/team"
 	tokenhandler "github.com/envm-vault/envm-vault/api/internal/handler/token"
 	userhandler "github.com/envm-vault/envm-vault/api/internal/handler/user"
@@ -24,6 +25,7 @@ func TestRegister_RoutesRegistered(t *testing.T) {
 		Token:  &tokenhandler.Handler{},
 		Audit:  &audithandler.Handler{},
 		Team:   &teamhandler.Handler{},
+		Tag:    &taghandler.Handler{},
 	})
 
 	want := map[string]bool{
@@ -44,6 +46,10 @@ func TestRegister_RoutesRegistered(t *testing.T) {
 		"POST /v1/teams":             false,
 		"PATCH /v1/teams/:id":        false,
 		"DELETE /v1/teams/:id":       false,
+		"GET /v1/tags":               false,
+		"POST /v1/tags":              false,
+		"PATCH /v1/tags/:id":         false,
+		"DELETE /v1/tags/:id":        false,
 	}
 
 	for _, route := range app.GetRoutes() {
@@ -69,6 +75,7 @@ func TestRegister_TokensMeRequiresAuth(t *testing.T) {
 		Token:  &tokenhandler.Handler{},
 		Audit:  &audithandler.Handler{},
 		Team:   &teamhandler.Handler{},
+		Tag:    &taghandler.Handler{},
 		JWT:    middleware.NewJWTMiddleware("test-secret", nil, nil),
 	})
 

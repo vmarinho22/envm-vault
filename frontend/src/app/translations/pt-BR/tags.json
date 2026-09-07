@@ -1,0 +1,41 @@
+{
+  "title": "Tags",
+  "description": "Etiquetas para identificar projetos. Qualquer usuário autenticado pode criar, editar e excluir.",
+  "create": "Criar tag",
+  "edit": "Editar",
+  "delete": "Excluir",
+  "empty": "Nenhuma tag cadastrada.",
+  "emptySearch": "Nenhuma tag encontrada para essa busca.",
+  "confirmDelete": "Excluir a tag \"{title}\"? Esta ação não pode ser desfeita.",
+  "columns": {
+    "title": "Título",
+    "color": "Cor",
+    "createdAt": "Criado em",
+    "updatedAt": "Atualizado em",
+    "actions": "Ações"
+  },
+  "search": {
+    "label": "Buscar por título",
+    "placeholder": "Ex.: backend",
+    "apply": "Buscar",
+    "clear": "Limpar"
+  },
+  "form": {
+    "createTitle": "Nova tag",
+    "editTitle": "Editar tag",
+    "title": "Título",
+    "color": "Cor",
+    "colorPicker": "Seletor de cor",
+    "colorHex": "Cor em hexadecimal",
+    "randomizeColor": "Sortear cor",
+    "cancel": "Cancelar",
+    "create": "Criar",
+    "save": "Salvar"
+  },
+  "errors": {
+    "loadFailed": "não foi possível carregar as tags",
+    "createFailed": "não foi possível criar a tag",
+    "updateFailed": "não foi possível atualizar a tag",
+    "deleteFailed": "não foi possível excluir a tag"
+  }
+}

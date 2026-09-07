@@ -10,6 +10,7 @@ func Register(app *fiber.App, deps Deps) {
 	registerTokenRoutes(v1, deps)
 	registerAuditRoutes(v1, deps)
 	registerTeamRoutes(v1, deps)
+	registerTagRoutes(v1, deps)
 
 	app.Get("/health", deps.Health.Check)
 }

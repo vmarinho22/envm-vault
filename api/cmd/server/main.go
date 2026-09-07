@@ -12,10 +12,11 @@ import (
 	"github.com/envm-vault/envm-vault/api/internal/database"
 	"github.com/envm-vault/envm-vault/api/internal/email"
 	"github.com/envm-vault/envm-vault/api/internal/env"
-	authhandler "github.com/envm-vault/envm-vault/api/internal/handler/auth"
 	audithandler "github.com/envm-vault/envm-vault/api/internal/handler/audit"
+	authhandler "github.com/envm-vault/envm-vault/api/internal/handler/auth"
 	healthhandler "github.com/envm-vault/envm-vault/api/internal/handler/health"
 	"github.com/envm-vault/envm-vault/api/internal/handler/httperr"
+	taghandler "github.com/envm-vault/envm-vault/api/internal/handler/tag"
 	teamhandler "github.com/envm-vault/envm-vault/api/internal/handler/team"
 	tokenhandler "github.com/envm-vault/envm-vault/api/internal/handler/token"
 	userhandler "github.com/envm-vault/envm-vault/api/internal/handler/user"
@@ -25,6 +26,7 @@ import (
 	"github.com/envm-vault/envm-vault/api/internal/service"
 	auditservice "github.com/envm-vault/envm-vault/api/internal/service/audit"
 	authservice "github.com/envm-vault/envm-vault/api/internal/service/auth"
+	tagservice "github.com/envm-vault/envm-vault/api/internal/service/tag"
 	teamservice "github.com/envm-vault/envm-vault/api/internal/service/team"
 	tokenservice "github.com/envm-vault/envm-vault/api/internal/service/token"
 	userservice "github.com/envm-vault/envm-vault/api/internal/service/user"
@@ -55,6 +57,7 @@ func main() {
 	tokenRepo := repository.NewAccessTokenRepository(gormDB)
 	auditRepo := repository.NewAuditLogRepository(gormDB)
 	teamRepo := repository.NewTeamRepository(gormDB)
+	tagRepo := repository.NewTagRepository(gormDB)
 	auditSvc := auditservice.New(auditRepo, userRepo)
 
 	var sender email.Sender
@@ -69,6 +72,7 @@ func main() {
 	userSvc := userservice.New(userRepo, tokenRepo, auditSvc)
 	tokenSvc := tokenservice.New(tokenRepo, userRepo, auditSvc)
 	teamSvc := teamservice.New(teamRepo, userRepo, auditSvc)
+	tagSvc := tagservice.New(tagRepo, auditSvc)
 
 	app := fiber.New(fiber.Config{
 		ErrorHandler: httperr.AppHandler,
@@ -91,6 +95,7 @@ func main() {
 		Token:  tokenhandler.New(tokenSvc),
 		Audit:  audithandler.New(auditSvc),
 		Team:   teamhandler.New(teamSvc),
+		Tag:    taghandler.New(tagSvc),
 		JWT:    middleware.NewJWTMiddleware(env.Envs.JWT.Secret, userRepo, auditSvc),
 	})
 

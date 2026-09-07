@@ -53,6 +53,10 @@ The API lives in `api/` and provides authentication via email OTP plus a unique 
 | `POST` | `/v1/teams` | JWT (admin+) | Create team (name + accountable user) |
 | `PATCH` | `/v1/teams/:id` | JWT (admin+) | Update team name and/or accountable |
 | `DELETE` | `/v1/teams/:id` | JWT (admin+) | Delete team |
+| `GET` | `/v1/tags` | JWT | List tags (optional `?title=` substring filter) |
+| `POST` | `/v1/tags` | JWT | Create tag (title + hex color) |
+| `PATCH` | `/v1/tags/:id` | JWT | Update tag title and/or color |
+| `DELETE` | `/v1/tags/:id` | JWT | Delete tag |
 
 ### Auth Flow
 
@@ -94,6 +98,10 @@ A unique programmatic credential per user for downloading env vars. One active k
 
 An organizational unit with a display `name`, URL `slug` (derived from the name), and a single accountable `User` (for future notifications). Any authenticated user can list/search teams; only `admin` / `super_admin` can create, update, or delete. Teams are not yet linked to projects or memberships.
 
+### Tag
+
+A global catalog label with a unique `title` and hex `color` (`#RRGGBB`) used to identify projects later. Any authenticated user can list, create, update, or delete tags. Tags are not yet linked to projects.
+
 ## Repository Structure
 
 ```
@@ -103,9 +111,9 @@ envm-vault/
 │   ├── tests/unit/       # unit tests (mirrors internal/)
 │   ├── internal/
 │   │   ├── env/          # Envs singleton + Load()
-│   │   ├── router/       # Route registration by context (health, auth, user, token, audit, team)
-│   │   ├── handler/      # Handlers per domain (auth/, user/, token/, health/, audit/, team/)
-│   │   ├── service/      # Business logic per domain (auth/, user/, token/, audit/, team/)
+│   │   ├── router/       # Route registration by context (health, auth, user, token, audit, team, tag)
+│   │   ├── handler/      # Handlers per domain (auth/, user/, token/, health/, audit/, team/, tag/)
+│   │   ├── service/      # Business logic per domain (auth/, user/, token/, audit/, team/, tag/)
 │   │   ├── middleware/
 │   │   ├── database/     # GORM connection + AutoMigrate
 │   │   ├── model/        # GORM models
@@ -128,6 +136,13 @@ erDiagram
   User ||--o{ Project : owns
   Project ||--o{ Environment : contains
   Environment ||--o{ Secret : stores
+  Tag {
+    uuid id PK
+    string title UK
+    string color
+    timestamp created_at
+    timestamp updated_at
+  }
 
   User {
     uuid id PK
@@ -184,9 +199,9 @@ erDiagram
 
 | Role | Description |
 |------|-------------|
-| `super_admin` | First user (bootstrap). Full access. Can revoke any API key. Can manage teams. Can block any user. |
-| `admin` | Can register users, revoke `user`/`admin` API keys, manage teams, and block `admin`/`user`. |
-| `user` | Standard user. Manages their own API key. Can list/search teams (read-only). |
+| `super_admin` | First user (bootstrap). Full access. Can revoke any API key. Can manage teams. Can block any user. Can manage tags. |
+| `admin` | Can register users, revoke `user`/`admin` API keys, manage teams, and block `admin`/`user`. Can manage tags. |
+| `user` | Standard user. Manages their own API key. Can list/search teams (read-only). Can create, update, and delete tags. |
 
 ## Security Principles
 

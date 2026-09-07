@@ -3,6 +3,7 @@
   "home": "Home",
   "apiKey": "API key",
   "teams": "Teams",
+  "tags": "Tags",
   "users": "Users",
   "audit": "Audit"
 }
