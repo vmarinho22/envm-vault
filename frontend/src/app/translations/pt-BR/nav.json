@@ -2,5 +2,6 @@
   "menuAriaLabel": "Menu principal",
   "home": "Início",
   "apiKey": "Chave de API",
-  "users": "Usuários"
+  "users": "Usuários",
+  "audit": "Auditoria"
 }

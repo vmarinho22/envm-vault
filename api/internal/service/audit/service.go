@@ -18,11 +18,12 @@ type Logger interface {
 
 // Service persists audit events and attaches request origin to context.
 type Service struct {
-	logs *repository.AuditLogRepository
+	logs  *repository.AuditLogRepository
+	users *repository.UserRepository
 }
 
-func New(logs *repository.AuditLogRepository) *Service {
-	return &Service{logs: logs}
+func New(logs *repository.AuditLogRepository, users *repository.UserRepository) *Service {
+	return &Service{logs: logs, users: users}
 }
 
 func (s *Service) AttachOrigin(ctx context.Context, origin RequestOrigin) context.Context {

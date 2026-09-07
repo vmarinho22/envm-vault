@@ -1,0 +1,34 @@
+/** Known audit action codes from the API. */
+export const AUDIT_ACTIONS = [
+  'login.requested',
+  'login.succeeded',
+  'login.failed',
+  'user.bootstrap_super_admin',
+  'user.registered',
+  'personal_token.created',
+  'personal_token.rotated',
+  'personal_token.revoked',
+  'personal_token.revoked_by_admin',
+] as const;
+
+export type AuditAction = (typeof AUDIT_ACTIONS)[number];
+
+const ACTION_I18N_KEYS: Record<string, string> = {
+  'login.requested': 'audit.actions.loginRequested',
+  'login.succeeded': 'audit.actions.loginSucceeded',
+  'login.failed': 'audit.actions.loginFailed',
+  'user.bootstrap_super_admin': 'audit.actions.userBootstrapSuperAdmin',
+  'user.registered': 'audit.actions.userRegistered',
+  'personal_token.created': 'audit.actions.personalTokenCreated',
+  'personal_token.rotated': 'audit.actions.personalTokenRotated',
+  'personal_token.revoked': 'audit.actions.personalTokenRevoked',
+  'personal_token.revoked_by_admin': 'audit.actions.personalTokenRevokedByAdmin',
+};
+
+export function actionLabel(action: string, t: (key: string) => string): string {
+  const key = ACTION_I18N_KEYS[action];
+  if (!key) {
+    return action;
+  }
+  return t(key);
+}

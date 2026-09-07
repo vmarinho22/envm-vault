@@ -77,3 +77,14 @@ func (r *UserRepository) List(ctx context.Context) ([]model.User, error) {
 	}
 	return users, nil
 }
+
+func (r *UserRepository) FindByIDs(ctx context.Context, ids []uuid.UUID) ([]model.User, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+	var users []model.User
+	if err := r.db.WithContext(ctx).Where("id IN ?", ids).Find(&users).Error; err != nil {
+		return nil, fmt.Errorf("find users by ids: %w", err)
+	}
+	return users, nil
+}

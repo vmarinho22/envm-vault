@@ -33,12 +33,13 @@ describe('DefaultLayout (component)', () => {
         { path: '', name: 'home', component: HomeView },
         { path: 'api-key', name: 'api-key', component: { template: '<div />' } },
         { path: 'users', name: 'users', component: { template: '<div />' } },
+        { path: 'audit-logs', name: 'audit-logs', component: { template: '<div />' } },
       ],
     },
     { path: '/login', name: 'login', component: LoginView },
   ];
 
-  it('renders sidebar with Início, Chave de API and Usuários for admin', async () => {
+  it('renders sidebar with Início, Chave de API, Usuários and Auditoria for admin', async () => {
     const { wrapper } = await mountComponent(DefaultLayout, {
       routes,
       initialRoute: '/',
@@ -49,6 +50,7 @@ describe('DefaultLayout (component)', () => {
     expect(nav.text()).toContain('Início');
     expect(nav.text()).toContain('Chave de API');
     expect(nav.text()).toContain('Usuários');
+    expect(nav.text()).toContain('Auditoria');
     expect(wrapper.get('header').text()).toContain('admin@example.com');
     expectComponentSnapshot(wrapper);
   });
@@ -79,6 +81,7 @@ describe('DefaultLayout (component)', () => {
     const nav = wrapper.get('aside[aria-label="Menu principal"]');
     expect(nav.text()).toContain('Chave de API');
     expect(nav.text()).not.toContain('Usuários');
+    expect(nav.text()).not.toContain('Auditoria');
     expectComponentSnapshot(wrapper);
   });
 

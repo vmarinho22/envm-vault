@@ -13,6 +13,7 @@ import (
 	"github.com/envm-vault/envm-vault/api/internal/email"
 	"github.com/envm-vault/envm-vault/api/internal/env"
 	authhandler "github.com/envm-vault/envm-vault/api/internal/handler/auth"
+	audithandler "github.com/envm-vault/envm-vault/api/internal/handler/audit"
 	healthhandler "github.com/envm-vault/envm-vault/api/internal/handler/health"
 	"github.com/envm-vault/envm-vault/api/internal/handler/httperr"
 	tokenhandler "github.com/envm-vault/envm-vault/api/internal/handler/token"
@@ -51,7 +52,7 @@ func main() {
 	loginCodeRepo := repository.NewLoginCodeRepository(gormDB)
 	tokenRepo := repository.NewAccessTokenRepository(gormDB)
 	auditRepo := repository.NewAuditLogRepository(gormDB)
-	auditSvc := auditservice.New(auditRepo)
+	auditSvc := auditservice.New(auditRepo, userRepo)
 
 	var sender email.Sender
 	if env.Envs.IsDevelopment() {
@@ -84,6 +85,7 @@ func main() {
 		Auth:   authhandler.New(authSvc),
 		User:   userhandler.New(userSvc),
 		Token:  tokenhandler.New(tokenSvc),
+		Audit:  audithandler.New(auditSvc),
 		JWT:    middleware.NewJWTMiddleware(env.Envs.JWT.Secret, auditSvc),
 	})
 

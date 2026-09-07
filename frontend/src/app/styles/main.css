@@ -1,5 +1,6 @@
 @import '@fontsource-variable/syne';
 @import '@fontsource-variable/manrope';
+@import '@vuepic/vue-datepicker/dist/main.css';
 @import 'tailwindcss';
 @plugin 'daisyui';
 @plugin 'daisyui/theme' {
@@ -89,4 +90,100 @@ html {
 
 .btn:not(:disabled):active {
   transform: translateY(1px);
+}
+
+/* VueDatePicker — vault dark theme (requires `dark` prop → .dp--theme-dark) */
+.audit-datepicker,
+.audit-datepicker.dp--theme-dark {
+  --dp-background-color: var(--color-base-100);
+  --dp-text-color: var(--color-base-content);
+  --dp-hover-color: var(--color-base-200);
+  --dp-hover-text-color: var(--color-base-content);
+  --dp-hover-icon-color: var(--color-base-content);
+  --dp-primary-color: var(--color-primary);
+  --dp-primary-disabled-color: var(--color-primary);
+  --dp-primary-text-color: var(--color-primary-content);
+  --dp-secondary-color: var(--color-base-content);
+  --dp-border-color: var(--color-base-300);
+  --dp-menu-border-color: var(--color-base-300);
+  --dp-border-color-hover: var(--color-base-content);
+  --dp-border-color-focus: var(--color-primary);
+  --dp-disabled-color: var(--color-base-300);
+  --dp-disabled-color-text: color-mix(in oklch, var(--color-base-content) 50%, transparent);
+  --dp-scroll-bar-background: var(--color-base-100);
+  --dp-scroll-bar-color: var(--color-base-300);
+  --dp-success-color: var(--color-success);
+  --dp-success-color-disabled: var(--color-success);
+  --dp-icon-color: color-mix(in oklch, var(--color-base-content) 70%, transparent);
+  --dp-danger-color: var(--color-error);
+  --dp-marker-color: var(--color-error);
+  --dp-tooltip-color: var(--color-base-200);
+  --dp-highlight-color: color-mix(in oklch, var(--color-primary) 25%, transparent);
+  --dp-range-between-dates-background-color: var(--color-base-200);
+  --dp-range-between-dates-text-color: var(--color-base-content);
+  --dp-range-between-border-color: var(--color-base-200);
+  --dp-border-radius: var(--radius-field);
+  --dp-font-family: inherit;
+  --dp-menu-padding: 0.5rem 0.75rem;
+  --dp-calendar-wrap-padding: 0 0.25rem;
+  --dp-calendar-header-cell-padding: 0.25rem;
+  --dp-cell-size: 2.25rem;
+  --dp-menu-min-width: 18rem;
+  /* Match daisyUI `input input-sm` used by Ator/Alvo filters */
+  --dp-font-size: 0.75rem;
+  --dp-input-padding: 0 2rem 0 0.75rem;
+  --dp-input-icon-padding: 2rem;
+  --dp-input-not-clearable-padding: 0 0.75rem;
+}
+
+.audit-datepicker .dp--input,
+.audit-datepicker .dp__input {
+  box-sizing: border-box;
+  height: 2rem;
+  min-height: 2rem;
+  max-height: 2rem;
+  line-height: 1.25rem;
+  font-size: var(--dp-font-size);
+  background-color: var(--color-base-100);
+  color: var(--color-base-content);
+  border: var(--border) solid color-mix(in oklab, var(--color-base-content) 20%, transparent);
+  border-radius: var(--radius-field);
+  box-shadow: none;
+  outline: none;
+}
+
+.audit-datepicker .dp--input:hover,
+.audit-datepicker .dp__input:hover {
+  border-color: color-mix(in oklab, var(--color-base-content) 20%, transparent);
+}
+
+.audit-datepicker .dp--input:focus,
+.audit-datepicker .dp--input:focus-visible,
+.audit-datepicker .dp__input:focus,
+.audit-datepicker .dp__input:focus-visible {
+  border-color: var(--color-base-content);
+  outline: 2px solid var(--color-base-content);
+  outline-offset: 2px;
+}
+
+.audit-datepicker .dp--input::placeholder,
+.audit-datepicker .dp__input::placeholder {
+  color: var(--color-base-content);
+  opacity: 0.5;
+}
+
+.audit-datepicker .dp--input-icon,
+.audit-datepicker .dp--input-icons {
+  width: 1rem;
+  height: 1rem;
+  color: color-mix(in oklab, var(--color-base-content) 50%, transparent);
+}
+
+.audit-datepicker .dp--calendar-header-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }

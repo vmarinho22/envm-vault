@@ -1,0 +1,66 @@
+{
+  "title": "Logs de auditoria",
+  "description": "Eventos de segurança: login, usuários e chaves de API.",
+  "refresh": "Atualizar",
+  "empty": "Nenhum log encontrado.",
+  "columns": {
+    "id": "ID",
+    "action": "Ação",
+    "actor": "Ator",
+    "target": "Alvo",
+    "channel": "Canal",
+    "occurredAt": "Ocorrido em",
+    "actions": "Ações"
+  },
+  "filters": {
+    "actor": "Ator",
+    "target": "Alvo",
+    "dateRange": "Período",
+    "searchUsers": "Buscar usuário…",
+    "noUsers": "Nenhum usuário encontrado",
+    "selected": "{count} selecionado(s)",
+    "all": "Todos"
+  },
+  "actions": {
+    "loginRequested": "Código de login solicitado",
+    "loginSucceeded": "Login bem-sucedido",
+    "loginFailed": "Falha no login",
+    "userBootstrapSuperAdmin": "Super admin criado (bootstrap)",
+    "userRegistered": "Usuário registrado",
+    "personalTokenCreated": "Token pessoal criado",
+    "personalTokenRotated": "Token pessoal rotacionado",
+    "personalTokenRevoked": "Token pessoal revogado",
+    "personalTokenRevokedByAdmin": "Token pessoal revogado por admin"
+  },
+  "channels": {
+    "web": "Web",
+    "api": "API"
+  },
+  "pagination": {
+    "prev": "Anterior",
+    "next": "Próxima",
+    "pageOf": "Página {page} de {totalPages} ({total} no total)"
+  },
+  "detail": {
+    "title": "Detalhe do log",
+    "close": "Fechar",
+    "openAria": "Ver detalhe do log",
+    "id": "ID",
+    "actorUserId": "ID do ator",
+    "actorRole": "Papel do ator",
+    "targetUserId": "ID do alvo",
+    "ip": "IP",
+    "userAgent": "User-Agent",
+    "origin": "Origin",
+    "createdAt": "Criado em",
+    "actionCode": "Código da ação"
+  },
+  "sort": {
+    "toggleAria": "Alternar ordenação por data",
+    "asc": "Crescente",
+    "desc": "Decrescente"
+  },
+  "errors": {
+    "loadFailed": "não foi possível carregar os logs"
+  }
+}

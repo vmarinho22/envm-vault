@@ -1,0 +1,66 @@
+{
+  "title": "Audit logs",
+  "description": "Security events: login, users, and API keys.",
+  "refresh": "Refresh",
+  "empty": "No logs found.",
+  "columns": {
+    "id": "ID",
+    "action": "Action",
+    "actor": "Actor",
+    "target": "Target",
+    "channel": "Channel",
+    "occurredAt": "Occurred at",
+    "actions": "Actions"
+  },
+  "filters": {
+    "actor": "Actor",
+    "target": "Target",
+    "dateRange": "Date range",
+    "searchUsers": "Search user…",
+    "noUsers": "No users found",
+    "selected": "{count} selected",
+    "all": "All"
+  },
+  "actions": {
+    "loginRequested": "Login code requested",
+    "loginSucceeded": "Login succeeded",
+    "loginFailed": "Login failed",
+    "userBootstrapSuperAdmin": "Super admin bootstrapped",
+    "userRegistered": "User registered",
+    "personalTokenCreated": "Personal token created",
+    "personalTokenRotated": "Personal token rotated",
+    "personalTokenRevoked": "Personal token revoked",
+    "personalTokenRevokedByAdmin": "Personal token revoked by admin"
+  },
+  "channels": {
+    "web": "Web",
+    "api": "API"
+  },
+  "pagination": {
+    "prev": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {totalPages} ({total} total)"
+  },
+  "detail": {
+    "title": "Log detail",
+    "close": "Close",
+    "openAria": "View log detail",
+    "id": "ID",
+    "actorUserId": "Actor user ID",
+    "actorRole": "Actor role",
+    "targetUserId": "Target user ID",
+    "ip": "IP",
+    "userAgent": "User-Agent",
+    "origin": "Origin",
+    "createdAt": "Created at",
+    "actionCode": "Action code"
+  },
+  "sort": {
+    "toggleAria": "Toggle date sort order",
+    "asc": "Ascending",
+    "desc": "Descending"
+  },
+  "errors": {
+    "loadFailed": "could not load audit logs"
+  }
+}

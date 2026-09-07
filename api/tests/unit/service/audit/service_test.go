@@ -9,7 +9,7 @@ import (
 )
 
 func TestAttachOrigin_RoundTrip(t *testing.T) {
-	svc := audit.New(nil)
+	svc := audit.New(nil, nil)
 	ctx := svc.AttachOrigin(context.Background(), audit.RequestOrigin{
 		IP:          "203.0.113.10",
 		UserAgent:   "vitest",
@@ -32,7 +32,7 @@ func TestAttachOrigin_RoundTrip(t *testing.T) {
 }
 
 func TestRecord_DoesNotPanicWithoutRepository(t *testing.T) {
-	svc := audit.New(nil)
+	svc := audit.New(nil, nil)
 	actor := uuid.MustParse("00000000-0000-0000-0000-000000000001")
 	svc.Record(context.Background(), audit.Event{
 		Action:      audit.ActionPersonalTokenCreated,
@@ -50,7 +50,7 @@ func TestOrNop(t *testing.T) {
 	if _, ok := audit.OrNop(nil).(audit.Nop); !ok {
 		t.Fatal("OrNop(nil) should return Nop")
 	}
-	svc := audit.New(nil)
+	svc := audit.New(nil, nil)
 	if audit.OrNop(svc) != svc {
 		t.Fatal("OrNop should return the same non-nil logger")
 	}

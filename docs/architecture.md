@@ -46,6 +46,7 @@ The API lives in `api/` and provides authentication via email OTP plus a unique 
 | `DELETE` | `/v1/tokens` | JWT | Revoke the current user's API key |
 | `GET` | `/v1/users` | JWT (admin+) | List users with API key status |
 | `DELETE` | `/v1/users/:id/token` | JWT (admin+) | Revoke another user's API key |
+| `GET` | `/v1/audit-logs` | JWT (admin+) | Paginated audit logs (filters + sort) |
 
 ### Auth Flow
 

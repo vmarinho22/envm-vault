@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
   ArrowRightStartOnRectangleIcon,
+  ClipboardDocumentListIcon,
   HomeIcon,
   KeyIcon,
   UsersIcon,
@@ -59,6 +60,15 @@ function logout(): void {
         >
           <UsersIcon class="size-5 shrink-0" aria-hidden="true" />
           {{ t('nav.users') }}
+        </RouterLink>
+        <RouterLink
+          v-if="auth.isAdmin"
+          :to="{ name: 'audit-logs' }"
+          :class="navLinkClass"
+          :exact-active-class="navActiveClass"
+        >
+          <ClipboardDocumentListIcon class="size-5 shrink-0" aria-hidden="true" />
+          {{ t('nav.audit') }}
         </RouterLink>
       </nav>
     </aside>

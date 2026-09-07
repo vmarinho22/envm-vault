@@ -4,6 +4,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	audithandler "github.com/envm-vault/envm-vault/api/internal/handler/audit"
 	authhandler "github.com/envm-vault/envm-vault/api/internal/handler/auth"
 	healthhandler "github.com/envm-vault/envm-vault/api/internal/handler/health"
 	tokenhandler "github.com/envm-vault/envm-vault/api/internal/handler/token"
@@ -20,6 +21,7 @@ func TestRegister_RoutesRegistered(t *testing.T) {
 		Auth:   &authhandler.Handler{},
 		User:   &userhandler.Handler{},
 		Token:  &tokenhandler.Handler{},
+		Audit:  &audithandler.Handler{},
 	})
 
 	want := map[string]bool{
@@ -33,6 +35,7 @@ func TestRegister_RoutesRegistered(t *testing.T) {
 		"GET /v1/tokens/me":          false,
 		"POST /v1/tokens":            false,
 		"DELETE /v1/tokens":          false,
+		"GET /v1/audit-logs":         false,
 	}
 
 	for _, route := range app.GetRoutes() {
@@ -56,6 +59,7 @@ func TestRegister_TokensMeRequiresAuth(t *testing.T) {
 		Auth:   &authhandler.Handler{},
 		User:   &userhandler.Handler{},
 		Token:  &tokenhandler.Handler{},
+		Audit:  &audithandler.Handler{},
 		JWT:    middleware.NewJWTMiddleware("test-secret", nil),
 	})
 
