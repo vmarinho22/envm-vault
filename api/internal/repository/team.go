@@ -75,6 +75,17 @@ func (r *TeamRepository) FindByID(ctx context.Context, id uuid.UUID) (*model.Tea
 	return &team, nil
 }
 
+func (r *TeamRepository) FindByIDs(ctx context.Context, ids []uuid.UUID) ([]model.Team, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+	var teams []model.Team
+	if err := r.db.WithContext(ctx).Where("id IN ?", ids).Find(&teams).Error; err != nil {
+		return nil, fmt.Errorf("find teams by ids: %w", err)
+	}
+	return teams, nil
+}
+
 func (r *TeamRepository) ExistsBySlug(ctx context.Context, slug string, excludeID *uuid.UUID) (bool, error) {
 	q := r.db.WithContext(ctx).Model(&model.Team{}).Where("slug = ?", slug)
 	if excludeID != nil {

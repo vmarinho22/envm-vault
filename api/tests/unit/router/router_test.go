@@ -8,6 +8,7 @@ import (
 	authhandler "github.com/envm-vault/envm-vault/api/internal/handler/auth"
 	environmenthandler "github.com/envm-vault/envm-vault/api/internal/handler/environment"
 	healthhandler "github.com/envm-vault/envm-vault/api/internal/handler/health"
+	projecthandler "github.com/envm-vault/envm-vault/api/internal/handler/project"
 	taghandler "github.com/envm-vault/envm-vault/api/internal/handler/tag"
 	teamhandler "github.com/envm-vault/envm-vault/api/internal/handler/team"
 	tokenhandler "github.com/envm-vault/envm-vault/api/internal/handler/token"
@@ -28,34 +29,40 @@ func TestRegister_RoutesRegistered(t *testing.T) {
 		Team:        &teamhandler.Handler{},
 		Tag:         &taghandler.Handler{},
 		Environment: &environmenthandler.Handler{},
+		Project:     &projecthandler.Handler{},
 	})
 
 	want := map[string]bool{
-		"GET /v1/health":              false,
-		"GET /health":                 false,
-		"POST /v1/auth/login":         false,
-		"POST /v1/auth/verify":        false,
-		"POST /v1/auth/register":      false,
-		"GET /v1/users":               false,
-		"DELETE /v1/users/:id/token":  false,
-		"POST /v1/users/:id/block":    false,
-		"POST /v1/users/:id/unblock":  false,
-		"GET /v1/tokens/me":           false,
-		"POST /v1/tokens":             false,
-		"DELETE /v1/tokens":           false,
-		"GET /v1/audit-logs":          false,
-		"GET /v1/teams":               false,
-		"POST /v1/teams":              false,
-		"PATCH /v1/teams/:id":         false,
-		"DELETE /v1/teams/:id":        false,
-		"GET /v1/tags":                false,
-		"POST /v1/tags":               false,
-		"PATCH /v1/tags/:id":          false,
-		"DELETE /v1/tags/:id":         false,
-		"GET /v1/environments":        false,
-		"POST /v1/environments":       false,
-		"PATCH /v1/environments/:id":  false,
-		"DELETE /v1/environments/:id": false,
+		"GET /v1/health":                 false,
+		"GET /health":                    false,
+		"POST /v1/auth/login":            false,
+		"POST /v1/auth/verify":           false,
+		"POST /v1/auth/register":         false,
+		"GET /v1/users":                  false,
+		"DELETE /v1/users/:id/token":     false,
+		"POST /v1/users/:id/block":       false,
+		"POST /v1/users/:id/unblock":     false,
+		"GET /v1/tokens/me":              false,
+		"POST /v1/tokens":                false,
+		"DELETE /v1/tokens":              false,
+		"GET /v1/audit-logs":             false,
+		"GET /v1/teams":                  false,
+		"POST /v1/teams":                 false,
+		"PATCH /v1/teams/:id":            false,
+		"DELETE /v1/teams/:id":           false,
+		"GET /v1/tags":                   false,
+		"POST /v1/tags":                  false,
+		"PATCH /v1/tags/:id":             false,
+		"DELETE /v1/tags/:id":            false,
+		"GET /v1/environments":           false,
+		"POST /v1/environments":          false,
+		"PATCH /v1/environments/:id":     false,
+		"DELETE /v1/environments/:id":    false,
+		"GET /v1/projects":               false,
+		"GET /v1/projects/by-slug/:slug": false,
+		"POST /v1/projects":              false,
+		"PATCH /v1/projects/:id":         false,
+		"DELETE /v1/projects/:id":        false,
 	}
 
 	for _, route := range app.GetRoutes() {
@@ -83,6 +90,7 @@ func TestRegister_TokensMeRequiresAuth(t *testing.T) {
 		Team:        &teamhandler.Handler{},
 		Tag:         &taghandler.Handler{},
 		Environment: &environmenthandler.Handler{},
+		Project:     &projecthandler.Handler{},
 		JWT:         middleware.NewJWTMiddleware("test-secret", nil, nil),
 	})
 

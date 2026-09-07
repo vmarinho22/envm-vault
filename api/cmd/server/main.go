@@ -17,6 +17,7 @@ import (
 	environmenthandler "github.com/envm-vault/envm-vault/api/internal/handler/environment"
 	healthhandler "github.com/envm-vault/envm-vault/api/internal/handler/health"
 	"github.com/envm-vault/envm-vault/api/internal/handler/httperr"
+	projecthandler "github.com/envm-vault/envm-vault/api/internal/handler/project"
 	taghandler "github.com/envm-vault/envm-vault/api/internal/handler/tag"
 	teamhandler "github.com/envm-vault/envm-vault/api/internal/handler/team"
 	tokenhandler "github.com/envm-vault/envm-vault/api/internal/handler/token"
@@ -28,6 +29,7 @@ import (
 	auditservice "github.com/envm-vault/envm-vault/api/internal/service/audit"
 	authservice "github.com/envm-vault/envm-vault/api/internal/service/auth"
 	environmentservice "github.com/envm-vault/envm-vault/api/internal/service/environment"
+	projectservice "github.com/envm-vault/envm-vault/api/internal/service/project"
 	tagservice "github.com/envm-vault/envm-vault/api/internal/service/tag"
 	teamservice "github.com/envm-vault/envm-vault/api/internal/service/team"
 	tokenservice "github.com/envm-vault/envm-vault/api/internal/service/token"
@@ -61,6 +63,7 @@ func main() {
 	teamRepo := repository.NewTeamRepository(gormDB)
 	tagRepo := repository.NewTagRepository(gormDB)
 	environmentRepo := repository.NewEnvironmentRepository(gormDB)
+	projectRepo := repository.NewProjectRepository(gormDB)
 	auditSvc := auditservice.New(auditRepo, userRepo)
 
 	var sender email.Sender
@@ -77,6 +80,7 @@ func main() {
 	teamSvc := teamservice.New(teamRepo, userRepo, auditSvc)
 	tagSvc := tagservice.New(tagRepo, auditSvc)
 	environmentSvc := environmentservice.New(environmentRepo, auditSvc)
+	projectSvc := projectservice.New(projectRepo, teamRepo, environmentRepo, tagRepo, auditSvc)
 
 	app := fiber.New(fiber.Config{
 		ErrorHandler: httperr.AppHandler,
@@ -101,6 +105,7 @@ func main() {
 		Team:        teamhandler.New(teamSvc),
 		Tag:         taghandler.New(tagSvc),
 		Environment: environmenthandler.New(environmentSvc),
+		Project:     projecthandler.New(projectSvc),
 		JWT:         middleware.NewJWTMiddleware(env.Envs.JWT.Secret, userRepo, auditSvc),
 	})
 

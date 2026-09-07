@@ -25,4 +25,7 @@ const (
 	ActionEnvironmentCreated        = "environment.created"
 	ActionEnvironmentUpdated        = "environment.updated"
 	ActionEnvironmentDeleted        = "environment.deleted"
+	ActionProjectCreated            = "project.created"
+	ActionProjectUpdated            = "project.updated"
+	ActionProjectDeleted            = "project.deleted"
 )

@@ -62,6 +62,17 @@ func (r *EnvironmentRepository) FindByID(ctx context.Context, id uuid.UUID) (*mo
 	return &environment, nil
 }
 
+func (r *EnvironmentRepository) FindByIDs(ctx context.Context, ids []uuid.UUID) ([]model.Environment, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+	var environments []model.Environment
+	if err := r.db.WithContext(ctx).Where("id IN ?", ids).Find(&environments).Error; err != nil {
+		return nil, fmt.Errorf("find environments by ids: %w", err)
+	}
+	return environments, nil
+}
+
 func (r *EnvironmentRepository) ExistsByTitle(ctx context.Context, title string, excludeID *uuid.UUID) (bool, error) {
 	q := r.db.WithContext(ctx).Model(&model.Environment{}).Where("LOWER(title) = LOWER(?)", title)
 	if excludeID != nil {

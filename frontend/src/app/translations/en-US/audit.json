@@ -41,7 +41,10 @@
     "tagDeleted": "Tag deleted",
     "environmentCreated": "Environment created",
     "environmentUpdated": "Environment updated",
-    "environmentDeleted": "Environment deleted"
+    "environmentDeleted": "Environment deleted",
+    "projectCreated": "Project created",
+    "projectUpdated": "Project updated",
+    "projectDeleted": "Project deleted"
   },
   "channels": {
     "web": "Web",

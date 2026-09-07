@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router';
 import DefaultLayout from '@/app/layouts/DefaultLayout.vue';
 import { useAuthStore } from '@/modules/auth/stores/auth.store';
 import LoginView from '@/modules/auth/views/LoginView.vue';
-import HomeView from '@/modules/home/views/HomeView.vue';
 import ApiKeyView from '@/modules/token/views/ApiKeyView.vue';
 import TokenSetupView from '@/modules/token/views/TokenSetupView.vue';
 import UsersView from '@/modules/user/views/UsersView.vue';
@@ -10,6 +9,7 @@ import AuditLogsView from '@/modules/audit/views/AuditLogsView.vue';
 import TeamsView from '@/modules/team/views/TeamsView.vue';
 import TagsView from '@/modules/tag/views/TagsView.vue';
 import EnvironmentsView from '@/modules/environment/views/EnvironmentsView.vue';
+import ProjectsView from '@/modules/project/views/ProjectsView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -33,7 +33,7 @@ const router = createRouter({
         {
           path: '',
           name: 'home',
-          component: HomeView,
+          component: ProjectsView,
         },
         {
           path: 'api-key',

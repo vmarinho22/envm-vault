@@ -62,6 +62,17 @@ func (r *TagRepository) FindByID(ctx context.Context, id uuid.UUID) (*model.Tag,
 	return &tag, nil
 }
 
+func (r *TagRepository) FindByIDs(ctx context.Context, ids []uuid.UUID) ([]model.Tag, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+	var tags []model.Tag
+	if err := r.db.WithContext(ctx).Where("id IN ?", ids).Find(&tags).Error; err != nil {
+		return nil, fmt.Errorf("find tags by ids: %w", err)
+	}
+	return tags, nil
+}
+
 func (r *TagRepository) ExistsByTitle(ctx context.Context, title string, excludeID *uuid.UUID) (bool, error) {
 	q := r.db.WithContext(ctx).Model(&model.Tag{}).Where("LOWER(title) = LOWER(?)", title)
 	if excludeID != nil {

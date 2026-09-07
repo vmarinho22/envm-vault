@@ -11,6 +11,7 @@ const props = defineProps<{
   accountableId: string;
   users: UserWithToken[];
   saving: boolean;
+  error?: string | null;
 }>();
 
 const emit = defineEmits<{
@@ -50,6 +51,7 @@ function onClose(): void {
       </h3>
 
       <form class="mt-4 space-y-4" @submit.prevent="emit('submit')">
+        <p v-if="error" class="text-sm text-error" role="alert">{{ error }}</p>
         <label class="form-control w-full">
           <span class="label-text">{{ t('teams.form.name') }}</span>
           <input

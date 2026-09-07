@@ -41,7 +41,10 @@
     "tagDeleted": "Tag excluída",
     "environmentCreated": "Ambiente criado",
     "environmentUpdated": "Ambiente atualizado",
-    "environmentDeleted": "Ambiente excluído"
+    "environmentDeleted": "Ambiente excluído",
+    "projectCreated": "Projeto criado",
+    "projectUpdated": "Projeto atualizado",
+    "projectDeleted": "Projeto excluído"
   },
   "channels": {
     "web": "Web",

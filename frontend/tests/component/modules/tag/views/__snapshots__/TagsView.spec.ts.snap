@@ -46,7 +46,8 @@ exports[`TagsView (component) > renders tags and mutate actions for standard use
   <dialog id="tag-form-modal" class="modal">
     <div class="modal-box max-w-md">
       <h3 class="text-lg font-medium">Nova tag</h3>
-      <form class="mt-4 space-y-4"><label class="form-control w-full"><span class="label-text">Título</span><input class="input input-bordered w-full" type="text" name="tag-title" autocomplete="off" required="" maxlength="80" aria-label="Título" value=""></label>
+      <form class="mt-4 space-y-4">
+        <!--v-if--><label class="form-control w-full"><span class="label-text">Título</span><input class="input input-bordered w-full" type="text" name="tag-title" autocomplete="off" required="" maxlength="80" aria-label="Título" value=""></label>
         <div class="form-control w-full"><span class="label-text">Cor</span>
           <div class="mt-1 flex items-center gap-2"><input class="h-10 w-14 cursor-pointer rounded border border-base-300 bg-transparent p-1" type="color" name="tag-color-picker" aria-label="Seletor de cor" value="#6366F1"><input class="input input-bordered min-w-0 flex-1 font-mono uppercase" type="text" name="tag-color-hex" autocomplete="off" required="" maxlength="7" pattern="#[0-9A-Fa-f]{6}" aria-label="Cor em hexadecimal" value="#6366F1"><button class="btn btn-ghost btn-square" type="button" aria-label="Sortear cor" title="Sortear cor"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"></path>
@@ -96,7 +97,8 @@ exports[`TagsView (component) > searches by title via API 1`] = `
   <dialog id="tag-form-modal" class="modal">
     <div class="modal-box max-w-md">
       <h3 class="text-lg font-medium">Nova tag</h3>
-      <form class="mt-4 space-y-4"><label class="form-control w-full"><span class="label-text">Título</span><input class="input input-bordered w-full" type="text" name="tag-title" autocomplete="off" required="" maxlength="80" aria-label="Título" value=""></label>
+      <form class="mt-4 space-y-4">
+        <!--v-if--><label class="form-control w-full"><span class="label-text">Título</span><input class="input input-bordered w-full" type="text" name="tag-title" autocomplete="off" required="" maxlength="80" aria-label="Título" value=""></label>
         <div class="form-control w-full"><span class="label-text">Cor</span>
           <div class="mt-1 flex items-center gap-2"><input class="h-10 w-14 cursor-pointer rounded border border-base-300 bg-transparent p-1" type="color" name="tag-color-picker" aria-label="Seletor de cor" value="#6366F1"><input class="input input-bordered min-w-0 flex-1 font-mono uppercase" type="text" name="tag-color-hex" autocomplete="off" required="" maxlength="7" pattern="#[0-9A-Fa-f]{6}" aria-label="Cor em hexadecimal" value="#6366F1"><button class="btn btn-ghost btn-square" type="button" aria-label="Sortear cor" title="Sortear cor"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"></path>

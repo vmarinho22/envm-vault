@@ -1,0 +1,66 @@
+{
+  "title": "Projects",
+  "description": "Projects group teams, environments, and tags. Any user can create and edit; only administrators can delete.",
+  "create": "Create project",
+  "edit": "Edit",
+  "delete": "Delete",
+  "empty": "No projects yet.",
+  "emptySearch": "No projects matched that search.",
+  "confirmDelete": "Delete project \"{title}\"? This cannot be undone.",
+  "columns": {
+    "title": "Title",
+    "slug": "Slug",
+    "teams": "Teams",
+    "tags": "Tags",
+    "environments": "Environments",
+    "createdAt": "Created at",
+    "updatedAt": "Updated at",
+    "actions": "Actions"
+  },
+  "search": {
+    "label": "Search by title",
+    "placeholder": "e.g. payment-service",
+    "teams": "Teams",
+    "tags": "Tags",
+    "allTeams": "All teams",
+    "allTags": "All tags",
+    "filterOptions": "Filter…",
+    "removeOption": "Remove {label}",
+    "apply": "Search",
+    "clear": "Clear"
+  },
+  "form": {
+    "createTitle": "New project",
+    "editTitle": "Edit project",
+    "title": "Title",
+    "slugPreview": "Slug",
+    "teams": "Teams",
+    "environments": "Environments",
+    "tags": "Tags",
+    "selectTeams": "Select teams",
+    "selectEnvironments": "Select environments",
+    "selectTags": "Select tags",
+    "addTeam": "Add team",
+    "addEnvironment": "Add environment",
+    "addTag": "Add tag",
+    "back": "Back",
+    "cancel": "Cancel",
+    "create": "Create",
+    "save": "Save"
+  },
+  "pagination": {
+    "prev": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {totalPages} ({total} total)"
+  },
+  "errors": {
+    "loadFailed": "could not load projects",
+    "createFailed": "could not create project",
+    "updateFailed": "could not update project",
+    "deleteFailed": "could not delete project",
+    "loadUsersFailed": "could not load users",
+    "createTeamFailed": "could not create team",
+    "createEnvironmentFailed": "could not create environment",
+    "createTagFailed": "could not create tag"
+  }
+}

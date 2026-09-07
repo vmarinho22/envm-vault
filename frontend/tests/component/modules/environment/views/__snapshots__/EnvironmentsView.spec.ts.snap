@@ -82,7 +82,8 @@ exports[`EnvironmentsView (component) > renders environments and admin actions 1
   <dialog id="environment-form-modal" class="modal">
     <div class="modal-box max-w-md">
       <h3 class="text-lg font-medium">Novo ambiente</h3>
-      <form class="mt-4 space-y-4"><label class="form-control w-full"><span class="label-text">Título</span><input class="input input-bordered w-full" type="text" name="environment-title" autocomplete="off" required="" maxlength="80" aria-label="Título" value=""></label>
+      <form class="mt-4 space-y-4">
+        <!--v-if--><label class="form-control w-full"><span class="label-text">Título</span><input class="input input-bordered w-full" type="text" name="environment-title" autocomplete="off" required="" maxlength="80" aria-label="Título" value=""></label>
         <div class="modal-action"><button class="btn" type="button">Cancelar</button><button class="btn btn-primary" type="submit">
             <!--v-if--> Criar
           </button></div>

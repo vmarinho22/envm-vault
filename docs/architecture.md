@@ -61,6 +61,11 @@ The API lives in `api/` and provides authentication via email OTP plus a unique 
 | `POST` | `/v1/environments` | JWT (admin+) | Create environment (title) |
 | `PATCH` | `/v1/environments/:id` | JWT (admin+) | Update environment title |
 | `DELETE` | `/v1/environments/:id` | JWT (admin+) | Delete environment |
+| `GET` | `/v1/projects` | JWT | List projects (filters + page size 12) |
+| `GET` | `/v1/projects/by-slug/:slug` | JWT | Get project by unique slug |
+| `POST` | `/v1/projects` | JWT | Create project (title + teams + environments + tags) |
+| `PATCH` | `/v1/projects/:id` | JWT | Update project |
+| `DELETE` | `/v1/projects/:id` | JWT (admin+) | Delete project |
 
 ### Auth Flow
 
@@ -76,15 +81,15 @@ The admin UI (`frontend/`) implements the same OTP flow on `/login`, then `/setu
 
 JWT is the admin UI session. The API key (`Authorization: Bearer ev_…`) is the programmatic credential for future env downloads. Which projects/environments a key can access will be decided by user membership, not by scopes on the token.
 
-## Core Concepts (planned)
+## Core Concepts
 
 ### Project
 
-A logical grouping of environment variables (e.g. `my-app`, `payment-service`).
+A project groups teams, catalog environments, and tags. Fields: unique `title`, unique `slug` (natural key for future `/project/<slug>`), timestamps. M2M with Team, Environment, and Tag. Any authenticated user can create/update; only `admin` / `super_admin` can delete. List supports filters by title/teams/tags and page size 12. Secrets are not linked yet.
 
 ### Environment
 
-A global catalog of deployment targets with a unique `title` (e.g. `dev`, `staging`, `production`). Any authenticated user can list/search; only `admin` / `super_admin` can create, update, or delete. On migrate/startup the catalog seeds four defaults when missing: `dev`, `test`, `staging`, `production`. Not yet linked to projects; future env download will select variables by environment title.
+A global catalog of deployment targets with a unique `title` (e.g. `dev`, `staging`, `production`). Any authenticated user can list/search; only `admin` / `super_admin` can create, update, or delete. Seeded defaults: `dev`, `test`, `staging`, `production`. Linked to projects via M2M.
 
 ### Secret / EnvVar
 
@@ -100,11 +105,11 @@ A unique programmatic credential per user for downloading env vars. One active k
 
 ### Team
 
-An organizational unit with a display `name`, URL `slug` (derived from the name), and a single accountable `User` (for future notifications). Any authenticated user can list/search teams; only `admin` / `super_admin` can create, update, or delete. Teams are not yet linked to projects or memberships.
+An organizational unit with a display `name`, URL `slug` (derived from the name), and a single accountable `User` (for future notifications). Any authenticated user can list/search teams; only `admin` / `super_admin` can create, update, or delete. Linked to projects via M2M.
 
 ### Tag
 
-A global catalog label with a unique `title` and hex `color` (`#RRGGBB`) used to identify projects later. Any authenticated user can list, create, update, or delete tags. Tags are not yet linked to projects. On migrate/startup the catalog seeds three defaults when missing: `backend` (`#000000`), `frontend` (`#FFFFFF`), `infra` (`#F97316`).
+A global catalog label with a unique `title` and hex `color` (`#RRGGBB`). Any authenticated user can list, create, update, or delete tags. Seeded defaults: `backend` (`#000000`), `frontend` (`#FFFFFF`), `infra` (`#F97316`). Linked to projects via M2M.
 
 ## Repository Structure
 
@@ -115,9 +120,9 @@ envm-vault/
 │   ├── tests/unit/       # unit tests (mirrors internal/)
 │   ├── internal/
 │   │   ├── env/          # Envs singleton + Load()
-│   │   ├── router/       # Route registration by context (health, auth, user, token, audit, team, tag, environment)
-│   │   ├── handler/      # Handlers per domain (auth/, user/, token/, health/, audit/, team/, tag/, environment/)
-│   │   ├── service/      # Business logic per domain (auth/, user/, token/, audit/, team/, tag/, environment/)
+│   │   ├── router/       # Route registration by context (…, team, tag, environment, project)
+│   │   ├── handler/      # Handlers per domain (…, team/, tag/, environment/, project/)
+│   │   ├── service/      # Business logic per domain (…, team/, tag/, environment/, project/)
 │   │   ├── middleware/
 │   │   ├── database/     # GORM connection + AutoMigrate
 │   │   ├── model/        # GORM models
@@ -137,7 +142,12 @@ erDiagram
   User ||--o| AccessToken : has
   User ||--o{ AuditLog : acts
   User ||--o{ Team : accountable_for
-  User ||--o{ Project : owns
+  Project ||--o{ ProjectTeam : has
+  Team ||--o{ ProjectTeam : in
+  Project ||--o{ ProjectEnvironment : has
+  Environment ||--o{ ProjectEnvironment : in
+  Project ||--o{ ProjectTag : has
+  Tag ||--o{ ProjectTag : in
   Tag {
     uuid id PK
     string title UK
@@ -148,6 +158,13 @@ erDiagram
   Environment {
     uuid id PK
     string title UK
+    timestamp created_at
+    timestamp updated_at
+  }
+  Project {
+    uuid id PK
+    string title
+    string slug UK
     timestamp created_at
     timestamp updated_at
   }
@@ -203,15 +220,15 @@ erDiagram
   }
 ```
 
-Project↔Environment↔Secret linking is planned (not yet in schema).
+Project↔Secret linking is planned (not yet in schema).
 
 ### User Roles
 
 | Role | Description |
 |------|-------------|
-| `super_admin` | First user (bootstrap). Full access. Can revoke any API key. Can manage teams and environments. Can block any user. Can manage tags. |
-| `admin` | Can register users, revoke `user`/`admin` API keys, manage teams and environments, and block `admin`/`user`. Can manage tags. |
-| `user` | Standard user. Manages their own API key. Can list/search teams and environments (read-only). Can create, update, and delete tags. |
+| `super_admin` | First user (bootstrap). Full access. Can revoke any API key. Can manage teams and environments. Can delete projects. Can block any user. Can manage tags. |
+| `admin` | Can register users, revoke `user`/`admin` API keys, manage teams and environments, delete projects, and block `admin`/`user`. Can manage tags. |
+| `user` | Standard user. Manages their own API key. Can list teams/environments; create/update projects; create/update/delete tags. Cannot delete projects. |
 
 ## Security Principles
 

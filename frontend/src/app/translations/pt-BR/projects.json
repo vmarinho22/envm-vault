@@ -1,0 +1,66 @@
+{
+  "title": "Projetos",
+  "description": "Projetos concentram times, ambientes e tags. Qualquer usuário pode criar e editar; apenas administradores podem excluir.",
+  "create": "Criar projeto",
+  "edit": "Editar",
+  "delete": "Excluir",
+  "empty": "Nenhum projeto cadastrado.",
+  "emptySearch": "Nenhum projeto encontrado para essa busca.",
+  "confirmDelete": "Excluir o projeto \"{title}\"? Esta ação não pode ser desfeita.",
+  "columns": {
+    "title": "Título",
+    "slug": "Slug",
+    "teams": "Times",
+    "tags": "Tags",
+    "environments": "Ambientes",
+    "createdAt": "Criado em",
+    "updatedAt": "Atualizado em",
+    "actions": "Ações"
+  },
+  "search": {
+    "label": "Buscar por título",
+    "placeholder": "Ex.: payment-service",
+    "teams": "Times",
+    "tags": "Tags",
+    "allTeams": "Todos os times",
+    "allTags": "Todas as tags",
+    "filterOptions": "Filtrar…",
+    "removeOption": "Remover {label}",
+    "apply": "Buscar",
+    "clear": "Limpar"
+  },
+  "form": {
+    "createTitle": "Novo projeto",
+    "editTitle": "Editar projeto",
+    "title": "Título",
+    "slugPreview": "Slug",
+    "teams": "Times",
+    "environments": "Ambientes",
+    "tags": "Tags",
+    "selectTeams": "Selecione times",
+    "selectEnvironments": "Selecione ambientes",
+    "selectTags": "Selecione tags",
+    "addTeam": "Adicionar time",
+    "addEnvironment": "Adicionar ambiente",
+    "addTag": "Adicionar tag",
+    "back": "Voltar",
+    "cancel": "Cancelar",
+    "create": "Criar",
+    "save": "Salvar"
+  },
+  "pagination": {
+    "prev": "Anterior",
+    "next": "Próxima",
+    "pageOf": "Página {page} de {totalPages} ({total} no total)"
+  },
+  "errors": {
+    "loadFailed": "não foi possível carregar os projetos",
+    "createFailed": "não foi possível criar o projeto",
+    "updateFailed": "não foi possível atualizar o projeto",
+    "deleteFailed": "não foi possível excluir o projeto",
+    "loadUsersFailed": "não foi possível carregar os usuários",
+    "createTeamFailed": "não foi possível criar o time",
+    "createEnvironmentFailed": "não foi possível criar o ambiente",
+    "createTagFailed": "não foi possível criar a tag"
+  }
+}

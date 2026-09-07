@@ -90,7 +90,8 @@ exports[`TeamsView (component) > renders teams and admin actions 1`] = `
   <dialog id="team-form-modal" class="modal">
     <div class="modal-box max-w-md">
       <h3 class="text-lg font-medium">Novo time</h3>
-      <form class="mt-4 space-y-4"><label class="form-control w-full"><span class="label-text">Nome</span><input class="input input-bordered w-full" type="text" name="team-name" autocomplete="off" required="" maxlength="80" aria-label="Nome" value=""></label>
+      <form class="mt-4 space-y-4">
+        <!--v-if--><label class="form-control w-full"><span class="label-text">Nome</span><input class="input input-bordered w-full" type="text" name="team-name" autocomplete="off" required="" maxlength="80" aria-label="Nome" value=""></label>
         <p class="text-sm text-base-content/60">Slug: <span class="font-mono">—</span></p><label class="form-control w-full"><span class="label-text">Responsável</span><select class="select select-bordered w-full" name="team-accountable" autocomplete="off" required="" aria-label="Responsável" value="">
             <option disabled="" value="">Selecione um usuário</option>
             <option value="1">admin@example.com</option>

@@ -5,6 +5,7 @@ import (
 	authhandler "github.com/envm-vault/envm-vault/api/internal/handler/auth"
 	environmenthandler "github.com/envm-vault/envm-vault/api/internal/handler/environment"
 	healthhandler "github.com/envm-vault/envm-vault/api/internal/handler/health"
+	projecthandler "github.com/envm-vault/envm-vault/api/internal/handler/project"
 	taghandler "github.com/envm-vault/envm-vault/api/internal/handler/tag"
 	teamhandler "github.com/envm-vault/envm-vault/api/internal/handler/team"
 	tokenhandler "github.com/envm-vault/envm-vault/api/internal/handler/token"
@@ -21,5 +22,6 @@ type Deps struct {
 	Team        *teamhandler.Handler
 	Tag         *taghandler.Handler
 	Environment *environmenthandler.Handler
+	Project     *projecthandler.Handler
 	JWT         *middleware.JWTMiddleware
 }

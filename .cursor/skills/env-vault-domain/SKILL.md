@@ -10,10 +10,10 @@ Read [docs/architecture.md](../../docs/architecture.md) for the full specificati
 ## Entities
 
 ### Project
-Groups environment variables under a slug (e.g. `my-app`). Owned by a User.
+Central hub with unique `title` and unique `slug` (business key for future `/project/<slug>`). Many-to-many with Teams, Environments, and Tags. Any authenticated user may create/update; only `admin` / `super_admin` may delete. Secrets not linked yet.
 
 ### Environment
-Global catalog of deployment targets with unique `title` (e.g. `dev`, `staging`, `production`). Not linked to Project yet. Any authenticated user may list/search; only `admin` / `super_admin` mutate. Seeded defaults (idempotent on migrate/startup): `dev`, `test`, `staging`, `production`.
+Global catalog of deployment targets with unique `title` (e.g. `dev`, `staging`, `production`). Linked to projects via M2M. Any authenticated user may list/search; only `admin` / `super_admin` mutate. Seeded defaults: `dev`, `test`, `staging`, `production`.
 
 ### Secret (EnvVar)
 A key-value pair scoped to Project + Environment. Values encrypted at rest (Phase 2).
@@ -25,10 +25,10 @@ Account that owns projects and manages a unique API key via the admin UI. May be
 Programmatic credential for downloading env vars. **One active key per user.** Stored hashed (SHA-256); plaintext shown only at generate/rotate. Sent as `Authorization: Bearer <token>`. Access to a given project/environment is determined by the user's membership, not by scopes on the token.
 
 ### Team
-Organizational unit with `name`, unique `slug` (from name via shared slug helper), and one accountable `User` (for future notifications). No memberships yet; not linked to Project yet. Any authenticated user may list/search; only `admin` / `super_admin` mutate.
+Organizational unit with `name`, unique `slug` (from name via shared slug helper), and one accountable `User`. Linked to projects via M2M. Any authenticated user may list/search; only `admin` / `super_admin` mutate.
 
 ### Tag
-Global catalog label with unique `title` and hex `color` (`#RRGGBB`) for identifying projects later. Not linked to Project yet. Any authenticated user may list, create, update, or delete. Seeded defaults (idempotent on migrate/startup): `backend` `#000000`, `frontend` `#FFFFFF`, `infra` `#F97316`.
+Global catalog label with unique `title` and hex `color` (`#RRGGBB`). Linked to projects via M2M. Any authenticated user may list, create, update, or delete. Seeded defaults: `backend` `#000000`, `frontend` `#FFFFFF`, `infra` `#F97316`.
 
 ## Primary Flow
 
@@ -42,16 +42,16 @@ Authorization: Bearer <access_token>
 
 1. One active API key per user — generate rotates and invalidates the previous hash.
 2. Secret values and API key plaintext never appear in logs.
-3. Environment catalog is global today; Project↔Environment linking (and per-project independence) is planned.
+3. Project `slug` is the unique natural key for UI routes (`/project/<slug>`); UUID is the PK for mutations and junctions.
 4. Slugs are generated with `api/internal/slug.FromName` (mirrored in `frontend/src/shared/slug`).
 
 ## Relationships
 
 ```
-User → has many → Project
 User → has one → AccessToken
 User → accountable for many → Team
-Tag (catalog; Project link TBD)
-Environment (catalog; Project link TBD)
+Project ↔ Team (M2M)
+Project ↔ Environment (M2M)
+Project ↔ Tag (M2M)
 Project → Secret via Environment (planned)
 ```

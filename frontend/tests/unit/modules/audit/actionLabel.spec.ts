@@ -10,6 +10,7 @@ describe('actionLabel', () => {
     expect(actionLabel('team.created', t)).toBe('audit.actions.teamCreated');
     expect(actionLabel('tag.created', t)).toBe('audit.actions.tagCreated');
     expect(actionLabel('environment.created', t)).toBe('audit.actions.environmentCreated');
+    expect(actionLabel('project.created', t)).toBe('audit.actions.projectCreated');
     expect(actionLabel('user.blocked', t)).toBe('audit.actions.userBlocked');
   });
 
