@@ -15,9 +15,10 @@ const (
 )
 
 type UserResponse struct {
-	ID    string `json:"id"`
-	Email string `json:"email"`
-	Role  string `json:"role"`
+	ID        string     `json:"id"`
+	Email     string     `json:"email"`
+	Role      string     `json:"role"`
+	BlockedAt *time.Time `json:"blocked_at,omitempty"`
 }
 
 type TokenStatusResponse struct {
@@ -27,10 +28,11 @@ type TokenStatusResponse struct {
 }
 
 type UserWithTokenResponse struct {
-	ID    string               `json:"id"`
-	Email string               `json:"email"`
-	Role  string               `json:"role"`
-	Token *TokenStatusResponse `json:"token"`
+	ID        string               `json:"id"`
+	Email     string               `json:"email"`
+	Role      string               `json:"role"`
+	BlockedAt *time.Time           `json:"blocked_at,omitempty"`
+	Token     *TokenStatusResponse `json:"token"`
 }
 
 type VerifyResponse struct {
@@ -48,8 +50,24 @@ func NormalizeEmail(raw string) (string, error) {
 
 func ToUserResponse(user model.User) UserResponse {
 	return UserResponse{
-		ID:    user.ID.String(),
-		Email: user.Email,
-		Role:  user.Role,
+		ID:        user.ID.String(),
+		Email:     user.Email,
+		Role:      user.Role,
+		BlockedAt: user.BlockedAt,
 	}
+}
+
+// CanManageTarget reports whether actorRole may manage (revoke token / block) a user with targetRole.
+func CanManageTarget(actorRole, targetRole string) bool {
+	if actorRole == RoleSuperAdmin {
+		return true
+	}
+	if actorRole == RoleAdmin {
+		return targetRole == RoleAdmin || targetRole == RoleUser
+	}
+	return false
+}
+
+func IsBlocked(user *model.User) bool {
+	return user != nil && user.BlockedAt != nil
 }

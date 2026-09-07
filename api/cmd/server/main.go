@@ -91,7 +91,7 @@ func main() {
 		Token:  tokenhandler.New(tokenSvc),
 		Audit:  audithandler.New(auditSvc),
 		Team:   teamhandler.New(teamSvc),
-		JWT:    middleware.NewJWTMiddleware(env.Envs.JWT.Secret, auditSvc),
+		JWT:    middleware.NewJWTMiddleware(env.Envs.JWT.Secret, userRepo, auditSvc),
 	})
 
 	go func() {

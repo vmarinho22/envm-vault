@@ -11,6 +11,7 @@ import { useI18n } from 'vue-i18n';
 import { RouterLink, RouterView, useRouter } from 'vue-router';
 import LocaleSwitcher from '@/app/components/LocaleSwitcher.vue';
 import { useAuthStore } from '@/modules/auth/stores/auth.store';
+import ConfirmDialog from '@/shared/confirm/ConfirmDialog.vue';
 
 const { t } = useI18n();
 const auth = useAuthStore();
@@ -105,5 +106,7 @@ function logout(): void {
         <RouterView />
       </main>
     </div>
+
+    <ConfirmDialog />
   </div>
 </template>

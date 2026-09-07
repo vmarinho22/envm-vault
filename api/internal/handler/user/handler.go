@@ -51,3 +51,31 @@ func (h *Handler) List(c *fiber.Ctx) error {
 	}
 	return c.JSON(users)
 }
+
+func (h *Handler) Block(c *fiber.Ctx) error {
+	user, err := h.user.Block(
+		c.UserContext(),
+		middleware.GetUserID(c),
+		middleware.GetUserEmail(c),
+		middleware.GetUserRole(c),
+		c.Params("id"),
+	)
+	if err != nil {
+		return httperr.Write(c, err)
+	}
+	return c.JSON(user)
+}
+
+func (h *Handler) Unblock(c *fiber.Ctx) error {
+	user, err := h.user.Unblock(
+		c.UserContext(),
+		middleware.GetUserID(c),
+		middleware.GetUserEmail(c),
+		middleware.GetUserRole(c),
+		c.Params("id"),
+	)
+	if err != nil {
+		return httperr.Write(c, err)
+	}
+	return c.JSON(user)
+}

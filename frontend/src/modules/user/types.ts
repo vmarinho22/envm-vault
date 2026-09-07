@@ -4,6 +4,7 @@ export interface User {
   id: string;
   email: string;
   role: UserRole;
+  blocked_at?: string | null;
 }
 
 export interface UserTokenStatus {

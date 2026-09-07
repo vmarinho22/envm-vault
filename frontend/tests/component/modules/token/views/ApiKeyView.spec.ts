@@ -2,6 +2,7 @@ import { flushPromises } from '@vue/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { tokenService } from '@/modules/token/services/TokenService';
 import ApiKeyView from '@/modules/token/views/ApiKeyView.vue';
+import ConfirmDialog from '@/shared/confirm/ConfirmDialog.vue';
 import { expectComponentSnapshot, mountComponent } from '../../../helpers/mount';
 
 vi.mock('@/modules/token/services/TokenService', () => ({
@@ -20,6 +21,11 @@ const revokeOwnMock = vi.mocked(tokenService.revokeOwn);
 const session = {
   token: 'jwt-token',
   user: { id: '1', email: 'admin@example.com', role: 'super_admin' as const },
+};
+
+const WithConfirm = {
+  components: { ApiKeyView, ConfirmDialog },
+  template: '<div><ApiKeyView /><ConfirmDialog /></div>',
 };
 
 describe('ApiKeyView (component)', () => {
@@ -46,17 +52,18 @@ describe('ApiKeyView (component)', () => {
   });
 
   it('shows the new token after rotate is confirmed', async () => {
-    vi.stubGlobal('confirm', vi.fn(() => true));
     createMock.mockResolvedValue({
       token: 'ev_rotatedtoken',
       prefix: 'ev_rotated',
       created_at: '2026-02-01T00:00:00Z',
     });
 
-    const { wrapper } = await mountComponent(ApiKeyView, { session });
+    const { wrapper } = await mountComponent(WithConfirm, { session });
     await flushPromises();
 
     await wrapper.get('[data-testid="rotate-token"]').trigger('click');
+    await flushPromises();
+    await wrapper.get('[data-testid="confirm-accept"]').trigger('click');
     await flushPromises();
 
     expect(createMock).toHaveBeenCalledTimes(1);
@@ -78,17 +85,18 @@ describe('ApiKeyView (component)', () => {
   });
 
   it('hides rotate while the new key is visible and restores it after dismiss', async () => {
-    vi.stubGlobal('confirm', vi.fn(() => true));
     createMock.mockResolvedValue({
       token: 'ev_rotatedtoken',
       prefix: 'ev_rotated',
       created_at: '2026-02-01T00:00:00Z',
     });
 
-    const { wrapper } = await mountComponent(ApiKeyView, { session });
+    const { wrapper } = await mountComponent(WithConfirm, { session });
     await flushPromises();
 
     await wrapper.get('[data-testid="rotate-token"]').trigger('click');
+    await flushPromises();
+    await wrapper.get('[data-testid="confirm-accept"]').trigger('click');
     await flushPromises();
 
     expect(wrapper.find('[data-testid="rotate-token"]').exists()).toBe(false);
@@ -99,24 +107,20 @@ describe('ApiKeyView (component)', () => {
     expect(wrapper.find('[data-testid="rotate-token"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="api-token-value"]').exists()).toBe(false);
     expectComponentSnapshot(wrapper);
-
-    vi.unstubAllGlobals();
   });
 
   it('does not rotate when confirmation is cancelled', async () => {
-    vi.stubGlobal('confirm', vi.fn(() => false));
-
-    const { wrapper } = await mountComponent(ApiKeyView, { session });
+    const { wrapper } = await mountComponent(WithConfirm, { session });
     await flushPromises();
 
     await wrapper.get('[data-testid="rotate-token"]').trigger('click');
+    await flushPromises();
+    await wrapper.get('[data-testid="confirm-cancel"]').trigger('click');
     await flushPromises();
 
     expect(createMock).not.toHaveBeenCalled();
     expect(wrapper.find('[data-testid="api-token-value"]').exists()).toBe(false);
     expectComponentSnapshot(wrapper);
-
-    vi.unstubAllGlobals();
   });
 
   it('navigates to setup-token after revoke', async () => {

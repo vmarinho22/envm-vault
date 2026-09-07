@@ -1,12 +1,21 @@
 {
   "title": "Usuários",
-  "description": "Crie usuários e revogue chaves de API. Quem perder a chave precisará gerar uma nova.",
+  "description": "Crie usuários, bloqueie o acesso e revogue chaves de API.",
   "create": "Criar usuário",
+  "block": "Bloquear",
+  "unblock": "Desbloquear",
+  "confirmBlock": "Bloquear \"{email}\"? O login e a chave de API serão desativados.",
+  "confirmUnblock": "Desbloquear \"{email}\"? O usuário poderá fazer login novamente e gerar uma nova chave.",
   "columns": {
     "email": "E-mail",
     "role": "Papel",
+    "status": "Status",
     "key": "Chave",
     "actions": "Ações"
+  },
+  "status": {
+    "active": "Ativo",
+    "blocked": "Bloqueado"
   },
   "empty": "Nenhum usuário encontrado.",
   "noKey": "Sem chave",
@@ -27,6 +36,8 @@
   "errors": {
     "loadFailed": "não foi possível carregar os usuários",
     "createFailed": "não foi possível criar o usuário",
+    "blockFailed": "não foi possível bloquear o usuário",
+    "unblockFailed": "não foi possível desbloquear o usuário",
     "revokeFailed": "não foi possível revogar a chave"
   }
 }

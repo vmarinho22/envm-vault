@@ -1,12 +1,16 @@
 package middleware
 
 import (
+	"errors"
 	"strings"
 
+	"github.com/envm-vault/envm-vault/api/internal/repository"
 	"github.com/envm-vault/envm-vault/api/internal/service"
 	auditservice "github.com/envm-vault/envm-vault/api/internal/service/audit"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type contextKey string
@@ -17,11 +21,12 @@ const UserEmailKey contextKey = "userEmail"
 
 type JWTMiddleware struct {
 	secret []byte
+	users  *repository.UserRepository
 	audit  auditservice.Logger
 }
 
-func NewJWTMiddleware(secret string, audit auditservice.Logger) *JWTMiddleware {
-	return &JWTMiddleware{secret: []byte(secret), audit: auditservice.OrNop(audit)}
+func NewJWTMiddleware(secret string, users *repository.UserRepository, audit auditservice.Logger) *JWTMiddleware {
+	return &JWTMiddleware{secret: []byte(secret), users: users, audit: auditservice.OrNop(audit)}
 }
 
 func (m *JWTMiddleware) Protect() fiber.Handler {
@@ -62,6 +67,33 @@ func (m *JWTMiddleware) Protect() fiber.Handler {
 		role, _ := claims["role"].(string)
 		userID, _ := claims["sub"].(string)
 		email, _ := claims["email"].(string)
+
+		if m.users != nil {
+			id, parseErr := uuid.Parse(userID)
+			if parseErr != nil {
+				return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+					"error": "invalid or expired token",
+				})
+			}
+			user, findErr := m.users.FindByID(c.UserContext(), id)
+			if findErr != nil {
+				if errors.Is(findErr, gorm.ErrRecordNotFound) {
+					return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+						"error": "invalid or expired token",
+					})
+				}
+				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+					"error": "internal server error",
+				})
+			}
+			if service.IsBlocked(user) {
+				return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+					"error": "user is blocked",
+				})
+			}
+			role = user.Role
+			email = user.Email
+		}
 
 		c.Locals(string(UserRoleKey), role)
 		c.Locals(string(UserIDKey), userID)

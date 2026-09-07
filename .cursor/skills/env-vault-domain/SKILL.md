@@ -19,7 +19,7 @@ A named deployment target within a Project (e.g. `dev`, `staging`, `prod`). Full
 A key-value pair scoped to Project + Environment. Values encrypted at rest (Phase 2).
 
 ### User
-Account that owns projects and manages a unique API key via the admin UI.
+Account that owns projects and manages a unique API key via the admin UI. May be blocked (`blocked_at`) by admin/super_admin — denies login, JWT, and API key create/rotate; blocking revokes the active key.
 
 ### AccessToken
 Programmatic credential for downloading env vars. **One active key per user.** Stored hashed (SHA-256); plaintext shown only at generate/rotate. Sent as `Authorization: Bearer <token>`. Access to a given project/environment is determined by the user's membership, not by scopes on the token.

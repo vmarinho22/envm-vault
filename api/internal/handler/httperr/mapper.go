@@ -41,6 +41,8 @@ func Write(c *fiber.Ctx, err error) error {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "unauthorized"})
 	case errors.Is(err, service.ErrForbidden):
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "forbidden"})
+	case errors.Is(err, service.ErrUserBlocked):
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "user is blocked"})
 	case errors.Is(err, service.ErrEmailAlreadyExists):
 		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"error": "email already registered"})
 	case errors.Is(err, service.ErrInvalidRole):

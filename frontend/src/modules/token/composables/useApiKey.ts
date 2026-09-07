@@ -5,11 +5,13 @@ import { useAuthStore } from '@/modules/auth/stores/auth.store';
 import { tokenService } from '@/modules/token/services/TokenService';
 import type { TokenStatus } from '@/modules/token/types';
 import { ApiError } from '@/shared/http/ApiError';
+import { useConfirmDialog } from '@/shared/confirm/useConfirmDialog';
 
 export function useApiKey() {
   const router = useRouter();
   const auth = useAuthStore();
   const { t } = useI18n();
+  const { confirm } = useConfirmDialog();
 
   const loading = ref(false);
   const mutating = ref(false);
@@ -42,7 +44,14 @@ export function useApiKey() {
   }
 
   async function rotate(): Promise<void> {
-    if (!window.confirm(t('apiKey.rotateConfirm'))) {
+    const ok = await confirm({
+      title: t('apiKey.rotate'),
+      message: t('apiKey.rotateConfirm'),
+      confirmLabel: t('apiKey.rotate'),
+      cancelLabel: t('common.cancel'),
+      variant: 'danger',
+    });
+    if (!ok) {
       return;
     }
 

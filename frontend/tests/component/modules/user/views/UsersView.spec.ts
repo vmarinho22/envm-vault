@@ -3,12 +3,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { tokenService } from '@/modules/token/services/TokenService';
 import { userService } from '@/modules/user/services/UserService';
 import UsersView from '@/modules/user/views/UsersView.vue';
+import ConfirmDialog from '@/shared/confirm/ConfirmDialog.vue';
 import { expectComponentSnapshot, mountComponent } from '../../../helpers/mount';
 
 vi.mock('@/modules/user/services/UserService', () => ({
   userService: {
     register: vi.fn(),
     list: vi.fn(),
+    block: vi.fn(),
+    unblock: vi.fn(),
   },
 }));
 
@@ -23,6 +26,8 @@ vi.mock('@/modules/token/services/TokenService', () => ({
 
 const listMock = vi.mocked(userService.list);
 const registerMock = vi.mocked(userService.register);
+const blockMock = vi.mocked(userService.block);
+const unblockMock = vi.mocked(userService.unblock);
 const revokeForUserMock = vi.mocked(tokenService.revokeForUser);
 
 const session = {
@@ -34,6 +39,8 @@ describe('UsersView (component)', () => {
   beforeEach(() => {
     listMock.mockReset();
     registerMock.mockReset();
+    blockMock.mockReset();
+    unblockMock.mockReset();
     revokeForUserMock.mockReset();
     listMock.mockResolvedValue([
       {
@@ -60,6 +67,9 @@ describe('UsersView (component)', () => {
     expect(wrapper.text()).toContain('admin@example.com');
     expect(wrapper.text()).toContain('ev_adminxxx');
     expect(wrapper.text()).toContain('Sem chave');
+    expect(wrapper.text()).toContain('Ativo');
+    expect(wrapper.get('button[aria-label="Bloquear"]')).toBeTruthy();
+    expect(wrapper.find('button[aria-label="Bloquear"]').exists()).toBe(true);
     expectComponentSnapshot(wrapper);
   });
 
@@ -107,6 +117,56 @@ describe('UsersView (component)', () => {
 
     expect(registerMock).toHaveBeenCalledWith('new@example.com', 'admin');
     expect(wrapper.text()).toContain('new@example.com');
+    expectComponentSnapshot(wrapper);
+  });
+
+  it('blocks a user after confirm and reloads the list', async () => {
+    blockMock.mockResolvedValue({
+      id: '2',
+      email: 'user@example.com',
+      role: 'user',
+      blocked_at: '2026-01-02T00:00:00Z',
+    });
+    listMock
+      .mockResolvedValueOnce([
+        {
+          id: '2',
+          email: 'user@example.com',
+          role: 'user',
+          token: { prefix: 'ev_userxxxx', created_at: '2026-01-01T00:00:00Z' },
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          id: '2',
+          email: 'user@example.com',
+          role: 'user',
+          blocked_at: '2026-01-02T00:00:00Z',
+          token: {
+            prefix: 'ev_userxxxx',
+            created_at: '2026-01-01T00:00:00Z',
+            revoked_at: '2026-01-02T00:00:00Z',
+          },
+        },
+      ]);
+
+    const { wrapper } = await mountComponent(
+      {
+        components: { UsersView, ConfirmDialog },
+        template: '<div><UsersView /><ConfirmDialog /></div>',
+      },
+      { session },
+    );
+    await flushPromises();
+
+    await wrapper.get('button[aria-label="Bloquear"]').trigger('click');
+    await flushPromises();
+    await wrapper.get('[data-testid="confirm-accept"]').trigger('click');
+    await flushPromises();
+
+    expect(blockMock).toHaveBeenCalledWith('2');
+    expect(wrapper.text()).toContain('Bloqueado');
+    expect(wrapper.get('button[aria-label="Desbloquear"]')).toBeTruthy();
     expectComponentSnapshot(wrapper);
   });
 

@@ -1,12 +1,21 @@
 {
   "title": "Users",
-  "description": "Create users and revoke API keys. Anyone who loses a key will need to generate a new one.",
+  "description": "Create users, block access, and revoke API keys.",
   "create": "Create user",
+  "block": "Block",
+  "unblock": "Unblock",
+  "confirmBlock": "Block \"{email}\"? Login and API key access will be disabled.",
+  "confirmUnblock": "Unblock \"{email}\"? The user will be able to sign in again and generate a new key.",
   "columns": {
     "email": "Email",
     "role": "Role",
+    "status": "Status",
     "key": "Key",
     "actions": "Actions"
+  },
+  "status": {
+    "active": "Active",
+    "blocked": "Blocked"
   },
   "empty": "No users found.",
   "noKey": "No key",
@@ -27,6 +36,8 @@
   "errors": {
     "loadFailed": "could not load users",
     "createFailed": "could not create the user",
+    "blockFailed": "could not block the user",
+    "unblockFailed": "could not unblock the user",
     "revokeFailed": "could not revoke the key"
   }
 }

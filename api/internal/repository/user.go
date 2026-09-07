@@ -88,3 +88,10 @@ func (r *UserRepository) FindByIDs(ctx context.Context, ids []uuid.UUID) ([]mode
 	}
 	return users, nil
 }
+
+func (r *UserRepository) Update(ctx context.Context, user *model.User) error {
+	if err := r.db.WithContext(ctx).Save(user).Error; err != nil {
+		return fmt.Errorf("update user: %w", err)
+	}
+	return nil
+}

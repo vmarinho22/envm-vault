@@ -61,12 +61,15 @@ func (s *Service) RequestLogin(ctx context.Context, rawEmail string) error {
 	}
 
 	if count > 0 {
-		exists, err := s.users.ExistsByEmail(ctx, emailAddr)
+		user, err := s.users.FindByEmail(ctx, emailAddr)
 		if err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return service.ErrUserNotFound
+			}
 			return err
 		}
-		if !exists {
-			return service.ErrUserNotFound
+		if service.IsBlocked(user) {
+			return service.ErrUserBlocked
 		}
 	}
 
@@ -159,6 +162,9 @@ func (s *Service) VerifyLogin(ctx context.Context, rawEmail, code string) (*serv
 			return err
 		}
 		if found != nil {
+			if service.IsBlocked(found) {
+				return service.ErrUserBlocked
+			}
 			user = found
 			return nil
 		}

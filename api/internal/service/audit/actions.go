@@ -10,6 +10,8 @@ const (
 	ActionLoginFailed               = "login.failed"
 	ActionUserBootstrapSuperAdmin   = "user.bootstrap_super_admin"
 	ActionUserRegistered            = "user.registered"
+	ActionUserBlocked               = "user.blocked"
+	ActionUserUnblocked             = "user.unblocked"
 	ActionPersonalTokenCreated      = "personal_token.created"
 	ActionPersonalTokenRotated      = "personal_token.rotated"
 	ActionPersonalTokenRevoked      = "personal_token.revoked"

@@ -38,4 +38,35 @@ describe('UserService', () => {
     await expect(userService.list()).resolves.toEqual([]);
     expect(fetchMock).toHaveBeenCalledWith('/v1/users', expect.any(Object));
   });
+
+  it('block posts to /v1/users/:id/block', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      jsonResponse(200, {
+        id: '2',
+        email: 'user@example.com',
+        role: 'user',
+        blocked_at: '2026-01-02T00:00:00Z',
+      }),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    await userService.block('2');
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/v1/users/2/block',
+      expect.objectContaining({ method: 'POST' }),
+    );
+  });
+
+  it('unblock posts to /v1/users/:id/unblock', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      jsonResponse(200, { id: '2', email: 'user@example.com', role: 'user' }),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    await userService.unblock('2');
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/v1/users/2/unblock',
+      expect.objectContaining({ method: 'POST' }),
+    );
+  });
 });

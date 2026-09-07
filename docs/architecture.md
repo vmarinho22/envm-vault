@@ -46,6 +46,8 @@ The API lives in `api/` and provides authentication via email OTP plus a unique 
 | `DELETE` | `/v1/tokens` | JWT | Revoke the current user's API key |
 | `GET` | `/v1/users` | JWT (admin+) | List users with API key status |
 | `DELETE` | `/v1/users/:id/token` | JWT (admin+) | Revoke another user's API key |
+| `POST` | `/v1/users/:id/block` | JWT (admin+) | Block user (revokes API key; denies login) |
+| `POST` | `/v1/users/:id/unblock` | JWT (admin+) | Unblock user (does not restore API key) |
 | `GET` | `/v1/audit-logs` | JWT (admin+) | Paginated audit logs (filters + sort) |
 | `GET` | `/v1/teams` | JWT | List teams (optional `?name=` substring filter) |
 | `POST` | `/v1/teams` | JWT (admin+) | Create team (name + accountable user) |
@@ -58,6 +60,7 @@ The API lives in `api/` and provides authentication via email OTP plus a unique 
 2. **Login:** Registered users request OTP via `/v1/auth/login`, verify via `/v1/auth/verify`.
 3. **Register:** `super_admin` or `admin` creates users via `/v1/auth/register` with role `admin` or `user`.
 4. **API key:** After login, the UI requires generating a unique API key (`POST /v1/tokens`) before other screens. The plaintext is shown once. `POST` again rotates (invalidates the previous hash). The user can revoke their key; `admin` can revoke `user`/`admin` keys; only `super_admin` can revoke a `super_admin` key.
+5. **Block:** `admin` / `super_admin` can block users (`POST /v1/users/:id/block`). Blocking sets `blocked_at`, revokes the active API key, and denies OTP login, JWT sessions, and token create/rotate. Unblock clears `blocked_at` only. Nobody can block themselves; `admin` cannot manage `super_admin`.
 
 In development (`APP_ENV=development`), OTP codes are logged to stdout instead of sent via email.
 
@@ -81,7 +84,7 @@ A key-value pair scoped to a **Project + Environment** combination.
 
 ### User
 
-An account with role `super_admin`, `admin`, or `user`. Authenticates via email OTP.
+An account with role `super_admin`, `admin`, or `user`. Authenticates via email OTP. Optional `blocked_at` disables login and API key usage until unblocked.
 
 ### AccessToken
 
@@ -130,6 +133,7 @@ erDiagram
     uuid id PK
     string email UK
     string role
+    timestamp blocked_at
     timestamp created_at
     timestamp updated_at
   }
@@ -180,8 +184,8 @@ erDiagram
 
 | Role | Description |
 |------|-------------|
-| `super_admin` | First user (bootstrap). Full access. Can revoke any API key. Can manage teams. |
-| `admin` | Can register users, revoke `user`/`admin` API keys, and manage teams. |
+| `super_admin` | First user (bootstrap). Full access. Can revoke any API key. Can manage teams. Can block any user. |
+| `admin` | Can register users, revoke `user`/`admin` API keys, manage teams, and block `admin`/`user`. |
 | `user` | Standard user. Manages their own API key. Can list/search teams (read-only). |
 
 ## Security Principles

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowPathIcon, TrashIcon } from '@heroicons/vue/24/outline';
+import { ArrowPathIcon, KeyIcon } from '@heroicons/vue/24/outline';
 import { onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import TokenOnceReveal from '@/modules/token/components/TokenOnceReveal.vue';
@@ -79,7 +79,7 @@ onMounted(() => {
           {{ t('apiKey.rotate') }}
         </button>
         <button class="btn btn-error btn-outline gap-2" type="button" :disabled="mutating" @click="revoke">
-          <TrashIcon class="size-5" aria-hidden="true" />
+          <KeyIcon class="size-5" aria-hidden="true" />
           {{ t('apiKey.revoke') }}
         </button>
       </div>

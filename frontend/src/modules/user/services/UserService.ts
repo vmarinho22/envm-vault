@@ -6,6 +6,8 @@ export type RegisterableRole = Exclude<UserRole, 'super_admin'>;
 export interface UserService {
   register(email: string, role: RegisterableRole): Promise<User>;
   list(): Promise<UserWithToken[]>;
+  block(id: string): Promise<User>;
+  unblock(id: string): Promise<User>;
 }
 
 export const userService: UserService = {
@@ -18,5 +20,17 @@ export const userService: UserService = {
 
   list(): Promise<UserWithToken[]> {
     return httpClient.request<UserWithToken[]>('/v1/users');
+  },
+
+  block(id: string): Promise<User> {
+    return httpClient.request<User>(`/v1/users/${id}/block`, {
+      method: 'POST',
+    });
+  },
+
+  unblock(id: string): Promise<User> {
+    return httpClient.request<User>(`/v1/users/${id}/unblock`, {
+      method: 'POST',
+    });
   },
 };

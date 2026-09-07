@@ -15,4 +15,5 @@ var (
 	ErrInvalidTeamName    = errors.New("invalid team name")
 	ErrTeamNotFound       = errors.New("team not found")
 	ErrTeamSlugTaken      = errors.New("team slug already taken")
+	ErrUserBlocked        = errors.New("user is blocked")
 )

@@ -34,6 +34,8 @@ func TestRegister_RoutesRegistered(t *testing.T) {
 		"POST /v1/auth/register":     false,
 		"GET /v1/users":              false,
 		"DELETE /v1/users/:id/token": false,
+		"POST /v1/users/:id/block":   false,
+		"POST /v1/users/:id/unblock": false,
 		"GET /v1/tokens/me":          false,
 		"POST /v1/tokens":            false,
 		"DELETE /v1/tokens":          false,
@@ -67,7 +69,7 @@ func TestRegister_TokensMeRequiresAuth(t *testing.T) {
 		Token:  &tokenhandler.Handler{},
 		Audit:  &audithandler.Handler{},
 		Team:   &teamhandler.Handler{},
-		JWT:    middleware.NewJWTMiddleware("test-secret", nil),
+		JWT:    middleware.NewJWTMiddleware("test-secret", nil, nil),
 	})
 
 	req := httptest.NewRequest(fiber.MethodGet, "/v1/tokens/me", nil)

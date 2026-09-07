@@ -16,4 +16,6 @@ func registerUserRoutes(v1 fiber.Router, deps Deps) {
 	users := v1.Group("/users", deps.JWT.Protect(), middleware.RequireAdmin())
 	users.Get("", deps.User.List)
 	users.Delete("/:id/token", deps.Token.RevokeForUser)
+	users.Post("/:id/block", deps.User.Block)
+	users.Post("/:id/unblock", deps.User.Unblock)
 }

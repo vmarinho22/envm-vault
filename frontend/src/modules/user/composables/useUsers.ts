@@ -4,10 +4,12 @@ import { tokenService } from '@/modules/token/services/TokenService';
 import type { RegisterableRole } from '@/modules/user/services/UserService';
 import { userService } from '@/modules/user/services/UserService';
 import type { UserWithToken } from '@/modules/user/types';
+import { useConfirmDialog } from '@/shared/confirm/useConfirmDialog';
 import { ApiError } from '@/shared/http/ApiError';
 
 export function useUsers() {
   const { t } = useI18n();
+  const { confirm } = useConfirmDialog();
   const users = ref<UserWithToken[]>([]);
   const loading = ref(false);
   const mutatingId = ref<string | null>(null);
@@ -74,6 +76,50 @@ export function useUsers() {
     }
   }
 
+  async function blockUser(user: UserWithToken): Promise<void> {
+    const ok = await confirm({
+      title: t('users.block'),
+      message: t('users.confirmBlock', { email: user.email }),
+      confirmLabel: t('users.block'),
+      cancelLabel: t('common.cancel'),
+      variant: 'danger',
+    });
+    if (!ok) return;
+
+    error.value = null;
+    mutatingId.value = user.id;
+    try {
+      await userService.block(user.id);
+      await fetchUsers();
+    } catch (err) {
+      error.value = toErrorMessage(err, t('users.errors.blockFailed'));
+    } finally {
+      mutatingId.value = null;
+    }
+  }
+
+  async function unblockUser(user: UserWithToken): Promise<void> {
+    const ok = await confirm({
+      title: t('users.unblock'),
+      message: t('users.confirmUnblock', { email: user.email }),
+      confirmLabel: t('users.unblock'),
+      cancelLabel: t('common.cancel'),
+      variant: 'primary',
+    });
+    if (!ok) return;
+
+    error.value = null;
+    mutatingId.value = user.id;
+    try {
+      await userService.unblock(user.id);
+      await fetchUsers();
+    } catch (err) {
+      error.value = toErrorMessage(err, t('users.errors.unblockFailed'));
+    } finally {
+      mutatingId.value = null;
+    }
+  }
+
   return {
     users,
     loading,
@@ -88,5 +134,7 @@ export function useUsers() {
     closeForm,
     submitCreate,
     revokeToken,
+    blockUser,
+    unblockUser,
   };
 }

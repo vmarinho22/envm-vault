@@ -27,6 +27,8 @@
     "loginFailed": "Falha no login",
     "userBootstrapSuperAdmin": "Super admin criado (bootstrap)",
     "userRegistered": "Usuário registrado",
+    "userBlocked": "Usuário bloqueado",
+    "userUnblocked": "Usuário desbloqueado",
     "personalTokenCreated": "Token pessoal criado",
     "personalTokenRotated": "Token pessoal rotacionado",
     "personalTokenRevoked": "Token pessoal revogado",

@@ -5,11 +5,13 @@ import { teamService } from '@/modules/team/services/TeamService';
 import type { CreateTeamInput, Team, UpdateTeamInput } from '@/modules/team/types';
 import { userService } from '@/modules/user/services/UserService';
 import type { UserWithToken } from '@/modules/user/types';
+import { useConfirmDialog } from '@/shared/confirm/useConfirmDialog';
 import { ApiError } from '@/shared/http/ApiError';
 
 export function useTeams() {
   const { t } = useI18n();
   const auth = useAuthStore();
+  const { confirm } = useConfirmDialog();
 
   const teams = ref<Team[]>([]);
   const users = ref<UserWithToken[]>([]);
@@ -118,7 +120,13 @@ export function useTeams() {
 
   async function removeTeam(team: Team): Promise<void> {
     if (!canMutate.value) return;
-    const ok = window.confirm(t('teams.confirmDelete', { name: team.name }));
+    const ok = await confirm({
+      title: t('teams.delete'),
+      message: t('teams.confirmDelete', { name: team.name }),
+      confirmLabel: t('teams.delete'),
+      cancelLabel: t('common.cancel'),
+      variant: 'danger',
+    });
     if (!ok) return;
 
     error.value = null;

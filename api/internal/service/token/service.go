@@ -63,6 +63,10 @@ func (s *Service) Create(ctx context.Context, actorID string) (*CreateResponse, 
 		return nil, err
 	}
 
+	if err := s.ensureNotBlocked(ctx, userID); err != nil {
+		return nil, err
+	}
+
 	plaintext, err := GeneratePlaintext()
 	if err != nil {
 		return nil, err
@@ -161,7 +165,7 @@ func (s *Service) RevokeForUser(ctx context.Context, actorID, actorRole, targetU
 		return err
 	}
 
-	if !CanRevokeTarget(actorRole, target.Role) {
+	if !service.CanManageTarget(actorRole, target.Role) {
 		return service.ErrForbidden
 	}
 
@@ -214,12 +218,24 @@ func parseActorID(actorID string) (uuid.UUID, error) {
 	return id, nil
 }
 
+func (s *Service) ensureNotBlocked(ctx context.Context, userID uuid.UUID) error {
+	if s.users == nil {
+		return nil
+	}
+	user, err := s.users.FindByID(ctx, userID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return service.ErrUserNotFound
+		}
+		return err
+	}
+	if service.IsBlocked(user) {
+		return service.ErrUserBlocked
+	}
+	return nil
+}
+
+// CanRevokeTarget reports whether actorRole may revoke a personal token for targetRole.
 func CanRevokeTarget(actorRole, targetRole string) bool {
-	if actorRole == service.RoleSuperAdmin {
-		return true
-	}
-	if actorRole == service.RoleAdmin {
-		return targetRole == service.RoleAdmin || targetRole == service.RoleUser
-	}
-	return false
+	return service.CanManageTarget(actorRole, targetRole)
 }

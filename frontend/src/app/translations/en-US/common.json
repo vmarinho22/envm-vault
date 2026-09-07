@@ -4,5 +4,7 @@
   "copy": "Copy",
   "copied": "Copied",
   "emDash": "—",
-  "language": "Language"
+  "language": "Language",
+  "cancel": "Cancel",
+  "confirm": "Confirm"
 }

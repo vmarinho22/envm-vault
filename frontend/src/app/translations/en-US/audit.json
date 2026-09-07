@@ -27,6 +27,8 @@
     "loginFailed": "Login failed",
     "userBootstrapSuperAdmin": "Super admin bootstrapped",
     "userRegistered": "User registered",
+    "userBlocked": "User blocked",
+    "userUnblocked": "User unblocked",
     "personalTokenCreated": "Personal token created",
     "personalTokenRotated": "Personal token rotated",
     "personalTokenRevoked": "Personal token revoked",
