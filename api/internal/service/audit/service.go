@@ -57,6 +57,8 @@ func (s *Service) Record(ctx context.Context, event Event) {
 		ProjectID:    event.ProjectID,
 		ProjectTitle: event.ProjectTitle,
 		ProjectSlug:  event.ProjectSlug,
+		SecretID:     event.SecretID,
+		SecretName:   event.SecretName,
 		AuthChannel:  origin.AuthChannel,
 		IP:           origin.IP,
 		UserAgent:    origin.UserAgent,
@@ -71,6 +73,7 @@ func (s *Service) Record(ctx context.Context, event Event) {
 		"actor_role", event.ActorRole,
 		"project_id", event.ProjectID,
 		"project_slug", event.ProjectSlug,
+		"secret_name", event.SecretName,
 		"ip", origin.IP,
 		"origin", origin.Origin,
 	)

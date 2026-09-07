@@ -13,6 +13,8 @@ export interface AuditLog {
   project_id: string | null;
   project_title: string;
   project_slug: string;
+  secret_id: string | null;
+  secret_name: string;
   auth_channel: AuthChannel;
   ip: string;
   user_agent: string;

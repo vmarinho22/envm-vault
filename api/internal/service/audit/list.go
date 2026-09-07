@@ -36,6 +36,8 @@ type LogResponse struct {
 	ProjectID    *string   `json:"project_id"`
 	ProjectTitle string    `json:"project_title"`
 	ProjectSlug  string    `json:"project_slug"`
+	SecretID     *string   `json:"secret_id"`
+	SecretName   string    `json:"secret_name"`
 	AuthChannel  string    `json:"auth_channel"`
 	IP           string    `json:"ip"`
 	UserAgent    string    `json:"user_agent"`
@@ -139,6 +141,7 @@ func toLogResponse(row model.AuditLog, emails map[uuid.UUID]string) LogResponse 
 		ActorRole:    row.ActorRole,
 		ProjectTitle: row.ProjectTitle,
 		ProjectSlug:  row.ProjectSlug,
+		SecretName:   row.SecretName,
 		AuthChannel:  row.AuthChannel,
 		IP:           row.IP,
 		UserAgent:    row.UserAgent,
@@ -160,6 +163,10 @@ func toLogResponse(row model.AuditLog, emails map[uuid.UUID]string) LogResponse 
 	if row.ProjectID != nil {
 		id := row.ProjectID.String()
 		resp.ProjectID = &id
+	}
+	if row.SecretID != nil {
+		id := row.SecretID.String()
+		resp.SecretID = &id
 	}
 	return resp
 }

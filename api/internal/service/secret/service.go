@@ -213,6 +213,7 @@ func (s *Service) Create(
 	}
 
 	pid := project.ID
+	sid := created.ID
 	s.audit.Record(ctx, audit.Event{
 		Action:       audit.ActionSecretCreated,
 		ActorUserID:  parseActorID(actorID),
@@ -221,6 +222,8 @@ func (s *Service) Create(
 		ProjectID:    &pid,
 		ProjectTitle: project.Title,
 		ProjectSlug:  project.Slug,
+		SecretID:     &sid,
+		SecretName:   fresh.Name,
 	})
 
 	resp := toResponse(*fresh)
@@ -277,6 +280,8 @@ func (s *Service) UpdateName(
 		ProjectID:    &pid,
 		ProjectTitle: project.Title,
 		ProjectSlug:  project.Slug,
+		SecretID:     &sid,
+		SecretName:   fresh.Name,
 	})
 
 	resp := toResponse(*fresh)
@@ -295,7 +300,8 @@ func (s *Service) Delete(
 	if err != nil {
 		return service.ErrSecretNotFound
 	}
-	if _, err := s.secrets.FindByProjectAndID(ctx, project.ID, sid); err != nil {
+	secret, err := s.secrets.FindByProjectAndID(ctx, project.ID, sid)
+	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return service.ErrSecretNotFound
 		}
@@ -317,6 +323,8 @@ func (s *Service) Delete(
 		ProjectID:    &pid,
 		ProjectTitle: project.Title,
 		ProjectSlug:  project.Slug,
+		SecretID:     &sid,
+		SecretName:   secret.Name,
 	})
 	return nil
 }
@@ -378,6 +386,8 @@ func (s *Service) SetValue(
 		ProjectID:    &pid,
 		ProjectTitle: project.Title,
 		ProjectSlug:  project.Slug,
+		SecretID:     &sid,
+		SecretName:   fresh.Name,
 	})
 
 	resp := toResponse(*fresh)
@@ -440,7 +450,8 @@ func (s *Service) ClearValue(
 	if err != nil {
 		return service.ErrEnvironmentNotFound
 	}
-	if _, err := s.secrets.FindByProjectAndID(ctx, project.ID, sid); err != nil {
+	secret, err := s.secrets.FindByProjectAndID(ctx, project.ID, sid)
+	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return service.ErrSecretNotFound
 		}
@@ -462,6 +473,8 @@ func (s *Service) ClearValue(
 		ProjectID:    &pid,
 		ProjectTitle: project.Title,
 		ProjectSlug:  project.Slug,
+		SecretID:     &sid,
+		SecretName:   secret.Name,
 	})
 	return nil
 }

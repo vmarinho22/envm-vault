@@ -72,6 +72,7 @@ exports[`AuditLogsView (component) > renders audit logs table with project colum
           <th>ID</th>
           <th>Ação</th>
           <th>Projeto</th>
+          <th>Secret</th>
           <th>Ator</th>
           <th>Alvo</th>
           <th>Canal</th>
@@ -87,6 +88,7 @@ exports[`AuditLogsView (component) > renders audit logs table with project colum
           <td class="max-w-[8rem] truncate font-mono text-xs" title="log-1">log-1</td>
           <td class="text-sm">Projeto criado</td>
           <td class="text-sm">Payment</td>
+          <td class="font-mono text-sm">—</td>
           <td>admin@example.com</td>
           <td>—</td>
           <td>Web</td>
@@ -96,11 +98,25 @@ exports[`AuditLogsView (component) > renders audit logs table with project colum
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"></path>
               </svg></button></td>
         </tr>
+        <tr>
+          <td class="max-w-[8rem] truncate font-mono text-xs" title="log-2">log-2</td>
+          <td class="text-sm">Valor de secret definido</td>
+          <td class="text-sm">Payment</td>
+          <td class="font-mono text-sm">DATABASE_URL</td>
+          <td>admin@example.com</td>
+          <td>—</td>
+          <td>Web</td>
+          <td class="whitespace-nowrap text-sm">09/06/2026 12:01</td>
+          <td class="text-right"><button class="btn btn-ghost btn-sm btn-square" type="button" aria-label="Ver detalhe do log"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"></path>
+              </svg></button></td>
+        </tr>
       </tbody>
     </table>
   </div>
   <div class="mt-6 flex items-center justify-between gap-4">
-    <p class="text-sm text-base-content/70">Página 1 de 1 (1 no total)</p>
+    <p class="text-sm text-base-content/70">Página 1 de 1 (2 no total)</p>
     <div class="flex gap-2"><button class="btn btn-outline btn-sm" type="button" disabled="">Anterior</button><button class="btn btn-outline btn-sm" type="button" disabled="">Próxima</button></div>
   </div>
   <dialog id="audit-log-detail-modal" class="modal">

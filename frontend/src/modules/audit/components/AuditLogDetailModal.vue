@@ -95,6 +95,16 @@ function dash(value: string | null | undefined): string {
           <dd class="font-mono">{{ dash(log.project_slug) }}</dd>
         </div>
         <div>
+          <dt class="text-base-content/60">{{ t('audit.detail.secretId') }}</dt>
+          <dd class="font-mono break-all" :title="dash(log.secret_id)">
+            {{ dash(log.secret_id) }}
+          </dd>
+        </div>
+        <div>
+          <dt class="text-base-content/60">{{ t('audit.columns.secret') }}</dt>
+          <dd class="font-mono">{{ dash(log.secret_name) }}</dd>
+        </div>
+        <div>
           <dt class="text-base-content/60">{{ t('audit.columns.channel') }}</dt>
           <dd>
             {{ channelLabel(log.auth_channel, t) }}

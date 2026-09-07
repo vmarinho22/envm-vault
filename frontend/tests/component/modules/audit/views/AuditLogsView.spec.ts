@@ -77,6 +77,8 @@ describe('AuditLogsView (component)', () => {
           project_id: 'p1',
           project_title: 'Payment',
           project_slug: 'payment',
+          secret_id: null,
+          secret_name: '',
           auth_channel: 'logged_in_user',
           ip: '127.0.0.1',
           user_agent: 'vitest',
@@ -84,10 +86,30 @@ describe('AuditLogsView (component)', () => {
           occurred_at: '2026-09-06T15:00:00Z',
           created_at: '2026-09-06T15:00:00Z',
         },
+        {
+          id: 'log-2',
+          action: 'secret_value.set',
+          actor_user_id: '1',
+          actor_email: 'admin@example.com',
+          actor_role: 'super_admin',
+          target_user_id: null,
+          target_email: null,
+          project_id: 'p1',
+          project_title: 'Payment',
+          project_slug: 'payment',
+          secret_id: 's1',
+          secret_name: 'DATABASE_URL',
+          auth_channel: 'logged_in_user',
+          ip: '127.0.0.1',
+          user_agent: 'vitest',
+          origin: 'http://localhost:3100',
+          occurred_at: '2026-09-06T15:01:00Z',
+          created_at: '2026-09-06T15:01:00Z',
+        },
       ],
       page: 1,
       page_size: 25,
-      total: 1,
+      total: 2,
     });
   });
 
@@ -98,6 +120,8 @@ describe('AuditLogsView (component)', () => {
     expect(wrapper.get('h1').text()).toBe('Logs de auditoria');
     expect(wrapper.text()).toContain('Projeto criado');
     expect(wrapper.text()).toContain('Payment');
+    expect(wrapper.text()).toContain('Secret');
+    expect(wrapper.text()).toContain('DATABASE_URL');
     expect(wrapper.text()).toContain('admin@example.com');
     expect(wrapper.text()).toContain('Projeto');
     expect(listUsersMock).toHaveBeenCalledTimes(1);

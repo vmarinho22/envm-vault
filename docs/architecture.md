@@ -248,6 +248,8 @@ erDiagram
     uuid project_id
     string project_title
     string project_slug
+    uuid secret_id
+    string secret_name
     string auth_channel
     string ip
     string user_agent
@@ -275,7 +277,7 @@ Project↔Secret linking is implemented (`secrets` + `secret_values`). Team memb
 6. **Env authorization** — env download identifies the user via the API key (`GET /v1/projects/:slug/env?environment=`). Only `super_admin` may download the `production` environment. Broader project/environment membership is TBD; until then, any valid non-revoked key for a non-blocked user can download non-production envs.
 7. **No secrets in the repository** — never commit real tokens or `.env` files.
 8. **JWT expiry** — configurable via `JWT_EXPIRY` (default 24h).
-9. **Audit trail** — security-relevant mutations write to `audit_logs` via `internal/service/audit` (best-effort). Middleware attaches IP/UA/Origin/channel; domain services call `Record` after success. Persist `action` (UI maps labels) plus optional typed snapshots (e.g. `project_id` / `project_title` / `project_slug` for `project.*` / `secret.*`). Channels: `login_attempt`, `logged_in_user`, `personal_token`. No metadata JSON column.
+9. **Audit trail** — security-relevant mutations write to `audit_logs` via `internal/service/audit` (best-effort). Middleware attaches IP/UA/Origin/channel; domain services call `Record` after success. Persist `action` (UI maps labels) plus optional typed snapshots (e.g. `project_id` / `project_title` / `project_slug` for `project.*` / `secret.*`; `secret_id` / `secret_name` for `secret.*` / `secret_value.*`). Channels: `login_attempt`, `logged_in_user`, `personal_token`. No metadata JSON column.
 10. **Secret encryption at rest** — AES-256-GCM with `ENCRYPTION_KEY` (required hex, 32 bytes) and `ENCRYPTION_KEY_VERSION`. Never log plaintext secret values.
 
 ## Open Decisions

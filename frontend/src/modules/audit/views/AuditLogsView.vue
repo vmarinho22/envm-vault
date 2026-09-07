@@ -171,6 +171,7 @@ onMounted(() => {
               <th>{{ t('audit.columns.id') }}</th>
               <th>{{ t('audit.columns.action') }}</th>
               <th>{{ t('audit.columns.project') }}</th>
+              <th>{{ t('audit.columns.secret') }}</th>
               <th>{{ t('audit.columns.actor') }}</th>
               <th>{{ t('audit.columns.target') }}</th>
               <th>{{ t('audit.columns.channel') }}</th>
@@ -198,7 +199,7 @@ onMounted(() => {
           </thead>
           <tbody>
             <tr v-if="logs.length === 0">
-              <td colspan="8" class="text-base-content/70">{{ t('audit.empty') }}</td>
+              <td colspan="9" class="text-base-content/70">{{ t('audit.empty') }}</td>
             </tr>
             <tr v-for="log in logs" :key="log.id">
               <td class="max-w-[8rem] truncate font-mono text-xs" :title="log.id">
@@ -206,6 +207,7 @@ onMounted(() => {
               </td>
               <td class="text-sm">{{ actionLabel(log.action, t) }}</td>
               <td class="text-sm">{{ projectLabel(log) }}</td>
+              <td class="font-mono text-sm">{{ log.secret_name || '—' }}</td>
               <td>{{ log.actor_email || '—' }}</td>
               <td>{{ log.target_email || '—' }}</td>
               <td>{{ channelLabel(log.auth_channel, t) }}</td>

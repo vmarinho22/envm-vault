@@ -12,4 +12,6 @@ type Event struct {
 	ProjectID    *uuid.UUID
 	ProjectTitle string
 	ProjectSlug  string
+	SecretID     *uuid.UUID
+	SecretName   string
 }

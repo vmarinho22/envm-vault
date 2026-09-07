@@ -18,6 +18,8 @@ type AuditLog struct {
 	ProjectID    *uuid.UUID `gorm:"type:uuid;index:idx_audit_logs_project_id"`
 	ProjectTitle string     `gorm:"type:varchar(80);not null;default:''"`
 	ProjectSlug  string     `gorm:"type:varchar(80);not null;default:''"`
+	SecretID     *uuid.UUID `gorm:"type:uuid"`
+	SecretName   string     `gorm:"type:varchar(128);not null;default:''"`
 	AuthChannel  string     `gorm:"type:varchar(32);not null"`
 	IP           string     `gorm:"type:varchar(64);not null;default:''"`
 	UserAgent    string     `gorm:"type:varchar(512);not null;default:''"`
