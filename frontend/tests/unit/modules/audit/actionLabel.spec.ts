@@ -7,6 +7,7 @@ describe('actionLabel', () => {
   it('maps known actions to i18n keys', () => {
     expect(actionLabel('personal_token.rotated', t)).toBe('audit.actions.personalTokenRotated');
     expect(actionLabel('login.succeeded', t)).toBe('audit.actions.loginSucceeded');
+    expect(actionLabel('team.created', t)).toBe('audit.actions.teamCreated');
   });
 
   it('falls back to raw action when unknown', () => {

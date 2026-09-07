@@ -7,6 +7,7 @@ import ApiKeyView from '@/modules/token/views/ApiKeyView.vue';
 import TokenSetupView from '@/modules/token/views/TokenSetupView.vue';
 import UsersView from '@/modules/user/views/UsersView.vue';
 import AuditLogsView from '@/modules/audit/views/AuditLogsView.vue';
+import TeamsView from '@/modules/team/views/TeamsView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -36,6 +37,11 @@ const router = createRouter({
           path: 'api-key',
           name: 'api-key',
           component: ApiKeyView,
+        },
+        {
+          path: 'teams',
+          name: 'teams',
+          component: TeamsView,
         },
         {
           path: 'users',

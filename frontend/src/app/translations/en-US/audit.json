@@ -30,7 +30,10 @@
     "personalTokenCreated": "Personal token created",
     "personalTokenRotated": "Personal token rotated",
     "personalTokenRevoked": "Personal token revoked",
-    "personalTokenRevokedByAdmin": "Personal token revoked by admin"
+    "personalTokenRevokedByAdmin": "Personal token revoked by admin",
+    "teamCreated": "Team created",
+    "teamUpdated": "Team updated",
+    "teamDeleted": "Team deleted"
   },
   "channels": {
     "web": "Web",

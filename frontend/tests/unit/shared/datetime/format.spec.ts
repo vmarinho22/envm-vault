@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { i18n } from '@/app/translations';
-import { formatDateTime, toDateParam } from '@/shared/datetime/format';
+import { formatDateTime, formatDate, toDateParam } from '@/shared/datetime/format';
 
 describe('formatDateTime', () => {
   afterEach(() => {
@@ -31,6 +31,17 @@ describe('formatDateTime', () => {
 
   it('returns original string when invalid', () => {
     expect(formatDateTime('not-a-date')).toBe('not-a-date');
+  });
+});
+
+describe('formatDate', () => {
+  it('formats date only in pt-BR and en-US', () => {
+    expect(formatDate('2026-09-06T15:43:00.000Z', 'pt-BR')).toBe('06/09/2026');
+    expect(formatDate('2026-09-06T15:43:00.000Z', 'en-US')).toBe('09/06/2026');
+  });
+
+  it('returns original string when invalid', () => {
+    expect(formatDate('not-a-date')).toBe('not-a-date');
   });
 });
 

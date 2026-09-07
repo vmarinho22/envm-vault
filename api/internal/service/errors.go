@@ -12,4 +12,7 @@ var (
 	ErrEmailAlreadyExists = errors.New("email already registered")
 	ErrInvalidRole        = errors.New("invalid role")
 	ErrTokenNotFound      = errors.New("access token not found")
+	ErrInvalidTeamName    = errors.New("invalid team name")
+	ErrTeamNotFound       = errors.New("team not found")
+	ErrTeamSlugTaken      = errors.New("team slug already taken")
 )

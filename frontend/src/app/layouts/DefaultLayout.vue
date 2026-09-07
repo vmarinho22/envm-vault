@@ -4,6 +4,7 @@ import {
   ClipboardDocumentListIcon,
   HomeIcon,
   KeyIcon,
+  UserGroupIcon,
   UsersIcon,
 } from '@heroicons/vue/24/outline';
 import { useI18n } from 'vue-i18n';
@@ -51,6 +52,14 @@ function logout(): void {
         >
           <KeyIcon class="size-5 shrink-0" aria-hidden="true" />
           {{ t('nav.apiKey') }}
+        </RouterLink>
+        <RouterLink
+          :to="{ name: 'teams' }"
+          :class="navLinkClass"
+          :exact-active-class="navActiveClass"
+        >
+          <UserGroupIcon class="size-5 shrink-0" aria-hidden="true" />
+          {{ t('nav.teams') }}
         </RouterLink>
         <RouterLink
           v-if="auth.isAdmin"

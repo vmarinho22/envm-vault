@@ -20,6 +20,7 @@ func Open(dsn string) (*gorm.DB, error) {
 		&model.LoginCode{},
 		&model.AccessToken{},
 		&model.AuditLog{},
+		&model.Team{},
 	); err != nil {
 		return nil, fmt.Errorf("auto migrate: %w", err)
 	}

@@ -1,0 +1,42 @@
+{
+  "title": "Times",
+  "description": "Times usados para organizar projetos e avisos. O responsável recebe comunicações do time.",
+  "create": "Criar time",
+  "edit": "Editar",
+  "delete": "Excluir",
+  "empty": "Nenhum time cadastrado.",
+  "emptySearch": "Nenhum time encontrado para essa busca.",
+  "confirmDelete": "Excluir o time \"{name}\"? Esta ação não pode ser desfeita.",
+  "columns": {
+    "name": "Nome",
+    "slug": "Slug",
+    "accountable": "Responsável",
+    "createdAt": "Criado em",
+    "updatedAt": "Atualizado em",
+    "actions": "Ações"
+  },
+  "search": {
+    "label": "Buscar por nome",
+    "placeholder": "Ex.: plataforma",
+    "apply": "Buscar",
+    "clear": "Limpar"
+  },
+  "form": {
+    "createTitle": "Novo time",
+    "editTitle": "Editar time",
+    "name": "Nome",
+    "slugPreview": "Slug",
+    "accountable": "Responsável",
+    "selectUser": "Selecione um usuário",
+    "cancel": "Cancelar",
+    "create": "Criar",
+    "save": "Salvar"
+  },
+  "errors": {
+    "loadFailed": "não foi possível carregar os times",
+    "loadUsersFailed": "não foi possível carregar os usuários",
+    "createFailed": "não foi possível criar o time",
+    "updateFailed": "não foi possível atualizar o time",
+    "deleteFailed": "não foi possível excluir o time"
+  }
+}

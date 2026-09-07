@@ -7,6 +7,7 @@ import (
 	audithandler "github.com/envm-vault/envm-vault/api/internal/handler/audit"
 	authhandler "github.com/envm-vault/envm-vault/api/internal/handler/auth"
 	healthhandler "github.com/envm-vault/envm-vault/api/internal/handler/health"
+	teamhandler "github.com/envm-vault/envm-vault/api/internal/handler/team"
 	tokenhandler "github.com/envm-vault/envm-vault/api/internal/handler/token"
 	userhandler "github.com/envm-vault/envm-vault/api/internal/handler/user"
 	"github.com/envm-vault/envm-vault/api/internal/middleware"
@@ -22,6 +23,7 @@ func TestRegister_RoutesRegistered(t *testing.T) {
 		User:   &userhandler.Handler{},
 		Token:  &tokenhandler.Handler{},
 		Audit:  &audithandler.Handler{},
+		Team:   &teamhandler.Handler{},
 	})
 
 	want := map[string]bool{
@@ -36,6 +38,10 @@ func TestRegister_RoutesRegistered(t *testing.T) {
 		"POST /v1/tokens":            false,
 		"DELETE /v1/tokens":          false,
 		"GET /v1/audit-logs":         false,
+		"GET /v1/teams":              false,
+		"POST /v1/teams":             false,
+		"PATCH /v1/teams/:id":        false,
+		"DELETE /v1/teams/:id":       false,
 	}
 
 	for _, route := range app.GetRoutes() {
@@ -60,6 +66,7 @@ func TestRegister_TokensMeRequiresAuth(t *testing.T) {
 		User:   &userhandler.Handler{},
 		Token:  &tokenhandler.Handler{},
 		Audit:  &audithandler.Handler{},
+		Team:   &teamhandler.Handler{},
 		JWT:    middleware.NewJWTMiddleware("test-secret", nil),
 	})
 
@@ -82,6 +89,6 @@ func TestRegister_TokensMeRequiresAuth(t *testing.T) {
 	defer postResp.Body.Close()
 
 	if postResp.StatusCode != fiber.StatusUnauthorized {
-		t.Fatalf("POST /v1/tokens status = %d, want %d (route missing would be 404)", postResp.StatusCode, fiber.StatusUnauthorized)
+		t.Fatalf("POST status = %d, want %d", postResp.StatusCode, fiber.StatusUnauthorized)
 	}
 }

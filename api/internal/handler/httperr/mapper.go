@@ -47,6 +47,12 @@ func Write(c *fiber.Ctx, err error) error {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{"error": "invalid role; allowed: admin, user"})
 	case errors.Is(err, service.ErrTokenNotFound):
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "access token not found"})
+	case errors.Is(err, service.ErrInvalidTeamName):
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid team name"})
+	case errors.Is(err, service.ErrTeamNotFound):
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "team not found"})
+	case errors.Is(err, service.ErrTeamSlugTaken):
+		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"error": "team slug already taken"})
 	default:
 		log.Printf("unhandled error method=%s path=%s: %v", c.Method(), c.Path(), err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "internal server error"})

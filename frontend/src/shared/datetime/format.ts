@@ -19,6 +19,11 @@ const DATETIME_FORMAT: Record<AppLocale, string> = {
   'en-US': 'MM/DD/YYYY HH:mm',
 };
 
+const DATE_FORMAT: Record<AppLocale, string> = {
+  'pt-BR': 'DD/MM/YYYY',
+  'en-US': 'MM/DD/YYYY',
+};
+
 function resolveAppLocale(locale?: string): AppLocale {
   if (locale && isAppLocale(locale)) {
     return locale;
@@ -35,6 +40,16 @@ export function formatDateTime(iso: string, locale?: string): string {
     return iso;
   }
   return parsed.format(DATETIME_FORMAT[appLocale]);
+}
+
+/** Format an ISO datetime as a date-only string (no time). */
+export function formatDate(iso: string, locale?: string): string {
+  const appLocale = resolveAppLocale(locale);
+  const parsed = dayjs(iso).locale(DAYJS_LOCALE[appLocale]);
+  if (!parsed.isValid()) {
+    return iso;
+  }
+  return parsed.format(DATE_FORMAT[appLocale]);
 }
 
 /**

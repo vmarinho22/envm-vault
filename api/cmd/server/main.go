@@ -16,6 +16,7 @@ import (
 	audithandler "github.com/envm-vault/envm-vault/api/internal/handler/audit"
 	healthhandler "github.com/envm-vault/envm-vault/api/internal/handler/health"
 	"github.com/envm-vault/envm-vault/api/internal/handler/httperr"
+	teamhandler "github.com/envm-vault/envm-vault/api/internal/handler/team"
 	tokenhandler "github.com/envm-vault/envm-vault/api/internal/handler/token"
 	userhandler "github.com/envm-vault/envm-vault/api/internal/handler/user"
 	"github.com/envm-vault/envm-vault/api/internal/middleware"
@@ -24,6 +25,7 @@ import (
 	"github.com/envm-vault/envm-vault/api/internal/service"
 	auditservice "github.com/envm-vault/envm-vault/api/internal/service/audit"
 	authservice "github.com/envm-vault/envm-vault/api/internal/service/auth"
+	teamservice "github.com/envm-vault/envm-vault/api/internal/service/team"
 	tokenservice "github.com/envm-vault/envm-vault/api/internal/service/token"
 	userservice "github.com/envm-vault/envm-vault/api/internal/service/user"
 	"github.com/gofiber/fiber/v2"
@@ -52,6 +54,7 @@ func main() {
 	loginCodeRepo := repository.NewLoginCodeRepository(gormDB)
 	tokenRepo := repository.NewAccessTokenRepository(gormDB)
 	auditRepo := repository.NewAuditLogRepository(gormDB)
+	teamRepo := repository.NewTeamRepository(gormDB)
 	auditSvc := auditservice.New(auditRepo, userRepo)
 
 	var sender email.Sender
@@ -65,6 +68,7 @@ func main() {
 	authSvc := authservice.New(gormDB, userRepo, loginCodeRepo, otpService, sender, env.Envs.JWT.Secret, env.Envs.JWT.Expiry, auditSvc)
 	userSvc := userservice.New(userRepo, tokenRepo, auditSvc)
 	tokenSvc := tokenservice.New(tokenRepo, userRepo, auditSvc)
+	teamSvc := teamservice.New(teamRepo, userRepo, auditSvc)
 
 	app := fiber.New(fiber.Config{
 		ErrorHandler: httperr.AppHandler,
@@ -86,6 +90,7 @@ func main() {
 		User:   userhandler.New(userSvc),
 		Token:  tokenhandler.New(tokenSvc),
 		Audit:  audithandler.New(auditSvc),
+		Team:   teamhandler.New(teamSvc),
 		JWT:    middleware.NewJWTMiddleware(env.Envs.JWT.Secret, auditSvc),
 	})
 

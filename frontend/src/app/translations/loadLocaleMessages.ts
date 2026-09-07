@@ -10,6 +10,7 @@ import ptApiKey from './pt-BR/apiKey.json';
 import ptTokenReveal from './pt-BR/tokenReveal.json';
 import ptUsers from './pt-BR/users.json';
 import ptAudit from './pt-BR/audit.json';
+import ptTeams from './pt-BR/teams.json';
 
 import enCommon from './en-US/common.json';
 import enLogin from './en-US/login.json';
@@ -21,6 +22,7 @@ import enApiKey from './en-US/apiKey.json';
 import enTokenReveal from './en-US/tokenReveal.json';
 import enUsers from './en-US/users.json';
 import enAudit from './en-US/audit.json';
+import enTeams from './en-US/teams.json';
 
 const ptBR = {
   common: ptCommon,
@@ -33,6 +35,7 @@ const ptBR = {
   tokenReveal: ptTokenReveal,
   users: ptUsers,
   audit: ptAudit,
+  teams: ptTeams,
 };
 
 const enUS = {
@@ -46,6 +49,7 @@ const enUS = {
   tokenReveal: enTokenReveal,
   users: enUsers,
   audit: enAudit,
+  teams: enTeams,
 };
 
 export type MessageSchema = typeof ptBR;

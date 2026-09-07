@@ -1,0 +1,42 @@
+{
+  "title": "Teams",
+  "description": "Teams used to organize projects and notifications. The accountable user receives team communications.",
+  "create": "Create team",
+  "edit": "Edit",
+  "delete": "Delete",
+  "empty": "No teams yet.",
+  "emptySearch": "No teams matched that search.",
+  "confirmDelete": "Delete team \"{name}\"? This cannot be undone.",
+  "columns": {
+    "name": "Name",
+    "slug": "Slug",
+    "accountable": "Accountable",
+    "createdAt": "Created at",
+    "updatedAt": "Updated at",
+    "actions": "Actions"
+  },
+  "search": {
+    "label": "Search by name",
+    "placeholder": "e.g. platform",
+    "apply": "Search",
+    "clear": "Clear"
+  },
+  "form": {
+    "createTitle": "New team",
+    "editTitle": "Edit team",
+    "name": "Name",
+    "slugPreview": "Slug",
+    "accountable": "Accountable",
+    "selectUser": "Select a user",
+    "cancel": "Cancel",
+    "create": "Create",
+    "save": "Save"
+  },
+  "errors": {
+    "loadFailed": "could not load teams",
+    "loadUsersFailed": "could not load users",
+    "createFailed": "could not create team",
+    "updateFailed": "could not update team",
+    "deleteFailed": "could not delete team"
+  }
+}

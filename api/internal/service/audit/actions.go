@@ -14,4 +14,7 @@ const (
 	ActionPersonalTokenRotated      = "personal_token.rotated"
 	ActionPersonalTokenRevoked      = "personal_token.revoked"
 	ActionPersonalTokenRevokedAdmin = "personal_token.revoked_by_admin"
+	ActionTeamCreated               = "team.created"
+	ActionTeamUpdated               = "team.updated"
+	ActionTeamDeleted               = "team.deleted"
 )

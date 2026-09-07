@@ -47,6 +47,10 @@ The API lives in `api/` and provides authentication via email OTP plus a unique 
 | `GET` | `/v1/users` | JWT (admin+) | List users with API key status |
 | `DELETE` | `/v1/users/:id/token` | JWT (admin+) | Revoke another user's API key |
 | `GET` | `/v1/audit-logs` | JWT (admin+) | Paginated audit logs (filters + sort) |
+| `GET` | `/v1/teams` | JWT | List teams (optional `?name=` substring filter) |
+| `POST` | `/v1/teams` | JWT (admin+) | Create team (name + accountable user) |
+| `PATCH` | `/v1/teams/:id` | JWT (admin+) | Update team name and/or accountable |
+| `DELETE` | `/v1/teams/:id` | JWT (admin+) | Delete team |
 
 ### Auth Flow
 
@@ -83,6 +87,10 @@ An account with role `super_admin`, `admin`, or `user`. Authenticates via email 
 
 A unique programmatic credential per user for downloading env vars. One active key at a time. Stored as a SHA-256 hash; only a display prefix is returned after creation. Sent as `Authorization: Bearer <token>` on env download (endpoint not implemented yet).
 
+### Team
+
+An organizational unit with a display `name`, URL `slug` (derived from the name), and a single accountable `User` (for future notifications). Any authenticated user can list/search teams; only `admin` / `super_admin` can create, update, or delete. Teams are not yet linked to projects or memberships.
+
 ## Repository Structure
 
 ```
@@ -92,13 +100,14 @@ envm-vault/
 │   ├── tests/unit/       # unit tests (mirrors internal/)
 │   ├── internal/
 │   │   ├── env/          # Envs singleton + Load()
-│   │   ├── router/       # Route registration by context (health, auth, user, token)
-│   │   ├── handler/      # Handlers per domain (auth/, user/, token/, health/)
-│   │   ├── service/      # Business logic per domain (auth/, user/, token/, audit/)
+│   │   ├── router/       # Route registration by context (health, auth, user, token, audit, team)
+│   │   ├── handler/      # Handlers per domain (auth/, user/, token/, health/, audit/, team/)
+│   │   ├── service/      # Business logic per domain (auth/, user/, token/, audit/, team/)
 │   │   ├── middleware/
 │   │   ├── database/     # GORM connection + AutoMigrate
 │   │   ├── model/        # GORM models
 │   │   ├── repository/   # data access layer
+│   │   └── slug/         # shared name→slug helper
 ├── frontend/             # Vue 3 admin UI (Vite :3100)
 ├── docs/
 ├── docker-compose.yml
@@ -112,6 +121,7 @@ erDiagram
   User ||--o{ LoginCode : requests
   User ||--o| AccessToken : has
   User ||--o{ AuditLog : acts
+  User ||--o{ Team : accountable_for
   User ||--o{ Project : owns
   Project ||--o{ Environment : contains
   Environment ||--o{ Secret : stores
@@ -120,6 +130,15 @@ erDiagram
     uuid id PK
     string email UK
     string role
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  Team {
+    uuid id PK
+    string name
+    string slug UK
+    uuid accountable_id FK
     timestamp created_at
     timestamp updated_at
   }
@@ -161,9 +180,9 @@ erDiagram
 
 | Role | Description |
 |------|-------------|
-| `super_admin` | First user (bootstrap). Full access. Can revoke any API key. |
-| `admin` | Can register users and revoke `user`/`admin` API keys. |
-| `user` | Standard user. Manages their own API key. |
+| `super_admin` | First user (bootstrap). Full access. Can revoke any API key. Can manage teams. |
+| `admin` | Can register users, revoke `user`/`admin` API keys, and manage teams. |
+| `user` | Standard user. Manages their own API key. Can list/search teams (read-only). |
 
 ## Security Principles
 
