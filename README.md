@@ -97,19 +97,21 @@ curl -X POST http://localhost:8080/v1/tokens \
 | `GET` | `/v1/users` | JWT (admin+) | Lista usuários e status da chave |
 | `DELETE` | `/v1/users/:id/token` | JWT (admin+) | Revoga a chave de outro usuário |
 | `GET` | `/v1/projects/:id/secrets` | JWT | Lista secrets (sem plaintext) |
-| `GET` | `/v1/projects/:slug/environments/:envTitle` | API key | Download das env vars (JSON ou `?format=env`) |
+| `GET` | `/v1/projects/:slug/env` | API key | Download das env vars (`?environment=` + opcional `?format=env`). Só `super_admin` baixa `production`. |
 
 ### Download de env vars (API key)
 
 ```bash
-curl http://localhost:8080/v1/projects/meu-app/environments/production \
+curl "http://localhost:8080/v1/projects/meu-app/env?environment=dev" \
   -H "Authorization: Bearer ev_…"
 # JSON: { "items": [{ "name": "DATABASE_URL", "value": "…" }] }
 
-curl "http://localhost:8080/v1/projects/meu-app/environments/production?format=env" \
+curl "http://localhost:8080/v1/projects/meu-app/env?environment=dev&format=env" \
   -H "Authorization: Bearer ev_…"
 # dotenv plaintext
 ```
+
+> Ambiente `production`: apenas usuários com role `super_admin` podem baixar.
 
 Configure `ENCRYPTION_KEY` (hex de 32 bytes) em `api/.env` — gerado com `openssl rand -hex 32`.
 

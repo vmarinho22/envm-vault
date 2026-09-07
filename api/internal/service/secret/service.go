@@ -19,7 +19,17 @@ import (
 	"gorm.io/gorm"
 )
 
-const maxSecretNameLen = 128
+const (
+	maxSecretNameLen           = 128
+	productionEnvironmentTitle = "production"
+)
+
+func assertProductionDownloadAllowed(actorRole, envTitle string) error {
+	if envTitle == productionEnvironmentTitle && actorRole != service.RoleSuperAdmin {
+		return service.ErrProductionDownloadForbidden
+	}
+	return nil
+}
 
 var secretNamePattern = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`)
 
@@ -469,8 +479,18 @@ func (s *Service) ExportEnvironment(
 	if err != nil {
 		return nil, service.ErrEnvironmentNotFound
 	}
-	if _, ok := projectEnvSet(project)[eid]; !ok {
+	var envTitle string
+	for _, e := range project.Environments {
+		if e.ID == eid {
+			envTitle = e.Title
+			break
+		}
+	}
+	if envTitle == "" {
 		return nil, service.ErrEnvironmentNotInProject
+	}
+	if err := assertProductionDownloadAllowed(actorRole, envTitle); err != nil {
+		return nil, err
 	}
 
 	items, err := s.decryptEnvironment(ctx, project.ID, eid)
@@ -498,6 +518,14 @@ func (s *Service) DownloadBySlug(
 	ctx context.Context,
 	actorID, actorEmail, actorRole, projectSlug, envTitle string,
 ) (*DownloadResponse, error) {
+	title := strings.TrimSpace(envTitle)
+	if title == "" {
+		return nil, service.ErrEnvironmentParamRequired
+	}
+	if err := assertProductionDownloadAllowed(actorRole, title); err != nil {
+		return nil, err
+	}
+
 	project, err := s.projects.FindBySlug(ctx, strings.TrimSpace(projectSlug))
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -506,7 +534,6 @@ func (s *Service) DownloadBySlug(
 		return nil, err
 	}
 
-	title := strings.TrimSpace(envTitle)
 	var envID *uuid.UUID
 	for _, e := range project.Environments {
 		if e.Title == title {

@@ -19,7 +19,7 @@ function logout(): void {
 </script>
 
 <template>
-  <div class="vault-bg flex min-h-svh flex-col">
+  <div class="vault-bg flex h-full flex-col overflow-y-auto">
     <header class="flex h-14 items-center justify-between px-6 md:px-10">
       <p class="font-brand text-xl tracking-tight">envm-vault</p>
       <div class="flex items-center gap-3">

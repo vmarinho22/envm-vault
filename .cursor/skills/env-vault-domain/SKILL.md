@@ -33,9 +33,10 @@ Global catalog label with unique `title` and hex `color` (`#RRGGBB`). Linked to 
 ## Primary Flow
 
 ```
-GET /v1/projects/{projectSlug}/environments/{envTitle}
+GET /v1/projects/{projectSlug}/env?environment={envTitle}
 Authorization: Bearer <access_token>
 → Identifies the user, then returns env vars for that project+environment
+→ environment=production requires role super_admin
 ```
 
 ## Key Rules
@@ -45,6 +46,7 @@ Authorization: Bearer <access_token>
 3. Project `slug` is the unique natural key for UI routes (`/project/<slug>`); UUID is the PK for mutations and junctions.
 4. Slugs are generated with `api/internal/slug.FromName` (mirrored in `frontend/src/shared/slug`).
 5. Secret names match `^[A-Za-z_][A-Za-z0-9_]*$` (max 128).
+6. Only `super_admin` may download the `production` environment (API key or JWT export).
 
 ## Relationships
 

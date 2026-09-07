@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`LoginView (component) > calls verifyLogin and stores the session on success 1`] = `
-"<main class="vault-bg flex min-h-svh items-end px-6 pb-16 md:items-center md:px-16 md:pb-0">
+"<main class="vault-bg flex h-full overflow-y-auto items-end px-6 pb-16 md:items-center md:px-16 md:pb-0">
   <section class="mx-auto w-full max-w-xl">
     <p class="font-brand vault-enter text-5xl leading-none tracking-tight text-base-content md:text-7xl"> envm-vault </p>
     <h1 class="vault-enter-delay mt-8 max-w-md text-2xl font-medium leading-snug text-base-content md:text-3xl">Entre para gerenciar os ambientes.</h1>
@@ -20,7 +20,7 @@ exports[`LoginView (component) > calls verifyLogin and stores the session on suc
 `;
 
 exports[`LoginView (component) > moves from email step to code step after requestLogin 1`] = `
-"<main class="vault-bg flex min-h-svh items-end px-6 pb-16 md:items-center md:px-16 md:pb-0">
+"<main class="vault-bg flex h-full overflow-y-auto items-end px-6 pb-16 md:items-center md:px-16 md:pb-0">
   <section class="mx-auto w-full max-w-xl">
     <p class="font-brand vault-enter text-5xl leading-none tracking-tight text-base-content md:text-7xl"> envm-vault </p>
     <h1 class="vault-enter-delay mt-8 max-w-md text-2xl font-medium leading-snug text-base-content md:text-3xl">Entre para gerenciar os ambientes.</h1>
@@ -39,7 +39,7 @@ exports[`LoginView (component) > moves from email step to code step after reques
 `;
 
 exports[`LoginView (component) > renders email step with brand and send CTA 1`] = `
-"<main class="vault-bg flex min-h-svh items-end px-6 pb-16 md:items-center md:px-16 md:pb-0">
+"<main class="vault-bg flex h-full overflow-y-auto items-end px-6 pb-16 md:items-center md:px-16 md:pb-0">
   <section class="mx-auto w-full max-w-xl">
     <p class="font-brand vault-enter text-5xl leading-none tracking-tight text-base-content md:text-7xl"> envm-vault </p>
     <h1 class="vault-enter-delay mt-8 max-w-md text-2xl font-medium leading-snug text-base-content md:text-3xl">Entre para gerenciar os ambientes.</h1>
@@ -54,7 +54,7 @@ exports[`LoginView (component) > renders email step with brand and send CTA 1`] 
 `;
 
 exports[`LoginView (component) > shows API error on the email step 1`] = `
-"<main class="vault-bg flex min-h-svh items-end px-6 pb-16 md:items-center md:px-16 md:pb-0">
+"<main class="vault-bg flex h-full overflow-y-auto items-end px-6 pb-16 md:items-center md:px-16 md:pb-0">
   <section class="mx-auto w-full max-w-xl">
     <p class="font-brand vault-enter text-5xl leading-none tracking-tight text-base-content md:text-7xl"> envm-vault </p>
     <h1 class="vault-enter-delay mt-8 max-w-md text-2xl font-medium leading-snug text-base-content md:text-3xl">Entre para gerenciar os ambientes.</h1>

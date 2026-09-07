@@ -46,12 +46,30 @@ html {
   color: var(--color-base-content);
 }
 
+/*
+  daisyUI sets `:root { overflow: var(--page-overflow) }` (see rootscrolllock.css).
+  That beats a plain `html { overflow }` rule and lets the document scroll.
+  Keep the shell locked; only inner panes (e.g. main) should scroll.
+*/
+:root {
+  --page-scroll-lock: hidden;
+  --page-overflow: hidden;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+}
+
 .font-brand {
   font-family: 'Syne Variable', sans-serif;
 }
 
 .vault-bg {
-  min-height: 100svh;
+  min-height: 100%;
   background-color: oklch(14% 0.022 200);
   background-image:
     radial-gradient(ellipse 90% 55% at 8% 12%, oklch(28% 0.06 185 / 0.45), transparent 58%),

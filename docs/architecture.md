@@ -73,8 +73,8 @@ The API lives in `api/` and provides authentication via email OTP plus a unique 
 | `PUT` | `/v1/projects/:id/secrets/:secretId/values/:environmentId` | JWT | Upsert encrypted value |
 | `GET` | `/v1/projects/:id/secrets/:secretId/values/:environmentId` | JWT | Reveal one decrypted value |
 | `DELETE` | `/v1/projects/:id/secrets/:secretId/values/:environmentId` | JWT | Clear value for one env |
-| `GET` | `/v1/projects/:id/environments/:environmentId/values` | JWT | Export all values for an env (JSON or `?format=env`) |
-| `GET` | `/v1/projects/:slug/environments/:envTitle` | API key (`ev_…`) | Download env vars (JSON default; dotenv via `?format=env` or `Accept: text/plain`) |
+| `GET` | `/v1/projects/:id/environments/:environmentId/values` | JWT | Export all values for an env (JSON or `?format=env`); `production` requires `super_admin` |
+| `GET` | `/v1/projects/:slug/env` | API key (`ev_…`) | Download env vars via `?environment=<title>` (JSON default; dotenv via `?format=env` or `Accept: text/plain`). Only `super_admin` may download `production`. |
 
 ### Auth Flow
 
@@ -94,7 +94,7 @@ JWT is the admin UI session. The API key (`Authorization: Bearer ev_…`) is the
 
 ### Project
 
-A project groups teams, catalog environments, and tags. Fields: unique `title`, unique `slug` (natural key for future `/project/<slug>`), timestamps. M2M with Team, Environment, and Tag. Any authenticated user can create/update; only `admin` / `super_admin` can delete. List supports filters by title/teams/tags and page size 12. Secrets are not linked yet.
+A project groups teams, catalog environments, and tags. Fields: unique `title`, unique `slug` (natural key for future `/project/<slug>`), timestamps. M2M with Team, Environment, and Tag. Any authenticated user can create/update; only `admin` / `super_admin` can delete. List supports filters by title/teams/tags and page size 12.
 
 ### Environment
 
@@ -261,9 +261,9 @@ Project↔Secret linking is implemented (`secrets` + `secret_values`). Team memb
 
 | Role | Description |
 |------|-------------|
-| `super_admin` | First user (bootstrap). Full access. Can revoke any API key. Can manage teams and environments. Can delete projects. Can block any user. Can manage tags. |
-| `admin` | Can register users, revoke `user`/`admin` API keys, manage teams and environments, delete projects, and block `admin`/`user`. Can manage tags. |
-| `user` | Standard user. Manages their own API key. Can list teams/environments; create/update projects; create/update/delete tags. Cannot delete projects. |
+| `super_admin` | First user (bootstrap). Full access. Can revoke any API key. Can manage teams and environments. Can delete projects. Can block any user. Can manage tags. Only role that can download the `production` environment. |
+| `admin` | Can register users, revoke `user`/`admin` API keys, manage teams and environments, delete projects, and block `admin`/`user`. Can manage tags. Cannot download `production`. |
+| `user` | Standard user. Manages their own API key. Can list teams/environments; create/update projects; create/update/delete tags. Cannot delete projects. Cannot download `production`. |
 
 ## Security Principles
 
@@ -272,7 +272,7 @@ Project↔Secret linking is implemented (`secrets` + `secret_values`). Team memb
 3. **Never log secret values** — OTP codes are logged only in development. API keys are never logged. Audit rows must not contain OTP, JWT, or full `ev_…` plaintext.
 4. **OTP verify lockout** — max 5 failed attempts per code (`attempt_count`); then the code is invalidated and the user must request a new OTP.
 5. **Global HTTP rate limit** — per-IP limiter (`RATE_LIMIT_MAX` / `RATE_LIMIT_WINDOW`, defaults 100/1m). `/health` and `/v1/health` are exempt. In-memory store (single instance); shared store needed for multi-replica later.
-6. **Env authorization** — env download identifies the user via the API key; project/environment access will be based on membership (TBD). Until then, any valid non-revoked key for a non-blocked user can download.
+6. **Env authorization** — env download identifies the user via the API key (`GET /v1/projects/:slug/env?environment=`). Only `super_admin` may download the `production` environment. Broader project/environment membership is TBD; until then, any valid non-revoked key for a non-blocked user can download non-production envs.
 7. **No secrets in the repository** — never commit real tokens or `.env` files.
 8. **JWT expiry** — configurable via `JWT_EXPIRY` (default 24h).
 9. **Audit trail** — security-relevant mutations write to `audit_logs` via `internal/service/audit` (best-effort). Middleware attaches IP/UA/Origin/channel; domain services call `Record` after success. Persist `action` (UI maps labels) plus optional typed snapshots (e.g. `project_id` / `project_title` / `project_slug` for `project.*` / `secret.*`). Channels: `login_attempt`, `logged_in_user`, `personal_token`. No metadata JSON column.

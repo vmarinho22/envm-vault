@@ -164,7 +164,7 @@ func (h *Handler) DownloadBySlug(c *fiber.Ctx) error {
 		middleware.GetUserEmail(c),
 		middleware.GetUserRole(c),
 		c.Params("slug"),
-		c.Params("envTitle"),
+		c.Query("environment"),
 	)
 	if err != nil {
 		return httperr.Write(c, err)

@@ -83,8 +83,96 @@ describe('ProjectDetailView', () => {
     expect(wrapper.text()).toContain('DATABASE_URL');
     expect(wrapper.text()).toContain('dev');
     expect(wrapper.text()).not.toContain('Exportar');
+    expect(wrapper.get('input[name="secret-environment-search"]')).toBeTruthy();
     expect(wrapper.get('button[aria-label="Editar"]')).toBeTruthy();
     expect(wrapper.get('button[aria-label="Excluir"]')).toBeTruthy();
+    expectComponentSnapshot(wrapper);
+  });
+
+  it('filters secrets by environment title', async () => {
+    listMock.mockResolvedValue({
+      items: [
+        {
+          id: 's1',
+          name: 'DATABASE_URL',
+          values: {
+            e1: { has_value: true, updated_at: '2026-01-02T00:00:00Z' },
+          },
+          created_at: '2026-01-01T00:00:00Z',
+          updated_at: '2026-01-02T00:00:00Z',
+        },
+        {
+          id: 's2',
+          name: 'API_KEY',
+          values: {
+            e2: { has_value: true, updated_at: '2026-01-02T00:00:00Z' },
+          },
+          created_at: '2026-01-01T00:00:00Z',
+          updated_at: '2026-01-02T00:00:00Z',
+        },
+      ],
+    });
+
+    const { wrapper } = await mountComponent(ProjectDetailView, {
+      session,
+      routes: [
+        { path: '/', name: 'home', component: { template: '<div />' } },
+        { path: '/project/:slug', name: 'project-detail', component: ProjectDetailView },
+      ],
+      initialRoute: '/project/payment',
+    });
+    await flushPromises();
+
+    await wrapper.get('input[name="secret-environment-search"]').setValue('prod');
+    await flushPromises();
+
+    const rows = wrapper.findAll('tbody tr');
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.text()).toContain('API_KEY');
+    expect(rows[0]?.text()).toContain('production');
+    expectComponentSnapshot(wrapper);
+  });
+
+  it('filters secrets by name substring', async () => {
+    listMock.mockResolvedValue({
+      items: [
+        {
+          id: 's1',
+          name: 'TEST_02',
+          values: {
+            e1: { has_value: true, updated_at: '2026-01-02T00:00:00Z' },
+          },
+          created_at: '2026-01-01T00:00:00Z',
+          updated_at: '2026-01-02T00:00:00Z',
+        },
+        {
+          id: 's2',
+          name: 'API_KEY',
+          values: {
+            e2: { has_value: true, updated_at: '2026-01-02T00:00:00Z' },
+          },
+          created_at: '2026-01-01T00:00:00Z',
+          updated_at: '2026-01-02T00:00:00Z',
+        },
+      ],
+    });
+
+    const { wrapper } = await mountComponent(ProjectDetailView, {
+      session,
+      routes: [
+        { path: '/', name: 'home', component: { template: '<div />' } },
+        { path: '/project/:slug', name: 'project-detail', component: ProjectDetailView },
+      ],
+      initialRoute: '/project/payment',
+    });
+    await flushPromises();
+
+    await wrapper.get('input[name="secret-environment-search"]').setValue('02');
+    await flushPromises();
+
+    const rows = wrapper.findAll('tbody tr');
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.text()).toContain('TEST_02');
     expectComponentSnapshot(wrapper);
   });
 });

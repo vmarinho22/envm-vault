@@ -24,5 +24,5 @@ func registerProjectRoutes(v1 fiber.Router, deps Deps) {
 
 	// API-key download (personal token). Register outside JWT group.
 	download := v1.Group("/projects", deps.APIKey.Protect())
-	download.Get("/:slug/environments/:envTitle", deps.Secret.DownloadBySlug)
+	download.Get("/:slug/env", deps.Secret.DownloadBySlug)
 }

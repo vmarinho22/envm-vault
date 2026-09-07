@@ -30,9 +30,9 @@ function logout(): void {
 </script>
 
 <template>
-  <div class="vault-bg flex min-h-svh">
+  <div class="vault-bg flex h-full max-h-full overflow-hidden">
     <aside
-      class="flex w-56 shrink-0 flex-col border-r border-base-300/80 bg-base-200/50 md:w-60"
+      class="flex h-full w-56 shrink-0 flex-col overflow-y-auto border-r border-base-300/80 bg-base-200/50 md:w-60"
       :aria-label="t('nav.menuAriaLabel')"
     >
       <div class="flex h-14 items-center px-5">
@@ -101,7 +101,7 @@ function logout(): void {
       </nav>
     </aside>
 
-    <div class="flex min-w-0 flex-1 flex-col">
+    <div class="flex min-h-0 min-w-0 flex-1 flex-col">
       <header
         class="flex h-14 shrink-0 items-center justify-end gap-3 border-b border-base-300/80 bg-base-200/40 px-6 md:gap-4 md:px-8"
       >
@@ -120,7 +120,7 @@ function logout(): void {
         </button>
       </header>
 
-      <main class="min-h-0 flex-1 overflow-auto">
+      <main class="min-h-0 flex-1 overflow-y-auto">
         <RouterView />
       </main>
     </div>

@@ -62,6 +62,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAuthenticated = computed(() => token.value !== null && user.value !== null);
   const isAdmin = computed(() => user.value?.role === 'admin' || user.value?.role === 'super_admin');
+  const isSuperAdmin = computed(() => user.value?.role === 'super_admin');
 
   function setSession(session: AuthSession): void {
     token.value = session.token;
@@ -102,6 +103,7 @@ export const useAuthStore = defineStore('auth', () => {
     hasApiToken,
     isAuthenticated,
     isAdmin,
+    isSuperAdmin,
     setSession,
     setHasApiToken,
     ensureHasApiToken,

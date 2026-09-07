@@ -76,7 +76,7 @@ func TestRegister_RoutesRegistered(t *testing.T) {
 		"DELETE /v1/projects/:id":        false,
 		"GET /v1/projects/:id/secrets":   false,
 		"POST /v1/projects/:id/secrets":  false,
-		"GET /v1/projects/:slug/environments/:envTitle": false,
+		"GET /v1/projects/:slug/env":     false,
 	}
 
 	for _, route := range app.GetRoutes() {
@@ -130,7 +130,7 @@ func TestRegister_DownloadRequiresAPIKey(t *testing.T) {
 		middleware.NewAPIKeyMiddleware(nil, nil, nil),
 	))
 
-	req := httptest.NewRequest(fiber.MethodGet, "/v1/projects/my-app/environments/dev", nil)
+	req := httptest.NewRequest(fiber.MethodGet, "/v1/projects/my-app/env?environment=dev", nil)
 	resp, err := app.Test(req, -1)
 	if err != nil {
 		t.Fatalf("request: %v", err)

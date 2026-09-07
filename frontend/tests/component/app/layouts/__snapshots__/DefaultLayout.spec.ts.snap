@@ -1,8 +1,8 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`DefaultLayout (component) > hides Usuários for a standard user but shows Times, Tags and Ambientes 1`] = `
-"<div class="vault-bg flex min-h-svh">
-  <aside class="flex w-56 shrink-0 flex-col border-r border-base-300/80 bg-base-200/50 md:w-60" aria-label="Menu principal">
+"<div class="vault-bg flex h-full max-h-full overflow-hidden">
+  <aside class="flex h-full w-56 shrink-0 flex-col overflow-y-auto border-r border-base-300/80 bg-base-200/50 md:w-60" aria-label="Menu principal">
     <div class="flex h-14 items-center px-5">
       <p class="font-brand text-xl leading-none tracking-tight">envm-vault</p>
     </div>
@@ -22,7 +22,7 @@ exports[`DefaultLayout (component) > hides Usuários for a standard user but sho
       <!--v-if-->
     </nav>
   </aside>
-  <div class="flex min-w-0 flex-1 flex-col">
+  <div class="flex min-h-0 min-w-0 flex-1 flex-col">
     <header class="flex h-14 shrink-0 items-center justify-end gap-3 border-b border-base-300/80 bg-base-200/40 px-6 md:gap-4 md:px-8">
       <p class="truncate text-sm text-base-content/70">user@example.com</p><label class="sr-only" for="locale-switcher">Idioma</label><select id="locale-switcher" class="select select-bordered select-sm w-auto min-w-28" data-testid="locale-switcher" aria-label="Idioma">
         <option value="pt-BR">Português</option>
@@ -31,9 +31,9 @@ exports[`DefaultLayout (component) > hides Usuários for a standard user but sho
           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"></path>
         </svg> Sair</button>
     </header>
-    <main class="min-h-0 flex-1 overflow-auto">
-      <div class="vault-bg flex min-h-svh">
-        <aside class="flex w-56 shrink-0 flex-col border-r border-base-300/80 bg-base-200/50 md:w-60" aria-label="Menu principal">
+    <main class="min-h-0 flex-1 overflow-y-auto">
+      <div class="vault-bg flex h-full max-h-full overflow-hidden">
+        <aside class="flex h-full w-56 shrink-0 flex-col overflow-y-auto border-r border-base-300/80 bg-base-200/50 md:w-60" aria-label="Menu principal">
           <div class="flex h-14 items-center px-5">
             <p class="font-brand text-xl leading-none tracking-tight">envm-vault</p>
           </div>
@@ -53,7 +53,7 @@ exports[`DefaultLayout (component) > hides Usuários for a standard user but sho
             <!--v-if-->
           </nav>
         </aside>
-        <div class="flex min-w-0 flex-1 flex-col">
+        <div class="flex min-h-0 min-w-0 flex-1 flex-col">
           <header class="flex h-14 shrink-0 items-center justify-end gap-3 border-b border-base-300/80 bg-base-200/40 px-6 md:gap-4 md:px-8">
             <p class="truncate text-sm text-base-content/70">user@example.com</p><label class="sr-only" for="locale-switcher">Idioma</label><select id="locale-switcher" class="select select-bordered select-sm w-auto min-w-28" data-testid="locale-switcher" aria-label="Idioma">
               <option value="pt-BR">Português</option>
@@ -62,7 +62,7 @@ exports[`DefaultLayout (component) > hides Usuários for a standard user but sho
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"></path>
               </svg> Sair</button>
           </header>
-          <main class="min-h-0 flex-1 overflow-auto">
+          <main class="min-h-0 flex-1 overflow-y-auto">
             <section class="px-8 py-10 md:px-12">
               <h1 class="text-2xl font-medium tracking-tight md:text-3xl">Início</h1>
               <p class="mt-3 max-w-lg text-base text-base-content/70">Bem-vindo ao envm-vault.</p>
@@ -92,8 +92,8 @@ exports[`DefaultLayout (component) > hides Usuários for a standard user but sho
 `;
 
 exports[`DefaultLayout (component) > highlights only Usuários when that route is active 1`] = `
-"<div class="vault-bg flex min-h-svh">
-  <aside class="flex w-56 shrink-0 flex-col border-r border-base-300/80 bg-base-200/50 md:w-60" aria-label="Menu principal">
+"<div class="vault-bg flex h-full max-h-full overflow-hidden">
+  <aside class="flex h-full w-56 shrink-0 flex-col overflow-y-auto border-r border-base-300/80 bg-base-200/50 md:w-60" aria-label="Menu principal">
     <div class="flex h-14 items-center px-5">
       <p class="font-brand text-xl leading-none tracking-tight">envm-vault</p>
     </div>
@@ -114,7 +114,7 @@ exports[`DefaultLayout (component) > highlights only Usuários when that route i
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"></path>
         </svg> Auditoria</a></nav>
   </aside>
-  <div class="flex min-w-0 flex-1 flex-col">
+  <div class="flex min-h-0 min-w-0 flex-1 flex-col">
     <header class="flex h-14 shrink-0 items-center justify-end gap-3 border-b border-base-300/80 bg-base-200/40 px-6 md:gap-4 md:px-8">
       <p class="truncate text-sm text-base-content/70">admin@example.com</p><label class="sr-only" for="locale-switcher">Idioma</label><select id="locale-switcher" class="select select-bordered select-sm w-auto min-w-28" data-testid="locale-switcher" aria-label="Idioma">
         <option value="pt-BR">Português</option>
@@ -123,9 +123,9 @@ exports[`DefaultLayout (component) > highlights only Usuários when that route i
           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"></path>
         </svg> Sair</button>
     </header>
-    <main class="min-h-0 flex-1 overflow-auto">
-      <div class="vault-bg flex min-h-svh">
-        <aside class="flex w-56 shrink-0 flex-col border-r border-base-300/80 bg-base-200/50 md:w-60" aria-label="Menu principal">
+    <main class="min-h-0 flex-1 overflow-y-auto">
+      <div class="vault-bg flex h-full max-h-full overflow-hidden">
+        <aside class="flex h-full w-56 shrink-0 flex-col overflow-y-auto border-r border-base-300/80 bg-base-200/50 md:w-60" aria-label="Menu principal">
           <div class="flex h-14 items-center px-5">
             <p class="font-brand text-xl leading-none tracking-tight">envm-vault</p>
           </div>
@@ -146,7 +146,7 @@ exports[`DefaultLayout (component) > highlights only Usuários when that route i
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"></path>
               </svg> Auditoria</a></nav>
         </aside>
-        <div class="flex min-w-0 flex-1 flex-col">
+        <div class="flex min-h-0 min-w-0 flex-1 flex-col">
           <header class="flex h-14 shrink-0 items-center justify-end gap-3 border-b border-base-300/80 bg-base-200/40 px-6 md:gap-4 md:px-8">
             <p class="truncate text-sm text-base-content/70">admin@example.com</p><label class="sr-only" for="locale-switcher">Idioma</label><select id="locale-switcher" class="select select-bordered select-sm w-auto min-w-28" data-testid="locale-switcher" aria-label="Idioma">
               <option value="pt-BR">Português</option>
@@ -155,7 +155,7 @@ exports[`DefaultLayout (component) > highlights only Usuários when that route i
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"></path>
               </svg> Sair</button>
           </header>
-          <main class="min-h-0 flex-1 overflow-auto">
+          <main class="min-h-0 flex-1 overflow-y-auto">
             <div></div>
           </main>
         </div>
@@ -182,8 +182,8 @@ exports[`DefaultLayout (component) > highlights only Usuários when that route i
 `;
 
 exports[`DefaultLayout (component) > logs out and navigates to login when Sair is clicked 1`] = `
-"<div class="vault-bg flex min-h-svh">
-  <aside class="flex w-56 shrink-0 flex-col border-r border-base-300/80 bg-base-200/50 md:w-60" aria-label="Menu principal">
+"<div class="vault-bg flex h-full max-h-full overflow-hidden">
+  <aside class="flex h-full w-56 shrink-0 flex-col overflow-y-auto border-r border-base-300/80 bg-base-200/50 md:w-60" aria-label="Menu principal">
     <div class="flex h-14 items-center px-5">
       <p class="font-brand text-xl leading-none tracking-tight">envm-vault</p>
     </div>
@@ -203,7 +203,7 @@ exports[`DefaultLayout (component) > logs out and navigates to login when Sair i
       <!--v-if-->
     </nav>
   </aside>
-  <div class="flex min-w-0 flex-1 flex-col">
+  <div class="flex min-h-0 min-w-0 flex-1 flex-col">
     <header class="flex h-14 shrink-0 items-center justify-end gap-3 border-b border-base-300/80 bg-base-200/40 px-6 md:gap-4 md:px-8">
       <!--v-if--><label class="sr-only" for="locale-switcher">Idioma</label><select id="locale-switcher" class="select select-bordered select-sm w-auto min-w-28" data-testid="locale-switcher" aria-label="Idioma">
         <option value="pt-BR">Português</option>
@@ -212,8 +212,8 @@ exports[`DefaultLayout (component) > logs out and navigates to login when Sair i
           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"></path>
         </svg> Sair</button>
     </header>
-    <main class="min-h-0 flex-1 overflow-auto">
-      <main class="vault-bg flex min-h-svh items-end px-6 pb-16 md:items-center md:px-16 md:pb-0">
+    <main class="min-h-0 flex-1 overflow-y-auto">
+      <main class="vault-bg flex h-full overflow-y-auto items-end px-6 pb-16 md:items-center md:px-16 md:pb-0">
         <section class="mx-auto w-full max-w-xl">
           <p class="font-brand vault-enter text-5xl leading-none tracking-tight text-base-content md:text-7xl"> envm-vault </p>
           <h1 class="vault-enter-delay mt-8 max-w-md text-2xl font-medium leading-snug text-base-content md:text-3xl">Entre para gerenciar os ambientes.</h1>
@@ -239,8 +239,8 @@ exports[`DefaultLayout (component) > logs out and navigates to login when Sair i
 `;
 
 exports[`DefaultLayout (component) > renders sidebar with Início, Chave de API, Times, Tags, Ambientes, Usuários and Auditoria for admin 1`] = `
-"<div class="vault-bg flex min-h-svh">
-  <aside class="flex w-56 shrink-0 flex-col border-r border-base-300/80 bg-base-200/50 md:w-60" aria-label="Menu principal">
+"<div class="vault-bg flex h-full max-h-full overflow-hidden">
+  <aside class="flex h-full w-56 shrink-0 flex-col overflow-y-auto border-r border-base-300/80 bg-base-200/50 md:w-60" aria-label="Menu principal">
     <div class="flex h-14 items-center px-5">
       <p class="font-brand text-xl leading-none tracking-tight">envm-vault</p>
     </div>
@@ -261,7 +261,7 @@ exports[`DefaultLayout (component) > renders sidebar with Início, Chave de API,
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"></path>
         </svg> Auditoria</a></nav>
   </aside>
-  <div class="flex min-w-0 flex-1 flex-col">
+  <div class="flex min-h-0 min-w-0 flex-1 flex-col">
     <header class="flex h-14 shrink-0 items-center justify-end gap-3 border-b border-base-300/80 bg-base-200/40 px-6 md:gap-4 md:px-8">
       <p class="truncate text-sm text-base-content/70">admin@example.com</p><label class="sr-only" for="locale-switcher">Idioma</label><select id="locale-switcher" class="select select-bordered select-sm w-auto min-w-28" data-testid="locale-switcher" aria-label="Idioma">
         <option value="pt-BR">Português</option>
@@ -270,9 +270,9 @@ exports[`DefaultLayout (component) > renders sidebar with Início, Chave de API,
           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"></path>
         </svg> Sair</button>
     </header>
-    <main class="min-h-0 flex-1 overflow-auto">
-      <div class="vault-bg flex min-h-svh">
-        <aside class="flex w-56 shrink-0 flex-col border-r border-base-300/80 bg-base-200/50 md:w-60" aria-label="Menu principal">
+    <main class="min-h-0 flex-1 overflow-y-auto">
+      <div class="vault-bg flex h-full max-h-full overflow-hidden">
+        <aside class="flex h-full w-56 shrink-0 flex-col overflow-y-auto border-r border-base-300/80 bg-base-200/50 md:w-60" aria-label="Menu principal">
           <div class="flex h-14 items-center px-5">
             <p class="font-brand text-xl leading-none tracking-tight">envm-vault</p>
           </div>
@@ -293,7 +293,7 @@ exports[`DefaultLayout (component) > renders sidebar with Início, Chave de API,
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"></path>
               </svg> Auditoria</a></nav>
         </aside>
-        <div class="flex min-w-0 flex-1 flex-col">
+        <div class="flex min-h-0 min-w-0 flex-1 flex-col">
           <header class="flex h-14 shrink-0 items-center justify-end gap-3 border-b border-base-300/80 bg-base-200/40 px-6 md:gap-4 md:px-8">
             <p class="truncate text-sm text-base-content/70">admin@example.com</p><label class="sr-only" for="locale-switcher">Idioma</label><select id="locale-switcher" class="select select-bordered select-sm w-auto min-w-28" data-testid="locale-switcher" aria-label="Idioma">
               <option value="pt-BR">Português</option>
@@ -302,7 +302,7 @@ exports[`DefaultLayout (component) > renders sidebar with Início, Chave de API,
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"></path>
               </svg> Sair</button>
           </header>
-          <main class="min-h-0 flex-1 overflow-auto">
+          <main class="min-h-0 flex-1 overflow-y-auto">
             <section class="px-8 py-10 md:px-12">
               <h1 class="text-2xl font-medium tracking-tight md:text-3xl">Início</h1>
               <p class="mt-3 max-w-lg text-base text-base-content/70">Bem-vindo ao envm-vault.</p>
@@ -332,8 +332,8 @@ exports[`DefaultLayout (component) > renders sidebar with Início, Chave de API,
 `;
 
 exports[`DefaultLayout (component) > switches UI language when locale is changed 1`] = `
-"<div class="vault-bg flex min-h-svh">
-  <aside class="flex w-56 shrink-0 flex-col border-r border-base-300/80 bg-base-200/50 md:w-60" aria-label="Main menu">
+"<div class="vault-bg flex h-full max-h-full overflow-hidden">
+  <aside class="flex h-full w-56 shrink-0 flex-col overflow-y-auto border-r border-base-300/80 bg-base-200/50 md:w-60" aria-label="Main menu">
     <div class="flex h-14 items-center px-5">
       <p class="font-brand text-xl leading-none tracking-tight">envm-vault</p>
     </div>
@@ -354,7 +354,7 @@ exports[`DefaultLayout (component) > switches UI language when locale is changed
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"></path>
         </svg> Audit</a></nav>
   </aside>
-  <div class="flex min-w-0 flex-1 flex-col">
+  <div class="flex min-h-0 min-w-0 flex-1 flex-col">
     <header class="flex h-14 shrink-0 items-center justify-end gap-3 border-b border-base-300/80 bg-base-200/40 px-6 md:gap-4 md:px-8">
       <p class="truncate text-sm text-base-content/70">admin@example.com</p><label class="sr-only" for="locale-switcher">Language</label><select id="locale-switcher" class="select select-bordered select-sm w-auto min-w-28" data-testid="locale-switcher" aria-label="Language">
         <option value="pt-BR">Português</option>
@@ -363,9 +363,9 @@ exports[`DefaultLayout (component) > switches UI language when locale is changed
           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"></path>
         </svg> Log out</button>
     </header>
-    <main class="min-h-0 flex-1 overflow-auto">
-      <div class="vault-bg flex min-h-svh">
-        <aside class="flex w-56 shrink-0 flex-col border-r border-base-300/80 bg-base-200/50 md:w-60" aria-label="Main menu">
+    <main class="min-h-0 flex-1 overflow-y-auto">
+      <div class="vault-bg flex h-full max-h-full overflow-hidden">
+        <aside class="flex h-full w-56 shrink-0 flex-col overflow-y-auto border-r border-base-300/80 bg-base-200/50 md:w-60" aria-label="Main menu">
           <div class="flex h-14 items-center px-5">
             <p class="font-brand text-xl leading-none tracking-tight">envm-vault</p>
           </div>
@@ -386,7 +386,7 @@ exports[`DefaultLayout (component) > switches UI language when locale is changed
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"></path>
               </svg> Audit</a></nav>
         </aside>
-        <div class="flex min-w-0 flex-1 flex-col">
+        <div class="flex min-h-0 min-w-0 flex-1 flex-col">
           <header class="flex h-14 shrink-0 items-center justify-end gap-3 border-b border-base-300/80 bg-base-200/40 px-6 md:gap-4 md:px-8">
             <p class="truncate text-sm text-base-content/70">admin@example.com</p><label class="sr-only" for="locale-switcher">Language</label><select id="locale-switcher" class="select select-bordered select-sm w-auto min-w-28" data-testid="locale-switcher" aria-label="Language">
               <option value="pt-BR">Português</option>
@@ -395,7 +395,7 @@ exports[`DefaultLayout (component) > switches UI language when locale is changed
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"></path>
               </svg> Log out</button>
           </header>
-          <main class="min-h-0 flex-1 overflow-auto">
+          <main class="min-h-0 flex-1 overflow-y-auto">
             <section class="px-8 py-10 md:px-12">
               <h1 class="text-2xl font-medium tracking-tight md:text-3xl">Home</h1>
               <p class="mt-3 max-w-lg text-base text-base-content/70">Welcome to envm-vault.</p>

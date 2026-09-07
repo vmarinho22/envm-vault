@@ -87,6 +87,10 @@ func Write(c *fiber.Ctx, err error) error {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "secret value not found"})
 	case errors.Is(err, service.ErrEnvironmentNotInProject):
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "environment is not linked to this project"})
+	case errors.Is(err, service.ErrEnvironmentParamRequired):
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "environment query parameter is required"})
+	case errors.Is(err, service.ErrProductionDownloadForbidden):
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "only super_admin can download production environment"})
 	default:
 		log.Printf("unhandled error method=%s path=%s: %v", c.Method(), c.Path(), err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "internal server error"})

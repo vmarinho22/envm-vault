@@ -16,6 +16,7 @@ export function useProjectSecrets() {
 
   const project = ref<Project | null>(null);
   const secrets = ref<Secret[]>([]);
+  const environmentQuery = ref('');
   const loading = ref(false);
   const mutating = ref(false);
   const error = ref<string | null>(null);
@@ -49,6 +50,17 @@ export function useProjectSecrets() {
     }
     return titles;
   }
+
+  const filteredSecrets = computed(() => {
+    const term = environmentQuery.value.trim().toLowerCase();
+    if (!term) return secrets.value;
+    return secrets.value.filter((secret) => {
+      if (secret.name.toLowerCase().includes(term)) return true;
+      return envTitlesForSecret(secret).some((title) => title.toLowerCase().includes(term));
+    });
+  });
+
+  const hasEnvironmentFilter = computed(() => environmentQuery.value.trim() !== '');
 
   async function refreshSecrets(): Promise<void> {
     if (!project.value) return;
@@ -205,6 +217,9 @@ export function useProjectSecrets() {
   return {
     project,
     secrets,
+    filteredSecrets,
+    environmentQuery,
+    hasEnvironmentFilter,
     loading,
     mutating,
     error,

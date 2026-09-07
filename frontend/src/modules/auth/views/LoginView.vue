@@ -9,7 +9,7 @@ const { step, email, code, loading, error, submitEmail, submitCode, backToEmail 
 </script>
 
 <template>
-  <main class="vault-bg flex min-h-svh items-end px-6 pb-16 md:items-center md:px-16 md:pb-0">
+  <main class="vault-bg flex h-full overflow-y-auto items-end px-6 pb-16 md:items-center md:px-16 md:pb-0">
     <section class="mx-auto w-full max-w-xl">
       <p
         class="font-brand vault-enter text-5xl leading-none tracking-tight text-base-content md:text-7xl"

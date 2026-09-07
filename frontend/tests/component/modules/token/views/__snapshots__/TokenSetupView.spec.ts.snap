@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`TokenSetupView (component) > does not generate a new token when Copiar is clicked 1`] = `
-"<div class="vault-bg flex min-h-svh flex-col">
+"<div class="vault-bg flex h-full flex-col overflow-y-auto">
   <header class="flex h-14 items-center justify-between px-6 md:px-10">
     <p class="font-brand text-xl tracking-tight">envm-vault</p>
     <div class="flex items-center gap-3"><label class="sr-only" for="locale-switcher">Idioma</label><select id="locale-switcher" class="select select-bordered select-sm w-auto min-w-28" data-testid="locale-switcher" aria-label="Idioma">
@@ -32,7 +32,7 @@ exports[`TokenSetupView (component) > does not generate a new token when Copiar 
 `;
 
 exports[`TokenSetupView (component) > renders generate CTA 1`] = `
-"<div class="vault-bg flex min-h-svh flex-col">
+"<div class="vault-bg flex h-full flex-col overflow-y-auto">
   <header class="flex h-14 items-center justify-between px-6 md:px-10">
     <p class="font-brand text-xl tracking-tight">envm-vault</p>
     <div class="flex items-center gap-3"><label class="sr-only" for="locale-switcher">Idioma</label><select id="locale-switcher" class="select select-bordered select-sm w-auto min-w-28" data-testid="locale-switcher" aria-label="Idioma">
@@ -56,7 +56,7 @@ exports[`TokenSetupView (component) > renders generate CTA 1`] = `
 `;
 
 exports[`TokenSetupView (component) > shows API error when generate fails 1`] = `
-"<div class="vault-bg flex min-h-svh flex-col">
+"<div class="vault-bg flex h-full flex-col overflow-y-auto">
   <header class="flex h-14 items-center justify-between px-6 md:px-10">
     <p class="font-brand text-xl tracking-tight">envm-vault</p>
     <div class="flex items-center gap-3"><label class="sr-only" for="locale-switcher">Idioma</label><select id="locale-switcher" class="select select-bordered select-sm w-auto min-w-28" data-testid="locale-switcher" aria-label="Idioma">
@@ -80,7 +80,7 @@ exports[`TokenSetupView (component) > shows API error when generate fails 1`] = 
 `;
 
 exports[`TokenSetupView (component) > shows the plaintext token after generate 1`] = `
-"<div class="vault-bg flex min-h-svh flex-col">
+"<div class="vault-bg flex h-full flex-col overflow-y-auto">
   <header class="flex h-14 items-center justify-between px-6 md:px-10">
     <p class="font-brand text-xl tracking-tight">envm-vault</p>
     <div class="flex items-center gap-3"><label class="sr-only" for="locale-switcher">Idioma</label><select id="locale-switcher" class="select select-bordered select-sm w-auto min-w-28" data-testid="locale-switcher" aria-label="Idioma">

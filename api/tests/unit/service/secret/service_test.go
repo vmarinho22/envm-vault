@@ -68,3 +68,21 @@ func TestFormatDotEnv_LongNameRejectedByPatternElsewhere(t *testing.T) {
 		t.Fatalf("unexpected output prefix")
 	}
 }
+
+func TestDownloadBySlug_RequiresEnvironment(t *testing.T) {
+	svc := secret.New(nil, nil, testCrypter(t), nil)
+	_, err := svc.DownloadBySlug(t.Context(), uuid.Nil.String(), "a@b.com", service.RoleUser, "my-app", "")
+	if err != service.ErrEnvironmentParamRequired {
+		t.Errorf("DownloadBySlug() error = %v, want ErrEnvironmentParamRequired", err)
+	}
+}
+
+func TestDownloadBySlug_ProductionForbiddenForNonSuperAdmin(t *testing.T) {
+	svc := secret.New(nil, nil, testCrypter(t), nil)
+	for _, role := range []string{service.RoleAdmin, service.RoleUser} {
+		_, err := svc.DownloadBySlug(t.Context(), uuid.Nil.String(), "a@b.com", role, "my-app", "production")
+		if err != service.ErrProductionDownloadForbidden {
+			t.Errorf("role %s: error = %v, want ErrProductionDownloadForbidden", role, err)
+		}
+	}
+}

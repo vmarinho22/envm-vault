@@ -31,5 +31,7 @@ var (
 	ErrSecretNotFound          = errors.New("secret not found")
 	ErrSecretNameTaken         = errors.New("secret name already taken")
 	ErrSecretValueNotFound     = errors.New("secret value not found")
-	ErrEnvironmentNotInProject = errors.New("environment not linked to project")
+	ErrEnvironmentNotInProject     = errors.New("environment not linked to project")
+	ErrEnvironmentParamRequired    = errors.New("environment query parameter is required")
+	ErrProductionDownloadForbidden = errors.New("only super_admin can download production environment")
 )
