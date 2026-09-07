@@ -6,6 +6,7 @@
   "columns": {
     "id": "ID",
     "action": "Action",
+    "project": "Project",
     "actor": "Actor",
     "target": "Target",
     "channel": "Channel",
@@ -15,6 +16,8 @@
   "filters": {
     "actor": "Actor",
     "target": "Target",
+    "project": "Project",
+    "allProjects": "All projects",
     "dateRange": "Date range",
     "searchUsers": "Search user…",
     "noUsers": "No users found",
@@ -63,6 +66,8 @@
     "actorUserId": "Actor user ID",
     "actorRole": "Actor role",
     "targetUserId": "Target user ID",
+    "projectId": "Project ID",
+    "projectSlug": "Project slug",
     "ip": "IP",
     "userAgent": "User-Agent",
     "origin": "Origin",

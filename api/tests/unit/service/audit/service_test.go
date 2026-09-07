@@ -58,8 +58,24 @@ func TestOrNop(t *testing.T) {
 
 func TestSpy_Record(t *testing.T) {
 	spy := &audit.Spy{}
-	spy.Record(context.Background(), audit.Event{Action: audit.ActionLoginFailed})
-	if len(spy.Events) != 1 || spy.Events[0].Action != audit.ActionLoginFailed {
+	projectID := uuid.MustParse("00000000-0000-0000-0000-000000000099")
+	spy.Record(context.Background(), audit.Event{
+		Action:       audit.ActionProjectCreated,
+		ProjectID:    &projectID,
+		ProjectTitle: "Payment",
+		ProjectSlug:  "payment",
+	})
+	if len(spy.Events) != 1 {
 		t.Fatalf("events = %#v", spy.Events)
+	}
+	ev := spy.Events[0]
+	if ev.Action != audit.ActionProjectCreated {
+		t.Fatalf("action = %q", ev.Action)
+	}
+	if ev.ProjectID == nil || *ev.ProjectID != projectID {
+		t.Fatalf("project_id = %#v", ev.ProjectID)
+	}
+	if ev.ProjectTitle != "Payment" || ev.ProjectSlug != "payment" {
+		t.Fatalf("project snapshot = %q / %q", ev.ProjectTitle, ev.ProjectSlug)
 	}
 }

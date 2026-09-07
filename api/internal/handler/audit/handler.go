@@ -78,6 +78,12 @@ func parseListFilter(c *fiber.Ctx) (auditservice.ListFilter, error) {
 	}
 	filter.TargetUserIDs = targetIDs
 
+	projectIDs, err := parseUUIDList(c, "project_id")
+	if err != nil {
+		return filter, fmt.Errorf("invalid project_id")
+	}
+	filter.ProjectIDs = projectIDs
+
 	from, err := optionalTime(c.Query("occurred_from"), false)
 	if err != nil {
 		return filter, fmt.Errorf("invalid occurred_from")

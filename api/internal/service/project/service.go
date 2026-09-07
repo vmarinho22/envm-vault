@@ -297,11 +297,15 @@ func (s *Service) Create(ctx context.Context, actorID, actorEmail, actorRole, ti
 		return nil, err
 	}
 
+	projectID := created.ID
 	s.audit.Record(ctx, audit.Event{
-		Action:      audit.ActionProjectCreated,
-		ActorUserID: parseActorID(actorID),
-		ActorEmail:  actorEmail,
-		ActorRole:   actorRole,
+		Action:       audit.ActionProjectCreated,
+		ActorUserID:  parseActorID(actorID),
+		ActorEmail:   actorEmail,
+		ActorRole:    actorRole,
+		ProjectID:    &projectID,
+		ProjectTitle: created.Title,
+		ProjectSlug:  created.Slug,
 	})
 
 	resp := toResponse(*created)
@@ -391,11 +395,15 @@ func (s *Service) Update(
 		return nil, err
 	}
 
+	pid := updated.ID
 	s.audit.Record(ctx, audit.Event{
-		Action:      audit.ActionProjectUpdated,
-		ActorUserID: parseActorID(actorID),
-		ActorEmail:  actorEmail,
-		ActorRole:   actorRole,
+		Action:       audit.ActionProjectUpdated,
+		ActorUserID:  parseActorID(actorID),
+		ActorEmail:   actorEmail,
+		ActorRole:    actorRole,
+		ProjectID:    &pid,
+		ProjectTitle: updated.Title,
+		ProjectSlug:  updated.Slug,
 	})
 
 	resp := toResponse(*updated)
@@ -412,6 +420,14 @@ func (s *Service) Delete(ctx context.Context, actorID, actorEmail, actorRole, pr
 		return service.ErrProjectNotFound
 	}
 
+	project, err := s.projects.FindByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return service.ErrProjectNotFound
+		}
+		return err
+	}
+
 	if err := s.projects.Delete(ctx, id); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return service.ErrProjectNotFound
@@ -419,11 +435,15 @@ func (s *Service) Delete(ctx context.Context, actorID, actorEmail, actorRole, pr
 		return err
 	}
 
+	projectUUID := project.ID
 	s.audit.Record(ctx, audit.Event{
-		Action:      audit.ActionProjectDeleted,
-		ActorUserID: parseActorID(actorID),
-		ActorEmail:  actorEmail,
-		ActorRole:   actorRole,
+		Action:       audit.ActionProjectDeleted,
+		ActorUserID:  parseActorID(actorID),
+		ActorEmail:   actorEmail,
+		ActorRole:    actorRole,
+		ProjectID:    &projectUUID,
+		ProjectTitle: project.Title,
+		ProjectSlug:  project.Slug,
 	})
 	return nil
 }

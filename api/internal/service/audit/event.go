@@ -9,4 +9,7 @@ type Event struct {
 	ActorEmail   string
 	ActorRole    string
 	TargetUserID *uuid.UUID
+	ProjectID    *uuid.UUID
+	ProjectTitle string
+	ProjectSlug  string
 }

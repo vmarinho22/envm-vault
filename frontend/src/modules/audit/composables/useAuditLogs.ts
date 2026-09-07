@@ -7,6 +7,9 @@ import type {
   AuditLog,
   AuditSort,
 } from '@/modules/audit/types';
+import type { CatalogOption } from '@/modules/project/components/CatalogMultiSelect.vue';
+import { projectService } from '@/modules/project/services/ProjectService';
+import { PROJECT_PAGE_SIZE, type Project } from '@/modules/project/types';
 import { userService } from '@/modules/user/services/UserService';
 import type { UserWithToken } from '@/modules/user/types';
 import { ApiError } from '@/shared/http/ApiError';
@@ -16,6 +19,7 @@ const PAGE_SIZE = 25;
 const defaultFilters = (): AuditListFilters => ({
   actorUserIds: [],
   targetUserIds: [],
+  projectIds: [],
   occurredFrom: '',
   occurredTo: '',
 });
@@ -30,6 +34,7 @@ export function useAuditLogs() {
 
   const logs = ref<AuditLog[]>([]);
   const users = ref<UserWithToken[]>([]);
+  const projects = ref<Project[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
 
@@ -48,6 +53,10 @@ export function useAuditLogs() {
     users.value.map((u) => ({ id: u.id, email: u.email })),
   );
 
+  const projectOptions = computed<CatalogOption[]>(() =>
+    projects.value.map((p) => ({ id: p.id, label: p.title })),
+  );
+
   function toErrorMessage(err: unknown, fallback: string): string {
     if (err instanceof ApiError) {
       return err.message;
@@ -59,17 +68,30 @@ export function useAuditLogs() {
     users.value = await userService.list();
   }
 
+  async function loadProjects(): Promise<void> {
+    const items: Project[] = [];
+    let page = 1;
+    for (;;) {
+      const resp = await projectService.list({ page, page_size: PROJECT_PAGE_SIZE });
+      items.push(...resp.items);
+      if (items.length >= resp.total || resp.items.length === 0) break;
+      page += 1;
+    }
+    projects.value = items;
+  }
+
   async function fetchLogs(): Promise<void> {
     error.value = null;
     loading.value = true;
     try {
-      const { actorUserIds, targetUserIds, occurredFrom, occurredTo } = filters.value;
+      const { actorUserIds, targetUserIds, projectIds, occurredFrom, occurredTo } = filters.value;
       const resp = await auditService.list({
         page: query.value.page,
         page_size: PAGE_SIZE,
         sort: query.value.sort,
         actor_user_ids: actorUserIds.length > 0 ? actorUserIds : undefined,
         target_user_ids: targetUserIds.length > 0 ? targetUserIds : undefined,
+        project_ids: projectIds.length > 0 ? projectIds : undefined,
         occurred_from: occurredFrom || undefined,
         occurred_to: occurredTo || undefined,
       });
@@ -87,7 +109,7 @@ export function useAuditLogs() {
     error.value = null;
     loading.value = true;
     try {
-      await loadUsers();
+      await Promise.all([loadUsers(), loadProjects()]);
       await fetchLogs();
     } catch (err) {
       error.value = toErrorMessage(err, t('audit.errors.loadFailed'));
@@ -137,6 +159,7 @@ export function useAuditLogs() {
     logs,
     users,
     userOptions,
+    projectOptions,
     loading,
     error,
     filters,

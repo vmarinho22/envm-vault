@@ -14,12 +14,14 @@ import AuditLogDetailModal from '@/modules/audit/components/AuditLogDetailModal.
 import UserMultiSelect from '@/modules/audit/components/UserMultiSelect.vue';
 import { channelLabel } from '@/modules/audit/channelLabel';
 import { useAuditLogs } from '@/modules/audit/composables/useAuditLogs';
+import CatalogMultiSelect from '@/modules/project/components/CatalogMultiSelect.vue';
 import { formatDateTime, toDateParam } from '@/shared/datetime/format';
 
 const { t } = useI18n();
 const {
   logs,
   userOptions,
+  projectOptions,
   loading,
   error,
   filters,
@@ -54,6 +56,12 @@ const sortAria = computed(() =>
   query.value.sort === 'asc' ? t('audit.sort.asc') : t('audit.sort.desc'),
 );
 
+function projectLabel(log: { project_title: string; project_slug: string }): string {
+  if (log.project_title) return log.project_title;
+  if (log.project_slug) return log.project_slug;
+  return '—';
+}
+
 watch(dateRange, async (range) => {
   // Only filter when cleared or when both ends of the range are set.
   if (range == null) {
@@ -78,6 +86,11 @@ async function onActorsChange(ids: string[]): Promise<void> {
 
 async function onTargetsChange(ids: string[]): Promise<void> {
   filters.value.targetUserIds = ids;
+  await applyFilters();
+}
+
+async function onProjectsChange(ids: string[]): Promise<void> {
+  filters.value.projectIds = ids;
   await applyFilters();
 }
 
@@ -120,6 +133,15 @@ onMounted(() => {
         :label="t('audit.filters.target')"
         @update:model-value="onTargetsChange"
       />
+      <div class="w-full max-w-xs">
+        <CatalogMultiSelect
+          :model-value="filters.projectIds"
+          :options="projectOptions"
+          :label="t('audit.filters.project')"
+          :placeholder="t('audit.filters.allProjects')"
+          @update:model-value="onProjectsChange"
+        />
+      </div>
       <div class="form-control flex w-full max-w-xs flex-col gap-[4px]">
         <span class="label-text">{{ t('audit.filters.dateRange') }}</span>
         <VueDatePicker
@@ -148,6 +170,7 @@ onMounted(() => {
             <tr>
               <th>{{ t('audit.columns.id') }}</th>
               <th>{{ t('audit.columns.action') }}</th>
+              <th>{{ t('audit.columns.project') }}</th>
               <th>{{ t('audit.columns.actor') }}</th>
               <th>{{ t('audit.columns.target') }}</th>
               <th>{{ t('audit.columns.channel') }}</th>
@@ -175,13 +198,14 @@ onMounted(() => {
           </thead>
           <tbody>
             <tr v-if="logs.length === 0">
-              <td colspan="7" class="text-base-content/70">{{ t('audit.empty') }}</td>
+              <td colspan="8" class="text-base-content/70">{{ t('audit.empty') }}</td>
             </tr>
             <tr v-for="log in logs" :key="log.id">
               <td class="max-w-[8rem] truncate font-mono text-xs" :title="log.id">
                 {{ log.id }}
               </td>
               <td class="text-sm">{{ actionLabel(log.action, t) }}</td>
+              <td class="text-sm">{{ projectLabel(log) }}</td>
               <td>{{ log.actor_email || '—' }}</td>
               <td>{{ log.target_email || '—' }}</td>
               <td>{{ channelLabel(log.auth_channel, t) }}</td>

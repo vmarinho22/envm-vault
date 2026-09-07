@@ -25,11 +25,12 @@ describe('AuditService', () => {
       page_size: 25,
       sort: 'asc',
       actor_user_ids: ['actor-1', 'actor-2'],
+      project_ids: ['proj-1'],
       occurred_from: '2026-01-01',
     });
 
     expect(fetchMock).toHaveBeenCalledWith(
-      '/v1/audit-logs?page=2&page_size=25&sort=asc&actor_user_id=actor-1&actor_user_id=actor-2&occurred_from=2026-01-01',
+      '/v1/audit-logs?page=2&page_size=25&sort=asc&actor_user_id=actor-1&actor_user_id=actor-2&project_id=proj-1&occurred_from=2026-01-01',
       expect.any(Object),
     );
   });

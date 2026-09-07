@@ -10,6 +10,9 @@ export interface AuditLog {
   actor_role: string;
   target_user_id: string | null;
   target_email: string | null;
+  project_id: string | null;
+  project_title: string;
+  project_slug: string;
   auth_channel: AuthChannel;
   ip: string;
   user_agent: string;
@@ -31,6 +34,7 @@ export interface AuditLogListParams {
   sort?: AuditSort;
   actor_user_ids?: string[];
   target_user_ids?: string[];
+  project_ids?: string[];
   occurred_from?: string;
   occurred_to?: string;
 }
@@ -39,6 +43,7 @@ export interface AuditLogListParams {
 export interface AuditListFilters {
   actorUserIds: string[];
   targetUserIds: string[];
+  projectIds: string[];
   occurredFrom: string;
   occurredTo: string;
 }

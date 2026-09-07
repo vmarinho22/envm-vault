@@ -54,6 +54,9 @@ func (s *Service) Record(ctx context.Context, event Event) {
 		ActorEmail:   event.ActorEmail,
 		ActorRole:    event.ActorRole,
 		TargetUserID: event.TargetUserID,
+		ProjectID:    event.ProjectID,
+		ProjectTitle: event.ProjectTitle,
+		ProjectSlug:  event.ProjectSlug,
 		AuthChannel:  origin.AuthChannel,
 		IP:           origin.IP,
 		UserAgent:    origin.UserAgent,
@@ -66,6 +69,8 @@ func (s *Service) Record(ctx context.Context, event Event) {
 		"auth_channel", origin.AuthChannel,
 		"actor_email", event.ActorEmail,
 		"actor_role", event.ActorRole,
+		"project_id", event.ProjectID,
+		"project_slug", event.ProjectSlug,
 		"ip", origin.IP,
 		"origin", origin.Origin,
 	)

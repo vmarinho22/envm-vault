@@ -6,6 +6,7 @@
   "columns": {
     "id": "ID",
     "action": "Ação",
+    "project": "Projeto",
     "actor": "Ator",
     "target": "Alvo",
     "channel": "Canal",
@@ -15,6 +16,8 @@
   "filters": {
     "actor": "Ator",
     "target": "Alvo",
+    "project": "Projeto",
+    "allProjects": "Todos os projetos",
     "dateRange": "Período",
     "searchUsers": "Buscar usuário…",
     "noUsers": "Nenhum usuário encontrado",
@@ -63,6 +66,8 @@
     "actorUserId": "ID do ator",
     "actorRole": "Papel do ator",
     "targetUserId": "ID do alvo",
+    "projectId": "ID do projeto",
+    "projectSlug": "Slug do projeto",
     "ip": "IP",
     "userAgent": "User-Agent",
     "origin": "Origin",

@@ -32,6 +32,7 @@ type AuditLogListFilter struct {
 	SortAsc       bool
 	ActorUserIDs  []uuid.UUID
 	TargetUserIDs []uuid.UUID
+	ProjectIDs    []uuid.UUID
 	OccurredFrom  *time.Time
 	OccurredTo    *time.Time
 }
@@ -44,6 +45,9 @@ func (r *AuditLogRepository) List(ctx context.Context, filter AuditLogListFilter
 	}
 	if len(filter.TargetUserIDs) > 0 {
 		q = q.Where("target_user_id IN ?", filter.TargetUserIDs)
+	}
+	if len(filter.ProjectIDs) > 0 {
+		q = q.Where("project_id IN ?", filter.ProjectIDs)
 	}
 	if filter.OccurredFrom != nil {
 		q = q.Where("occurred_at >= ?", *filter.OccurredFrom)

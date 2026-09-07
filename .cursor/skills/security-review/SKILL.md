@@ -37,7 +37,7 @@ Use this checklist when reviewing changes that touch authentication, tokens, or 
 
 - [ ] Security-relevant mutations call `audit.Logger.Record` after success (not on unauthorized/forbidden early returns unless intentionally auditing failures, e.g. `login.failed`)
 - [ ] Audit rows/slog never include OTP codes, JWTs, or full personal token plaintext (`ev_…`)
-- [ ] New actions use constants in `internal/service/audit` (action only; UI maps labels from action); no ad-hoc metadata JSON
+- [ ] New actions use constants in `internal/service/audit` (action + optional typed snapshots such as project id/title/slug; UI maps labels from action); no ad-hoc metadata JSON
 - [ ] Persist failures are best-effort (must not break the HTTP success path)
 
 ## Reporting
