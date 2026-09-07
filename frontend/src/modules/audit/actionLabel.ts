@@ -17,6 +17,9 @@ export const AUDIT_ACTIONS = [
   'tag.created',
   'tag.updated',
   'tag.deleted',
+  'environment.created',
+  'environment.updated',
+  'environment.deleted',
 ] as const;
 
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];
@@ -39,6 +42,9 @@ const ACTION_I18N_KEYS: Record<string, string> = {
   'tag.created': 'audit.actions.tagCreated',
   'tag.updated': 'audit.actions.tagUpdated',
   'tag.deleted': 'audit.actions.tagDeleted',
+  'environment.created': 'audit.actions.environmentCreated',
+  'environment.updated': 'audit.actions.environmentUpdated',
+  'environment.deleted': 'audit.actions.environmentDeleted',
 };
 
 export function actionLabel(action: string, t: (key: string) => string): string {

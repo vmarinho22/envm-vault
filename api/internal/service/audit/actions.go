@@ -22,4 +22,7 @@ const (
 	ActionTagCreated                = "tag.created"
 	ActionTagUpdated                = "tag.updated"
 	ActionTagDeleted                = "tag.deleted"
+	ActionEnvironmentCreated        = "environment.created"
+	ActionEnvironmentUpdated        = "environment.updated"
+	ActionEnvironmentDeleted        = "environment.deleted"
 )

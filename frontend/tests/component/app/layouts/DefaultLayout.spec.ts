@@ -34,6 +34,7 @@ describe('DefaultLayout (component)', () => {
         { path: 'api-key', name: 'api-key', component: { template: '<div />' } },
         { path: 'teams', name: 'teams', component: { template: '<div />' } },
         { path: 'tags', name: 'tags', component: { template: '<div />' } },
+        { path: 'environments', name: 'environments', component: { template: '<div />' } },
         { path: 'users', name: 'users', component: { template: '<div />' } },
         { path: 'audit-logs', name: 'audit-logs', component: { template: '<div />' } },
       ],
@@ -41,7 +42,7 @@ describe('DefaultLayout (component)', () => {
     { path: '/login', name: 'login', component: LoginView },
   ];
 
-  it('renders sidebar with Início, Chave de API, Times, Tags, Usuários and Auditoria for admin', async () => {
+  it('renders sidebar with Início, Chave de API, Times, Tags, Ambientes, Usuários and Auditoria for admin', async () => {
     const { wrapper } = await mountComponent(DefaultLayout, {
       routes,
       initialRoute: '/',
@@ -53,6 +54,7 @@ describe('DefaultLayout (component)', () => {
     expect(nav.text()).toContain('Chave de API');
     expect(nav.text()).toContain('Times');
     expect(nav.text()).toContain('Tags');
+    expect(nav.text()).toContain('Ambientes');
     expect(nav.text()).toContain('Usuários');
     expect(nav.text()).toContain('Auditoria');
     expect(wrapper.get('header').text()).toContain('admin@example.com');
@@ -75,7 +77,7 @@ describe('DefaultLayout (component)', () => {
     expectComponentSnapshot(wrapper);
   });
 
-  it('hides Usuários for a standard user but shows Times and Tags', async () => {
+  it('hides Usuários for a standard user but shows Times, Tags and Ambientes', async () => {
     const { wrapper } = await mountComponent(DefaultLayout, {
       routes,
       initialRoute: '/',
@@ -86,6 +88,7 @@ describe('DefaultLayout (component)', () => {
     expect(nav.text()).toContain('Chave de API');
     expect(nav.text()).toContain('Times');
     expect(nav.text()).toContain('Tags');
+    expect(nav.text()).toContain('Ambientes');
     expect(nav.text()).not.toContain('Usuários');
     expect(nav.text()).not.toContain('Auditoria');
     expectComponentSnapshot(wrapper);

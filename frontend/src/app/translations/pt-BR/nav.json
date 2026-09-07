@@ -4,6 +4,7 @@
   "apiKey": "Chave de API",
   "teams": "Times",
   "tags": "Tags",
+  "environments": "Ambientes",
   "users": "Usuários",
   "audit": "Auditoria"
 }

@@ -13,7 +13,7 @@ Read [docs/architecture.md](../../docs/architecture.md) for the full specificati
 Groups environment variables under a slug (e.g. `my-app`). Owned by a User.
 
 ### Environment
-A named deployment target within a Project (e.g. `dev`, `staging`, `prod`). Fully customizable — no fixed set.
+Global catalog of deployment targets with unique `title` (e.g. `dev`, `staging`, `production`). Not linked to Project yet. Any authenticated user may list/search; only `admin` / `super_admin` mutate. Seeded defaults (idempotent on migrate/startup): `dev`, `test`, `staging`, `production`.
 
 ### Secret (EnvVar)
 A key-value pair scoped to Project + Environment. Values encrypted at rest (Phase 2).
@@ -42,7 +42,7 @@ Authorization: Bearer <access_token>
 
 1. One active API key per user — generate rotates and invalidates the previous hash.
 2. Secret values and API key plaintext never appear in logs.
-3. Environments are per-project — `dev` in project A is independent from `dev` in project B.
+3. Environment catalog is global today; Project↔Environment linking (and per-project independence) is planned.
 4. Slugs are generated with `api/internal/slug.FromName` (mirrored in `frontend/src/shared/slug`).
 
 ## Relationships
@@ -51,7 +51,7 @@ Authorization: Bearer <access_token>
 User → has many → Project
 User → has one → AccessToken
 User → accountable for many → Team
-Project → has many → Environment
-Environment → has many → Secret
 Tag (catalog; Project link TBD)
+Environment (catalog; Project link TBD)
+Project → Secret via Environment (planned)
 ```

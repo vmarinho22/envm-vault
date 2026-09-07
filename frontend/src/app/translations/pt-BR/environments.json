@@ -1,0 +1,36 @@
+{
+  "title": "Ambientes",
+  "description": "Ambientes usados para agrupar variáveis. Apenas administradores podem criar, editar e excluir.",
+  "create": "Criar ambiente",
+  "edit": "Editar",
+  "delete": "Excluir",
+  "empty": "Nenhum ambiente cadastrado.",
+  "emptySearch": "Nenhum ambiente encontrado para essa busca.",
+  "confirmDelete": "Excluir o ambiente \"{title}\"? Esta ação não pode ser desfeita.",
+  "columns": {
+    "title": "Título",
+    "createdAt": "Criado em",
+    "updatedAt": "Atualizado em",
+    "actions": "Ações"
+  },
+  "search": {
+    "label": "Buscar por título",
+    "placeholder": "Ex.: staging",
+    "apply": "Buscar",
+    "clear": "Limpar"
+  },
+  "form": {
+    "createTitle": "Novo ambiente",
+    "editTitle": "Editar ambiente",
+    "title": "Título",
+    "cancel": "Cancelar",
+    "create": "Criar",
+    "save": "Salvar"
+  },
+  "errors": {
+    "loadFailed": "não foi possível carregar os ambientes",
+    "createFailed": "não foi possível criar o ambiente",
+    "updateFailed": "não foi possível atualizar o ambiente",
+    "deleteFailed": "não foi possível excluir o ambiente"
+  }
+}

@@ -9,6 +9,7 @@ import UsersView from '@/modules/user/views/UsersView.vue';
 import AuditLogsView from '@/modules/audit/views/AuditLogsView.vue';
 import TeamsView from '@/modules/team/views/TeamsView.vue';
 import TagsView from '@/modules/tag/views/TagsView.vue';
+import EnvironmentsView from '@/modules/environment/views/EnvironmentsView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -48,6 +49,11 @@ const router = createRouter({
           path: 'tags',
           name: 'tags',
           component: TagsView,
+        },
+        {
+          path: 'environments',
+          name: 'environments',
+          component: EnvironmentsView,
         },
         {
           path: 'users',

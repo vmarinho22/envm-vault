@@ -2,6 +2,7 @@
 import {
   ArrowRightStartOnRectangleIcon,
   ClipboardDocumentListIcon,
+  CubeTransparentIcon,
   HomeIcon,
   KeyIcon,
   TagIcon,
@@ -70,6 +71,14 @@ function logout(): void {
         >
           <TagIcon class="size-5 shrink-0" aria-hidden="true" />
           {{ t('nav.tags') }}
+        </RouterLink>
+        <RouterLink
+          :to="{ name: 'environments' }"
+          :class="navLinkClass"
+          :exact-active-class="navActiveClass"
+        >
+          <CubeTransparentIcon class="size-5 shrink-0" aria-hidden="true" />
+          {{ t('nav.environments') }}
         </RouterLink>
         <RouterLink
           v-if="auth.isAdmin"

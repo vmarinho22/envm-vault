@@ -14,6 +14,7 @@ import (
 	"github.com/envm-vault/envm-vault/api/internal/env"
 	audithandler "github.com/envm-vault/envm-vault/api/internal/handler/audit"
 	authhandler "github.com/envm-vault/envm-vault/api/internal/handler/auth"
+	environmenthandler "github.com/envm-vault/envm-vault/api/internal/handler/environment"
 	healthhandler "github.com/envm-vault/envm-vault/api/internal/handler/health"
 	"github.com/envm-vault/envm-vault/api/internal/handler/httperr"
 	taghandler "github.com/envm-vault/envm-vault/api/internal/handler/tag"
@@ -26,6 +27,7 @@ import (
 	"github.com/envm-vault/envm-vault/api/internal/service"
 	auditservice "github.com/envm-vault/envm-vault/api/internal/service/audit"
 	authservice "github.com/envm-vault/envm-vault/api/internal/service/auth"
+	environmentservice "github.com/envm-vault/envm-vault/api/internal/service/environment"
 	tagservice "github.com/envm-vault/envm-vault/api/internal/service/tag"
 	teamservice "github.com/envm-vault/envm-vault/api/internal/service/team"
 	tokenservice "github.com/envm-vault/envm-vault/api/internal/service/token"
@@ -58,6 +60,7 @@ func main() {
 	auditRepo := repository.NewAuditLogRepository(gormDB)
 	teamRepo := repository.NewTeamRepository(gormDB)
 	tagRepo := repository.NewTagRepository(gormDB)
+	environmentRepo := repository.NewEnvironmentRepository(gormDB)
 	auditSvc := auditservice.New(auditRepo, userRepo)
 
 	var sender email.Sender
@@ -73,6 +76,7 @@ func main() {
 	tokenSvc := tokenservice.New(tokenRepo, userRepo, auditSvc)
 	teamSvc := teamservice.New(teamRepo, userRepo, auditSvc)
 	tagSvc := tagservice.New(tagRepo, auditSvc)
+	environmentSvc := environmentservice.New(environmentRepo, auditSvc)
 
 	app := fiber.New(fiber.Config{
 		ErrorHandler: httperr.AppHandler,
@@ -89,14 +93,15 @@ func main() {
 	app.Use(middleware.NewRateLimiter(env.Envs.RateLimit.Max, env.Envs.RateLimit.Window))
 
 	router.Register(app, router.Deps{
-		Health: healthhandler.New(gormDB),
-		Auth:   authhandler.New(authSvc),
-		User:   userhandler.New(userSvc),
-		Token:  tokenhandler.New(tokenSvc),
-		Audit:  audithandler.New(auditSvc),
-		Team:   teamhandler.New(teamSvc),
-		Tag:    taghandler.New(tagSvc),
-		JWT:    middleware.NewJWTMiddleware(env.Envs.JWT.Secret, userRepo, auditSvc),
+		Health:      healthhandler.New(gormDB),
+		Auth:        authhandler.New(authSvc),
+		User:        userhandler.New(userSvc),
+		Token:       tokenhandler.New(tokenSvc),
+		Audit:       audithandler.New(auditSvc),
+		Team:        teamhandler.New(teamSvc),
+		Tag:         taghandler.New(tagSvc),
+		Environment: environmenthandler.New(environmentSvc),
+		JWT:         middleware.NewJWTMiddleware(env.Envs.JWT.Secret, userRepo, auditSvc),
 	})
 
 	go func() {

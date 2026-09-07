@@ -22,6 +22,7 @@ func Open(dsn string) (*gorm.DB, error) {
 		&model.AuditLog{},
 		&model.Team{},
 		&model.Tag{},
+		&model.Environment{},
 	); err != nil {
 		return nil, fmt.Errorf("auto migrate: %w", err)
 	}
@@ -35,6 +36,10 @@ func Open(dsn string) (*gorm.DB, error) {
 
 	if err := EnsureDefaultTags(db); err != nil {
 		return nil, fmt.Errorf("seed default tags: %w", err)
+	}
+
+	if err := EnsureDefaultEnvironments(db); err != nil {
+		return nil, fmt.Errorf("seed default environments: %w", err)
 	}
 
 	return db, nil

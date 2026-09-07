@@ -38,7 +38,10 @@
     "teamDeleted": "Time excluído",
     "tagCreated": "Tag criada",
     "tagUpdated": "Tag atualizada",
-    "tagDeleted": "Tag excluída"
+    "tagDeleted": "Tag excluída",
+    "environmentCreated": "Ambiente criado",
+    "environmentUpdated": "Ambiente atualizado",
+    "environmentDeleted": "Ambiente excluído"
   },
   "channels": {
     "web": "Web",

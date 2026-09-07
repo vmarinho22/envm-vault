@@ -3,6 +3,7 @@ package router
 import (
 	audithandler "github.com/envm-vault/envm-vault/api/internal/handler/audit"
 	authhandler "github.com/envm-vault/envm-vault/api/internal/handler/auth"
+	environmenthandler "github.com/envm-vault/envm-vault/api/internal/handler/environment"
 	healthhandler "github.com/envm-vault/envm-vault/api/internal/handler/health"
 	taghandler "github.com/envm-vault/envm-vault/api/internal/handler/tag"
 	teamhandler "github.com/envm-vault/envm-vault/api/internal/handler/team"
@@ -12,12 +13,13 @@ import (
 )
 
 type Deps struct {
-	Health *healthhandler.Handler
-	Auth   *authhandler.Handler
-	User   *userhandler.Handler
-	Token  *tokenhandler.Handler
-	Audit  *audithandler.Handler
-	Team   *teamhandler.Handler
-	Tag    *taghandler.Handler
-	JWT    *middleware.JWTMiddleware
+	Health      *healthhandler.Handler
+	Auth        *authhandler.Handler
+	User        *userhandler.Handler
+	Token       *tokenhandler.Handler
+	Audit       *audithandler.Handler
+	Team        *teamhandler.Handler
+	Tag         *taghandler.Handler
+	Environment *environmenthandler.Handler
+	JWT         *middleware.JWTMiddleware
 }

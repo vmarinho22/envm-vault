@@ -63,6 +63,12 @@ func Write(c *fiber.Ctx, err error) error {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "tag not found"})
 	case errors.Is(err, service.ErrTagTitleTaken):
 		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"error": "tag title already taken"})
+	case errors.Is(err, service.ErrInvalidEnvironmentTitle):
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid environment title"})
+	case errors.Is(err, service.ErrEnvironmentNotFound):
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "environment not found"})
+	case errors.Is(err, service.ErrEnvironmentTitleTaken):
+		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"error": "environment title already taken"})
 	default:
 		log.Printf("unhandled error method=%s path=%s: %v", c.Method(), c.Path(), err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "internal server error"})

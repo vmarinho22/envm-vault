@@ -12,6 +12,7 @@ import ptUsers from './pt-BR/users.json';
 import ptAudit from './pt-BR/audit.json';
 import ptTeams from './pt-BR/teams.json';
 import ptTags from './pt-BR/tags.json';
+import ptEnvironments from './pt-BR/environments.json';
 
 import enCommon from './en-US/common.json';
 import enLogin from './en-US/login.json';
@@ -25,6 +26,7 @@ import enUsers from './en-US/users.json';
 import enAudit from './en-US/audit.json';
 import enTeams from './en-US/teams.json';
 import enTags from './en-US/tags.json';
+import enEnvironments from './en-US/environments.json';
 
 const ptBR = {
   common: ptCommon,
@@ -39,6 +41,7 @@ const ptBR = {
   audit: ptAudit,
   teams: ptTeams,
   tags: ptTags,
+  environments: ptEnvironments,
 };
 
 const enUS = {
@@ -54,6 +57,7 @@ const enUS = {
   audit: enAudit,
   teams: enTeams,
   tags: enTags,
+  environments: enEnvironments,
 };
 
 export type MessageSchema = typeof ptBR;

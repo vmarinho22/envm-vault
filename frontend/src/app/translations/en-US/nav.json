@@ -4,6 +4,7 @@
   "apiKey": "API key",
   "teams": "Teams",
   "tags": "Tags",
+  "environments": "Environments",
   "users": "Users",
   "audit": "Audit"
 }

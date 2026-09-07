@@ -1,0 +1,36 @@
+{
+  "title": "Environments",
+  "description": "Environments used to group variables. Only administrators can create, edit, and delete.",
+  "create": "Create environment",
+  "edit": "Edit",
+  "delete": "Delete",
+  "empty": "No environments yet.",
+  "emptySearch": "No environments matched that search.",
+  "confirmDelete": "Delete environment \"{title}\"? This cannot be undone.",
+  "columns": {
+    "title": "Title",
+    "createdAt": "Created at",
+    "updatedAt": "Updated at",
+    "actions": "Actions"
+  },
+  "search": {
+    "label": "Search by title",
+    "placeholder": "e.g. staging",
+    "apply": "Search",
+    "clear": "Clear"
+  },
+  "form": {
+    "createTitle": "New environment",
+    "editTitle": "Edit environment",
+    "title": "Title",
+    "cancel": "Cancel",
+    "create": "Create",
+    "save": "Save"
+  },
+  "errors": {
+    "loadFailed": "could not load environments",
+    "createFailed": "could not create environment",
+    "updateFailed": "could not update environment",
+    "deleteFailed": "could not delete environment"
+  }
+}

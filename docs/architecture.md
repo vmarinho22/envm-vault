@@ -57,6 +57,10 @@ The API lives in `api/` and provides authentication via email OTP plus a unique 
 | `POST` | `/v1/tags` | JWT | Create tag (title + hex color) |
 | `PATCH` | `/v1/tags/:id` | JWT | Update tag title and/or color |
 | `DELETE` | `/v1/tags/:id` | JWT | Delete tag |
+| `GET` | `/v1/environments` | JWT | List environments (optional `?title=` substring filter) |
+| `POST` | `/v1/environments` | JWT (admin+) | Create environment (title) |
+| `PATCH` | `/v1/environments/:id` | JWT (admin+) | Update environment title |
+| `DELETE` | `/v1/environments/:id` | JWT (admin+) | Delete environment |
 
 ### Auth Flow
 
@@ -80,11 +84,11 @@ A logical grouping of environment variables (e.g. `my-app`, `payment-service`).
 
 ### Environment
 
-A named deployment target within a project. Environments are fully customizable per project.
+A global catalog of deployment targets with a unique `title` (e.g. `dev`, `staging`, `production`). Any authenticated user can list/search; only `admin` / `super_admin` can create, update, or delete. On migrate/startup the catalog seeds four defaults when missing: `dev`, `test`, `staging`, `production`. Not yet linked to projects; future env download will select variables by environment title.
 
 ### Secret / EnvVar
 
-A key-value pair scoped to a **Project + Environment** combination.
+A key-value pair scoped to a **Project + Environment** combination (planned).
 
 ### User
 
@@ -111,9 +115,9 @@ envm-vault/
 │   ├── tests/unit/       # unit tests (mirrors internal/)
 │   ├── internal/
 │   │   ├── env/          # Envs singleton + Load()
-│   │   ├── router/       # Route registration by context (health, auth, user, token, audit, team, tag)
-│   │   ├── handler/      # Handlers per domain (auth/, user/, token/, health/, audit/, team/, tag/)
-│   │   ├── service/      # Business logic per domain (auth/, user/, token/, audit/, team/, tag/)
+│   │   ├── router/       # Route registration by context (health, auth, user, token, audit, team, tag, environment)
+│   │   ├── handler/      # Handlers per domain (auth/, user/, token/, health/, audit/, team/, tag/, environment/)
+│   │   ├── service/      # Business logic per domain (auth/, user/, token/, audit/, team/, tag/, environment/)
 │   │   ├── middleware/
 │   │   ├── database/     # GORM connection + AutoMigrate
 │   │   ├── model/        # GORM models
@@ -134,12 +138,16 @@ erDiagram
   User ||--o{ AuditLog : acts
   User ||--o{ Team : accountable_for
   User ||--o{ Project : owns
-  Project ||--o{ Environment : contains
-  Environment ||--o{ Secret : stores
   Tag {
     uuid id PK
     string title UK
     string color
+    timestamp created_at
+    timestamp updated_at
+  }
+  Environment {
+    uuid id PK
+    string title UK
     timestamp created_at
     timestamp updated_at
   }
@@ -195,13 +203,15 @@ erDiagram
   }
 ```
 
+Project↔Environment↔Secret linking is planned (not yet in schema).
+
 ### User Roles
 
 | Role | Description |
 |------|-------------|
-| `super_admin` | First user (bootstrap). Full access. Can revoke any API key. Can manage teams. Can block any user. Can manage tags. |
-| `admin` | Can register users, revoke `user`/`admin` API keys, manage teams, and block `admin`/`user`. Can manage tags. |
-| `user` | Standard user. Manages their own API key. Can list/search teams (read-only). Can create, update, and delete tags. |
+| `super_admin` | First user (bootstrap). Full access. Can revoke any API key. Can manage teams and environments. Can block any user. Can manage tags. |
+| `admin` | Can register users, revoke `user`/`admin` API keys, manage teams and environments, and block `admin`/`user`. Can manage tags. |
+| `user` | Standard user. Manages their own API key. Can list/search teams and environments (read-only). Can create, update, and delete tags. |
 
 ## Security Principles
 
