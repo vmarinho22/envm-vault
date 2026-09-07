@@ -1,13 +1,28 @@
 <script setup lang="ts">
-import { TrashIcon } from '@heroicons/vue/24/outline';
+import { PlusIcon, TrashIcon } from '@heroicons/vue/24/outline';
 import { onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
+import UserFormModal from '@/modules/user/components/UserFormModal.vue';
 import { useUsers } from '@/modules/user/composables/useUsers';
 import { roleLabel } from '@/modules/user/roleLabel';
 import type { UserWithToken } from '@/modules/user/types';
 
 const { t } = useI18n();
-const { users, loading, mutatingId, error, fetchUsers, revokeToken } = useUsers();
+const {
+  users,
+  loading,
+  mutatingId,
+  creating,
+  error,
+  formOpen,
+  formEmail,
+  formRole,
+  fetchUsers,
+  openCreate,
+  closeForm,
+  submitCreate,
+  revokeToken,
+} = useUsers();
 
 function tokenStatus(user: UserWithToken): string {
   if (!user.token) return t('users.noKey');
@@ -26,10 +41,18 @@ onMounted(() => {
 
 <template>
   <section class="px-8 py-10 md:px-12">
-    <h1 class="text-2xl font-medium tracking-tight md:text-3xl">{{ t('users.title') }}</h1>
-    <p class="mt-3 max-w-lg text-base text-base-content/70">
-      {{ t('users.description') }}
-    </p>
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-medium tracking-tight md:text-3xl">{{ t('users.title') }}</h1>
+        <p class="mt-3 max-w-lg text-base text-base-content/70">
+          {{ t('users.description') }}
+        </p>
+      </div>
+      <button class="btn btn-primary gap-2" type="button" @click="openCreate">
+        <PlusIcon class="size-4" aria-hidden="true" />
+        {{ t('users.create') }}
+      </button>
+    </div>
 
     <p v-if="error" class="mt-6 text-sm text-error" role="alert">{{ error }}</p>
     <p v-else-if="loading" class="mt-8 text-base-content/70">{{ t('common.loading') }}</p>
@@ -70,5 +93,16 @@ onMounted(() => {
         </tbody>
       </table>
     </div>
+
+    <UserFormModal
+      :open="formOpen"
+      :email="formEmail"
+      :role="formRole"
+      :saving="creating"
+      @close="closeForm"
+      @submit="submitCreate"
+      @update:email="formEmail = $event"
+      @update:role="formRole = $event"
+    />
   </section>
 </template>

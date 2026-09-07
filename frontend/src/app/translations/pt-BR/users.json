@@ -1,6 +1,7 @@
 {
   "title": "Usuários",
-  "description": "Revogue a chave de API de um usuário. Ele precisará gerar uma nova para continuar.",
+  "description": "Crie usuários e revogue chaves de API. Quem perder a chave precisará gerar uma nova.",
+  "create": "Criar usuário",
   "columns": {
     "email": "E-mail",
     "role": "Papel",
@@ -16,8 +17,16 @@
     "admin": "Admin",
     "user": "Usuário"
   },
+  "form": {
+    "createTitle": "Novo usuário",
+    "email": "E-mail",
+    "role": "Papel",
+    "cancel": "Cancelar",
+    "create": "Criar"
+  },
   "errors": {
     "loadFailed": "não foi possível carregar os usuários",
+    "createFailed": "não foi possível criar o usuário",
     "revokeFailed": "não foi possível revogar a chave"
   }
 }

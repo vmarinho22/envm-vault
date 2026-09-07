@@ -22,6 +22,7 @@ vi.mock('@/modules/token/services/TokenService', () => ({
 }));
 
 const listMock = vi.mocked(userService.list);
+const registerMock = vi.mocked(userService.register);
 const revokeForUserMock = vi.mocked(tokenService.revokeForUser);
 
 const session = {
@@ -32,6 +33,7 @@ const session = {
 describe('UsersView (component)', () => {
   beforeEach(() => {
     listMock.mockReset();
+    registerMock.mockReset();
     revokeForUserMock.mockReset();
     listMock.mockResolvedValue([
       {
@@ -54,9 +56,57 @@ describe('UsersView (component)', () => {
     await flushPromises();
 
     expect(wrapper.get('h1').text()).toBe('Usuários');
+    expect(wrapper.text()).toContain('Criar usuário');
     expect(wrapper.text()).toContain('admin@example.com');
     expect(wrapper.text()).toContain('ev_adminxxx');
     expect(wrapper.text()).toContain('Sem chave');
+    expectComponentSnapshot(wrapper);
+  });
+
+  it('creates a user and reloads the list', async () => {
+    registerMock.mockResolvedValue({
+      id: '3',
+      email: 'new@example.com',
+      role: 'user',
+    });
+    listMock
+      .mockResolvedValueOnce([
+        {
+          id: '1',
+          email: 'admin@example.com',
+          role: 'super_admin',
+          token: { prefix: 'ev_adminxxx', created_at: '2026-01-01T00:00:00Z' },
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          id: '1',
+          email: 'admin@example.com',
+          role: 'super_admin',
+          token: { prefix: 'ev_adminxxx', created_at: '2026-01-01T00:00:00Z' },
+        },
+        {
+          id: '3',
+          email: 'new@example.com',
+          role: 'user',
+          token: null,
+        },
+      ]);
+
+    const { wrapper } = await mountComponent(UsersView, { session });
+    await flushPromises();
+
+    await wrapper.get('button.btn-primary').trigger('click');
+    await flushPromises();
+
+    const dialog = wrapper.get('#user-form-modal');
+    await dialog.get('input[type="email"]').setValue('new@example.com');
+    await dialog.get('select').setValue('admin');
+    await dialog.get('form').trigger('submit');
+    await flushPromises();
+
+    expect(registerMock).toHaveBeenCalledWith('new@example.com', 'admin');
+    expect(wrapper.text()).toContain('new@example.com');
     expectComponentSnapshot(wrapper);
   });
 
