@@ -128,7 +128,6 @@ describe('ProjectsView (component)', () => {
 
     expect(wrapper.get('h1').text()).toBe('Projetos');
     expect(wrapper.text()).toContain('Payment');
-    expect(wrapper.text()).toContain('payment');
     expect(wrapper.text()).toContain('Platform');
     expect(wrapper.text()).toContain('Criar projeto');
     expect(wrapper.get('button[aria-label="Editar"]')).toBeTruthy();

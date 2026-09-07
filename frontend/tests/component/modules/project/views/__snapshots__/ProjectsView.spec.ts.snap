@@ -39,12 +39,9 @@ exports[`ProjectsView (component) > hides delete for standard user but keeps cre
       <thead>
         <tr>
           <th>Título</th>
-          <th>Slug</th>
           <th>Times</th>
           <th>Tags</th>
-          <th>Ambientes</th>
           <th>Criado em</th>
-          <th>Atualizado em</th>
           <th><span class="sr-only">Ações</span></th>
         </tr>
       </thead>
@@ -52,18 +49,13 @@ exports[`ProjectsView (component) > hides delete for standard user but keeps cre
         <!--v-if-->
         <tr>
           <td>Payment</td>
-          <td class="font-mono text-sm">payment</td>
           <td><span class="flex flex-wrap gap-1"><span class="badge badge-ghost badge-sm">Platform</span>
             <!--v-if--></span>
           </td>
           <td><span class="flex flex-wrap gap-1"><span class="badge badge-sm gap-1 border border-base-300"><span class="inline-block size-2 rounded-full" style="background-color: rgb(0, 0, 0);" aria-hidden="true"></span> backend</span>
             <!--v-if--></span>
           </td>
-          <td><span class="flex flex-wrap gap-1"><span class="badge badge-outline badge-sm">dev</span>
-            <!--v-if--></span>
-          </td>
           <td>12/31/2025</td>
-          <td>01/01/2026</td>
           <td class="text-right">
             <div class="flex justify-end gap-1"><button class="btn btn-ghost btn-square btn-sm" type="button" aria-label="Editar"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
                   <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"></path>
@@ -159,12 +151,9 @@ exports[`ProjectsView (component) > lets admin create environment from project f
       <thead>
         <tr>
           <th>Título</th>
-          <th>Slug</th>
           <th>Times</th>
           <th>Tags</th>
-          <th>Ambientes</th>
           <th>Criado em</th>
-          <th>Atualizado em</th>
           <th><span class="sr-only">Ações</span></th>
         </tr>
       </thead>
@@ -172,18 +161,13 @@ exports[`ProjectsView (component) > lets admin create environment from project f
         <!--v-if-->
         <tr>
           <td>Payment</td>
-          <td class="font-mono text-sm">payment</td>
           <td><span class="flex flex-wrap gap-1"><span class="badge badge-ghost badge-sm">Platform</span>
             <!--v-if--></span>
           </td>
           <td><span class="flex flex-wrap gap-1"><span class="badge badge-sm gap-1 border border-base-300"><span class="inline-block size-2 rounded-full" style="background-color: rgb(0, 0, 0);" aria-hidden="true"></span> backend</span>
             <!--v-if--></span>
           </td>
-          <td><span class="flex flex-wrap gap-1"><span class="badge badge-outline badge-sm">dev</span>
-            <!--v-if--></span>
-          </td>
           <td>12/31/2025</td>
-          <td>01/01/2026</td>
           <td class="text-right">
             <div class="flex justify-end gap-1"><button class="btn btn-ghost btn-square btn-sm" type="button" aria-label="Editar"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
                   <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"></path>
@@ -281,12 +265,9 @@ exports[`ProjectsView (component) > lets admin create team from project form and
       <thead>
         <tr>
           <th>Título</th>
-          <th>Slug</th>
           <th>Times</th>
           <th>Tags</th>
-          <th>Ambientes</th>
           <th>Criado em</th>
-          <th>Atualizado em</th>
           <th><span class="sr-only">Ações</span></th>
         </tr>
       </thead>
@@ -294,18 +275,13 @@ exports[`ProjectsView (component) > lets admin create team from project form and
         <!--v-if-->
         <tr>
           <td>Payment</td>
-          <td class="font-mono text-sm">payment</td>
           <td><span class="flex flex-wrap gap-1"><span class="badge badge-ghost badge-sm">Platform</span>
             <!--v-if--></span>
           </td>
           <td><span class="flex flex-wrap gap-1"><span class="badge badge-sm gap-1 border border-base-300"><span class="inline-block size-2 rounded-full" style="background-color: rgb(0, 0, 0);" aria-hidden="true"></span> backend</span>
             <!--v-if--></span>
           </td>
-          <td><span class="flex flex-wrap gap-1"><span class="badge badge-outline badge-sm">dev</span>
-            <!--v-if--></span>
-          </td>
           <td>12/31/2025</td>
-          <td>01/01/2026</td>
           <td class="text-right">
             <div class="flex justify-end gap-1"><button class="btn btn-ghost btn-square btn-sm" type="button" aria-label="Editar"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
                   <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"></path>
@@ -403,12 +379,9 @@ exports[`ProjectsView (component) > renders projects with create/edit and delete
       <thead>
         <tr>
           <th>Título</th>
-          <th>Slug</th>
           <th>Times</th>
           <th>Tags</th>
-          <th>Ambientes</th>
           <th>Criado em</th>
-          <th>Atualizado em</th>
           <th><span class="sr-only">Ações</span></th>
         </tr>
       </thead>
@@ -416,18 +389,13 @@ exports[`ProjectsView (component) > renders projects with create/edit and delete
         <!--v-if-->
         <tr>
           <td>Payment</td>
-          <td class="font-mono text-sm">payment</td>
           <td><span class="flex flex-wrap gap-1"><span class="badge badge-ghost badge-sm">Platform</span>
             <!--v-if--></span>
           </td>
           <td><span class="flex flex-wrap gap-1"><span class="badge badge-sm gap-1 border border-base-300"><span class="inline-block size-2 rounded-full" style="background-color: rgb(0, 0, 0);" aria-hidden="true"></span> backend</span>
             <!--v-if--></span>
           </td>
-          <td><span class="flex flex-wrap gap-1"><span class="badge badge-outline badge-sm">dev</span>
-            <!--v-if--></span>
-          </td>
           <td>12/31/2025</td>
-          <td>01/01/2026</td>
           <td class="text-right">
             <div class="flex justify-end gap-1"><button class="btn btn-ghost btn-square btn-sm" type="button" aria-label="Editar"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
                   <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"></path>
@@ -522,18 +490,15 @@ exports[`ProjectsView (component) > searches by title via API 1`] = `
       <thead>
         <tr>
           <th>Título</th>
-          <th>Slug</th>
           <th>Times</th>
           <th>Tags</th>
-          <th>Ambientes</th>
           <th>Criado em</th>
-          <th>Atualizado em</th>
           <th><span class="sr-only">Ações</span></th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td colspan="8" class="text-base-content/70">Nenhum projeto encontrado para essa busca.</td>
+          <td colspan="5" class="text-base-content/70">Nenhum projeto encontrado para essa busca.</td>
         </tr>
       </tbody>
     </table>
@@ -622,12 +587,9 @@ exports[`ProjectsView (component) > shows catalog add buttons by role and create
       <thead>
         <tr>
           <th>Título</th>
-          <th>Slug</th>
           <th>Times</th>
           <th>Tags</th>
-          <th>Ambientes</th>
           <th>Criado em</th>
-          <th>Atualizado em</th>
           <th><span class="sr-only">Ações</span></th>
         </tr>
       </thead>
@@ -635,18 +597,13 @@ exports[`ProjectsView (component) > shows catalog add buttons by role and create
         <!--v-if-->
         <tr>
           <td>Payment</td>
-          <td class="font-mono text-sm">payment</td>
           <td><span class="flex flex-wrap gap-1"><span class="badge badge-ghost badge-sm">Platform</span>
             <!--v-if--></span>
           </td>
           <td><span class="flex flex-wrap gap-1"><span class="badge badge-sm gap-1 border border-base-300"><span class="inline-block size-2 rounded-full" style="background-color: rgb(0, 0, 0);" aria-hidden="true"></span> backend</span>
             <!--v-if--></span>
           </td>
-          <td><span class="flex flex-wrap gap-1"><span class="badge badge-outline badge-sm">dev</span>
-            <!--v-if--></span>
-          </td>
           <td>12/31/2025</td>
-          <td>01/01/2026</td>
           <td class="text-right">
             <div class="flex justify-end gap-1"><button class="btn btn-ghost btn-square btn-sm" type="button" aria-label="Editar"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
                   <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"></path>

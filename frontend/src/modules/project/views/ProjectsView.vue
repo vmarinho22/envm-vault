@@ -132,12 +132,9 @@ onMounted(() => {
         <thead>
           <tr>
             <th>{{ t('projects.columns.title') }}</th>
-            <th>{{ t('projects.columns.slug') }}</th>
             <th>{{ t('projects.columns.teams') }}</th>
             <th>{{ t('projects.columns.tags') }}</th>
-            <th>{{ t('projects.columns.environments') }}</th>
             <th>{{ t('projects.columns.createdAt') }}</th>
-            <th>{{ t('projects.columns.updatedAt') }}</th>
             <th>
               <span class="sr-only">{{ t('projects.columns.actions') }}</span>
             </th>
@@ -145,13 +142,12 @@ onMounted(() => {
         </thead>
         <tbody>
           <tr v-if="projects.length === 0">
-            <td colspan="8" class="text-base-content/70">
+            <td colspan="5" class="text-base-content/70">
               {{ hasActiveSearch ? t('projects.emptySearch') : t('projects.empty') }}
             </td>
           </tr>
           <tr v-for="project in projects" :key="project.id">
             <td>{{ project.title }}</td>
-            <td class="font-mono text-sm">{{ project.slug }}</td>
             <td>
               <span class="flex flex-wrap gap-1">
                 <span v-for="team in project.teams" :key="team.id" class="badge badge-ghost badge-sm">
@@ -177,20 +173,7 @@ onMounted(() => {
                 <span v-if="project.tags.length === 0">{{ t('common.emDash') }}</span>
               </span>
             </td>
-            <td>
-              <span class="flex flex-wrap gap-1">
-                <span
-                  v-for="env in project.environments"
-                  :key="env.id"
-                  class="badge badge-outline badge-sm"
-                >
-                  {{ env.title }}
-                </span>
-                <span v-if="project.environments.length === 0">{{ t('common.emDash') }}</span>
-              </span>
-            </td>
             <td>{{ formatDate(project.created_at) }}</td>
-            <td>{{ formatDate(project.updated_at) }}</td>
             <td class="text-right">
               <div class="flex justify-end gap-1">
                 <button
