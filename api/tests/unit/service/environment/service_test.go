@@ -86,3 +86,20 @@ func TestDelete_InvalidEnvironmentID(t *testing.T) {
 		t.Errorf("Delete() error = %v, want ErrEnvironmentNotFound", err)
 	}
 }
+
+func TestAssertMutableEnvironment_ProductionProtected(t *testing.T) {
+	cases := []struct {
+		title string
+		want  error
+	}{
+		{title: service.ProductionEnvironmentTitle, want: service.ErrProductionEnvironmentProtected},
+		{title: "dev", want: nil},
+		{title: "staging", want: nil},
+	}
+	for _, tc := range cases {
+		err := environment.AssertMutableEnvironment(tc.title)
+		if err != tc.want {
+			t.Errorf("AssertMutableEnvironment(%q) = %v, want %v", tc.title, err, tc.want)
+		}
+	}
+}

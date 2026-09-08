@@ -13,7 +13,7 @@ Read [docs/architecture.md](../../docs/architecture.md) for the full specificati
 Central hub with unique `title` and unique `slug` (business key for `/project/<slug>`). Many-to-many with Teams, Environments, and Tags. Any authenticated user may create/update; only `admin` / `super_admin` may delete. Owns Secrets.
 
 ### Environment
-Global catalog of deployment targets with unique `title` (e.g. `dev`, `staging`, `production`). Linked to projects via M2M. Any authenticated user may list/search; only `admin` / `super_admin` mutate. Seeded defaults: `dev`, `test`, `staging`, `production`.
+Global catalog of deployment targets with unique `title` (e.g. `dev`, `staging`, `production`). Linked to projects via M2M. Any authenticated user may list/search; only `admin` / `super_admin` mutate. Seeded `production` cannot be renamed or deleted. Seeded defaults: `dev`, `test`, `staging`, `production`.
 
 ### Secret (EnvVar)
 A named key scoped to a **Project** (`secrets` table). Values live in `secret_values` per Environment (sparse). Values encrypted at rest (AES-256-GCM, `ENCRYPTION_KEY`). Unique `(project_id, name)`.

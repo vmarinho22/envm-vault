@@ -12,6 +12,9 @@ const (
 	RoleSuperAdmin = "super_admin"
 	RoleAdmin      = "admin"
 	RoleUser       = "user"
+
+	// ProductionEnvironmentTitle is the protected catalog environment title.
+	ProductionEnvironmentTitle = "production"
 )
 
 type UserResponse struct {

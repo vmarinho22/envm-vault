@@ -20,12 +20,11 @@ import (
 )
 
 const (
-	maxSecretNameLen           = 128
-	productionEnvironmentTitle = "production"
+	maxSecretNameLen = 128
 )
 
 func assertProductionDownloadAllowed(actorRole, envTitle string) error {
-	if envTitle == productionEnvironmentTitle && actorRole != service.RoleSuperAdmin {
+	if envTitle == service.ProductionEnvironmentTitle && actorRole != service.RoleSuperAdmin {
 		return service.ErrProductionDownloadForbidden
 	}
 	return nil

@@ -4,6 +4,7 @@
   "create": "Criar ambiente",
   "edit": "Editar",
   "delete": "Excluir",
+  "protected": "O ambiente production não pode ser editado nem excluído.",
   "empty": "Nenhum ambiente cadastrado.",
   "emptySearch": "Nenhum ambiente encontrado para essa busca.",
   "confirmDelete": "Excluir o ambiente \"{title}\"? Esta ação não pode ser desfeita.",

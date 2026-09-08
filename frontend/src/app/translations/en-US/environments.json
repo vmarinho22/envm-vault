@@ -4,6 +4,7 @@
   "create": "Create environment",
   "edit": "Edit",
   "delete": "Delete",
+  "protected": "The production environment cannot be edited or deleted.",
   "empty": "No environments yet.",
   "emptySearch": "No environments matched that search.",
   "confirmDelete": "Delete environment \"{title}\"? This cannot be undone.",

@@ -32,6 +32,12 @@ const sampleEnvironments = [
     created_at: '2026-01-01T00:00:00Z',
     updated_at: '2026-01-02T00:00:00Z',
   },
+  {
+    id: 'e2',
+    title: 'production',
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-02T00:00:00Z',
+  },
 ];
 
 describe('EnvironmentsView (component)', () => {
@@ -46,9 +52,14 @@ describe('EnvironmentsView (component)', () => {
 
     expect(wrapper.get('h1').text()).toBe('Ambientes');
     expect(wrapper.text()).toContain('dev');
+    expect(wrapper.text()).toContain('production');
     expect(wrapper.text()).toContain('Criar ambiente');
-    expect(wrapper.get('button[aria-label="Editar"]')).toBeTruthy();
-    expect(wrapper.get('button[aria-label="Excluir"]')).toBeTruthy();
+    const editButtons = wrapper.findAll('button[aria-label="Editar"]');
+    const deleteButtons = wrapper.findAll('button[aria-label="Excluir"]');
+    expect(editButtons).toHaveLength(2);
+    expect(deleteButtons).toHaveLength(2);
+    expect(editButtons[1]?.attributes('disabled')).toBeDefined();
+    expect(deleteButtons[1]?.attributes('disabled')).toBeDefined();
     expectComponentSnapshot(wrapper);
   });
 

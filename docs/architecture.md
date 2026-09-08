@@ -59,8 +59,8 @@ The API lives in `api/` and provides authentication via email OTP plus a unique 
 | `DELETE` | `/v1/tags/:id` | JWT | Delete tag |
 | `GET` | `/v1/environments` | JWT | List environments (optional `?title=` substring filter) |
 | `POST` | `/v1/environments` | JWT (admin+) | Create environment (title) |
-| `PATCH` | `/v1/environments/:id` | JWT (admin+) | Update environment title |
-| `DELETE` | `/v1/environments/:id` | JWT (admin+) | Delete environment |
+| `PATCH` | `/v1/environments/:id` | JWT (admin+) | Update environment title (`production` is protected) |
+| `DELETE` | `/v1/environments/:id` | JWT (admin+) | Delete environment (`production` is protected) |
 | `GET` | `/v1/projects` | JWT | List projects (filters + page size 12) |
 | `GET` | `/v1/projects/by-slug/:slug` | JWT | Get project by unique slug |
 | `POST` | `/v1/projects` | JWT | Create project (title + teams + environments + tags) |
@@ -98,7 +98,7 @@ A project groups teams, catalog environments, and tags. Fields: unique `title`, 
 
 ### Environment
 
-A global catalog of deployment targets with a unique `title` (e.g. `dev`, `staging`, `production`). Any authenticated user can list/search; only `admin` / `super_admin` can create, update, or delete. Seeded defaults: `dev`, `test`, `staging`, `production`. Linked to projects via M2M.
+A global catalog of deployment targets with a unique `title` (e.g. `dev`, `staging`, `production`). Any authenticated user can list/search; only `admin` / `super_admin` can create, update, or delete. The seeded `production` environment cannot be renamed or deleted. Seeded defaults: `dev`, `test`, `staging`, `production`. Linked to projects via M2M.
 
 ### Secret / EnvVar
 

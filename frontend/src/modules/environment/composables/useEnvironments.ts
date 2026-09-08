@@ -29,6 +29,10 @@ export function useEnvironments() {
   const canMutate = computed(() => auth.isAdmin);
   const hasActiveSearch = computed(() => appliedTitle.value.trim() !== '');
 
+  function isProtectedEnvironment(environment: Environment): boolean {
+    return environment.title === 'production';
+  }
+
   function toErrorMessage(err: unknown, fallback: string): string {
     if (err instanceof ApiError) {
       return err.message;
@@ -67,6 +71,7 @@ export function useEnvironments() {
   }
 
   function openEdit(environment: Environment): void {
+    if (!canMutate.value || isProtectedEnvironment(environment)) return;
     editing.value = environment;
     formTitle.value = environment.title;
     formOpen.value = true;
@@ -79,6 +84,7 @@ export function useEnvironments() {
 
   async function submitForm(): Promise<void> {
     if (!canMutate.value) return;
+    if (editing.value && isProtectedEnvironment(editing.value)) return;
     error.value = null;
     mutating.value = true;
     try {
@@ -108,7 +114,7 @@ export function useEnvironments() {
   }
 
   async function removeEnvironment(environment: Environment): Promise<void> {
-    if (!canMutate.value) return;
+    if (!canMutate.value || isProtectedEnvironment(environment)) return;
     const ok = await confirm({
       title: t('environments.delete'),
       message: t('environments.confirmDelete', { title: environment.title }),
@@ -146,6 +152,7 @@ export function useEnvironments() {
     editing,
     formTitle,
     canMutate,
+    isProtectedEnvironment,
     init,
     fetchEnvironments,
     applySearch,

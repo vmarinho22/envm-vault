@@ -18,6 +18,7 @@ const {
   editing,
   formTitle,
   canMutate,
+  isProtectedEnvironment,
   init,
   applySearch,
   clearSearch,
@@ -112,8 +113,13 @@ onMounted(() => {
                 <button
                   class="btn btn-ghost btn-square btn-sm"
                   type="button"
-                  :disabled="mutating"
+                  :disabled="mutating || isProtectedEnvironment(environment)"
                   :aria-label="t('environments.edit')"
+                  :title="
+                    isProtectedEnvironment(environment)
+                      ? t('environments.protected')
+                      : t('environments.edit')
+                  "
                   @click="openEdit(environment)"
                 >
                   <PencilSquareIcon class="size-4" aria-hidden="true" />
@@ -121,8 +127,13 @@ onMounted(() => {
                 <button
                   class="btn btn-error btn-outline btn-square btn-sm"
                   type="button"
-                  :disabled="mutating"
+                  :disabled="mutating || isProtectedEnvironment(environment)"
                   :aria-label="t('environments.delete')"
+                  :title="
+                    isProtectedEnvironment(environment)
+                      ? t('environments.protected')
+                      : t('environments.delete')
+                  "
                   @click="removeEnvironment(environment)"
                 >
                   <TrashIcon class="size-4" aria-hidden="true" />

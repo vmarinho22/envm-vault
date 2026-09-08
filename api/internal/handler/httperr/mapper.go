@@ -91,6 +91,8 @@ func Write(c *fiber.Ctx, err error) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "environment query parameter is required"})
 	case errors.Is(err, service.ErrProductionDownloadForbidden):
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "only super_admin can download production environment"})
+	case errors.Is(err, service.ErrProductionEnvironmentProtected):
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "production environment cannot be modified or deleted"})
 	default:
 		log.Printf("unhandled error method=%s path=%s: %v", c.Method(), c.Path(), err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "internal server error"})

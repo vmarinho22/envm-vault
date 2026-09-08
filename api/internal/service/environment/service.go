@@ -49,6 +49,13 @@ func requireAdmin(role string) error {
 	return nil
 }
 
+func AssertMutableEnvironment(title string) error {
+	if title == service.ProductionEnvironmentTitle {
+		return service.ErrProductionEnvironmentProtected
+	}
+	return nil
+}
+
 func normalizeTitle(raw string) (string, error) {
 	title := strings.TrimSpace(raw)
 	if title == "" || utf8.RuneCountInString(title) > maxEnvironmentTitleLen {
@@ -136,6 +143,10 @@ func (s *Service) Update(ctx context.Context, actorID, actorEmail, actorRole, en
 		return &resp, nil
 	}
 
+	if err := AssertMutableEnvironment(environment.Title); err != nil {
+		return nil, err
+	}
+
 	normalizedTitle, titleErr := normalizeTitle(*title)
 	if titleErr != nil {
 		return nil, titleErr
@@ -177,10 +188,14 @@ func (s *Service) Delete(ctx context.Context, actorID, actorEmail, actorRole, en
 		return service.ErrEnvironmentNotFound
 	}
 
-	if _, err := s.environments.FindByID(ctx, id); err != nil {
+	environment, err := s.environments.FindByID(ctx, id)
+	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return service.ErrEnvironmentNotFound
 		}
+		return err
+	}
+	if err := AssertMutableEnvironment(environment.Title); err != nil {
 		return err
 	}
 
