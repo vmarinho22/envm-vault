@@ -1,7 +1,9 @@
 package router_test
 
 import (
+	"io"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	audithandler "github.com/envm-vault/envm-vault/api/internal/handler/audit"
@@ -130,7 +132,9 @@ func TestRegister_DownloadRequiresAPIKey(t *testing.T) {
 		middleware.NewAPIKeyMiddleware(nil, nil, nil),
 	))
 
+	// Non-ev_ bearer must hit APIKey (prefix check), not JWT parse.
 	req := httptest.NewRequest(fiber.MethodGet, "/v1/projects/my-app/env?environment=dev", nil)
+	req.Header.Set("Authorization", "Bearer not-an-api-key")
 	resp, err := app.Test(req, -1)
 	if err != nil {
 		t.Fatalf("request: %v", err)
@@ -139,5 +143,17 @@ func TestRegister_DownloadRequiresAPIKey(t *testing.T) {
 
 	if resp.StatusCode != fiber.StatusUnauthorized {
 		t.Fatalf("status = %d, want %d", resp.StatusCode, fiber.StatusUnauthorized)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatalf("read body: %v", err)
+	}
+	got := string(body)
+	if !strings.Contains(got, "invalid or revoked access token") {
+		t.Fatalf("body = %q, want API-key error (not JWT)", got)
+	}
+	if strings.Contains(got, "invalid or expired token") {
+		t.Fatalf("download hit JWT middleware: %q", got)
 	}
 }
