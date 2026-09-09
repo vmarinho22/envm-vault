@@ -6,5 +6,6 @@ import (
 
 func registerSecretRoutes(v1 fiber.Router, deps Deps) {
 	secrets := v1.Group("/secrets", deps.JWT.Protect())
-	secrets.Get("", deps.Secret.SearchCatalog)
+	secrets.Get("", deps.Secret.ListCatalog)
+	secrets.Get("/:id", deps.Secret.GetCatalog)
 }

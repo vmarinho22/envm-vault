@@ -128,7 +128,7 @@ describe('ProjectsView (component)', () => {
   });
 
   it('renders projects with create/edit and delete for admin', async () => {
-    const { wrapper } = await mountComponent(ProjectsView, {
+    const { wrapper, router } = await mountComponent(ProjectsView, {
       session: adminSession,
       routes: projectRoutes,
     });
@@ -140,6 +140,12 @@ describe('ProjectsView (component)', () => {
     expect(wrapper.text()).toContain('Criar projeto');
     expect(wrapper.get('button[aria-label="Editar"]')).toBeTruthy();
     expect(wrapper.get('button[aria-label="Excluir"]')).toBeTruthy();
+
+    await wrapper.get('tbody tr[role="link"]').trigger('click');
+    await flushPromises();
+    expect(router.currentRoute.value.name).toBe('project-detail');
+    expect(router.currentRoute.value.params.slug).toBe('payment');
+
     expectComponentSnapshot(wrapper);
   });
 

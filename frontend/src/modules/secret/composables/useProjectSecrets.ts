@@ -97,10 +97,11 @@ export function useProjectSecrets() {
     }
     catalogSearching.value = true;
     try {
-      const resp = await secretService.search({
+      const resp = await secretService.listCatalog({
         title: term,
         excludeProjectId: project.value.id,
-        limit: 20,
+        page: 1,
+        pageSize: 20,
       });
       catalogHits.value = resp.items;
     } catch {
@@ -136,10 +137,11 @@ export function useProjectSecrets() {
     error.value = null;
     catalogSearching.value = true;
     try {
-      const resp = await secretService.search({
+      const resp = await secretService.listCatalog({
         title: term,
         excludeProjectId: project.value.id,
-        limit: 20,
+        page: 1,
+        pageSize: 20,
       });
       catalogHits.value = resp.items;
       if (resp.items.length === 0) {

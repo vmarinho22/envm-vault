@@ -21,9 +21,9 @@ import (
 )
 
 const (
-	maxSecretNameLen   = 128
-	defaultSearchLimit = 20
-	maxSearchLimit     = 50
+	maxSecretNameLen      = 128
+	DefaultCatalogPageSize = 12
+	maxTypeaheadPageSize   = 50
 )
 
 func assertProductionDownloadAllowed(actorRole, envTitle string) error {
@@ -82,8 +82,27 @@ type CatalogItem struct {
 	UpdatedAt    time.Time `json:"updated_at"`
 }
 
-type CatalogSearchResponse struct {
-	Items []CatalogItem `json:"items"`
+type CatalogListResponse struct {
+	Items    []CatalogItem `json:"items"`
+	Page     int           `json:"page"`
+	PageSize int           `json:"page_size"`
+	Total    int64         `json:"total"`
+}
+
+type ProjectLink struct {
+	ID    string `json:"id"`
+	Title string `json:"title"`
+	Slug  string `json:"slug"`
+}
+
+type CatalogDetailResponse struct {
+	ID           string               `json:"id"`
+	Name         string               `json:"name"`
+	ProjectCount int64                `json:"project_count"`
+	Values       map[string]ValueMeta `json:"values"`
+	Projects     []ProjectLink        `json:"projects"`
+	CreatedAt    time.Time            `json:"created_at"`
+	UpdatedAt    time.Time            `json:"updated_at"`
 }
 
 type RevealResponse struct {
@@ -174,22 +193,10 @@ func (s *Service) responseFor(ctx context.Context, secret model.Secret, project 
 	return &resp, nil
 }
 
-func (s *Service) Search(
+func (s *Service) ListCatalog(
 	ctx context.Context,
-	titleQuery, excludeProjectIDRaw, limitRaw string,
-) (*CatalogSearchResponse, error) {
-	limit := defaultSearchLimit
-	if strings.TrimSpace(limitRaw) != "" {
-		n, err := strconv.Atoi(strings.TrimSpace(limitRaw))
-		if err != nil || n < 1 {
-			limit = defaultSearchLimit
-		} else if n > maxSearchLimit {
-			limit = maxSearchLimit
-		} else {
-			limit = n
-		}
-	}
-
+	titleQuery, excludeProjectIDRaw, pageRaw, pageSizeRaw string,
+) (*CatalogListResponse, error) {
 	var excludeID *uuid.UUID
 	if raw := strings.TrimSpace(excludeProjectIDRaw); raw != "" {
 		id, err := uuid.Parse(raw)
@@ -205,7 +212,35 @@ func (s *Service) Search(
 		excludeID = &id
 	}
 
-	secrets, err := s.secrets.Search(ctx, titleQuery, excludeID, limit)
+	page := 1
+	if strings.TrimSpace(pageRaw) != "" {
+		n, err := strconv.Atoi(strings.TrimSpace(pageRaw))
+		if err == nil && n >= 1 {
+			page = n
+		}
+	}
+
+	maxSize := DefaultCatalogPageSize
+	if excludeID != nil {
+		maxSize = maxTypeaheadPageSize
+	}
+	pageSize := DefaultCatalogPageSize
+	if strings.TrimSpace(pageSizeRaw) != "" {
+		n, err := strconv.Atoi(strings.TrimSpace(pageSizeRaw))
+		if err == nil && n >= 1 {
+			pageSize = n
+		}
+	}
+	if pageSize > maxSize {
+		pageSize = maxSize
+	}
+
+	secrets, total, err := s.secrets.ListCatalog(ctx, repository.SecretCatalogFilter{
+		TitleQuery:       titleQuery,
+		ExcludeProjectID: excludeID,
+		Page:             page,
+		PageSize:         pageSize,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -224,7 +259,57 @@ func (s *Service) Search(
 			UpdatedAt:    sec.UpdatedAt,
 		})
 	}
-	return &CatalogSearchResponse{Items: items}, nil
+	return &CatalogListResponse{
+		Items:    items,
+		Page:     page,
+		PageSize: pageSize,
+		Total:    total,
+	}, nil
+}
+
+func (s *Service) GetCatalog(
+	ctx context.Context,
+	secretID string,
+) (*CatalogDetailResponse, error) {
+	sid, err := uuid.Parse(strings.TrimSpace(secretID))
+	if err != nil {
+		return nil, service.ErrSecretNotFound
+	}
+	secret, err := s.secrets.FindByID(ctx, sid)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, service.ErrSecretNotFound
+		}
+		return nil, err
+	}
+	projects, err := s.secrets.ListProjectsBySecretID(ctx, sid)
+	if err != nil {
+		return nil, err
+	}
+	links := make([]ProjectLink, 0, len(projects))
+	for _, p := range projects {
+		links = append(links, ProjectLink{
+			ID:    p.ID.String(),
+			Title: p.Title,
+			Slug:  p.Slug,
+		})
+	}
+	values := make(map[string]ValueMeta, len(secret.Values))
+	for _, v := range secret.Values {
+		values[v.EnvironmentID.String()] = ValueMeta{
+			HasValue:  true,
+			UpdatedAt: v.UpdatedAt,
+		}
+	}
+	return &CatalogDetailResponse{
+		ID:           secret.ID.String(),
+		Name:         secret.Name,
+		ProjectCount: int64(len(links)),
+		Values:       values,
+		Projects:     links,
+		CreatedAt:    secret.CreatedAt,
+		UpdatedAt:    secret.UpdatedAt,
+	}, nil
 }
 
 func (s *Service) List(ctx context.Context, projectID string) (*ListResponse, error) {

@@ -11,6 +11,8 @@ import TagsView from '@/modules/tag/views/TagsView.vue';
 import EnvironmentsView from '@/modules/environment/views/EnvironmentsView.vue';
 import ProjectsView from '@/modules/project/views/ProjectsView.vue';
 import ProjectDetailView from '@/modules/secret/views/ProjectDetailView.vue';
+import SecretsView from '@/modules/secret/views/SecretsView.vue';
+import SecretDetailView from '@/modules/secret/views/SecretDetailView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -60,6 +62,16 @@ const router = createRouter({
           path: 'environments',
           name: 'environments',
           component: EnvironmentsView,
+        },
+        {
+          path: 'secrets',
+          name: 'secrets',
+          component: SecretsView,
+        },
+        {
+          path: 'secrets/:id',
+          name: 'secret-detail',
+          component: SecretDetailView,
         },
         {
           path: 'users',

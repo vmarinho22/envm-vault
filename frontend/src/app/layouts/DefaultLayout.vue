@@ -5,6 +5,7 @@ import {
   CubeTransparentIcon,
   HomeIcon,
   KeyIcon,
+  LockClosedIcon,
   TagIcon,
   UserGroupIcon,
   UsersIcon,
@@ -79,6 +80,14 @@ function logout(): void {
         >
           <CubeTransparentIcon class="size-5 shrink-0" aria-hidden="true" />
           {{ t('nav.environments') }}
+        </RouterLink>
+        <RouterLink
+          :to="{ name: 'secrets' }"
+          :class="navLinkClass"
+          :exact-active-class="navActiveClass"
+        >
+          <LockClosedIcon class="size-5 shrink-0" aria-hidden="true" />
+          {{ t('nav.secrets') }}
         </RouterLink>
         <RouterLink
           v-if="auth.isAdmin"

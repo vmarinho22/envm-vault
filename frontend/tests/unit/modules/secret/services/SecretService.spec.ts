@@ -33,12 +33,31 @@ describe('secretService', () => {
     expect(requestMock).toHaveBeenCalledWith('/v1/projects/proj-1/secrets');
   });
 
-  it('search hits catalog with query params', async () => {
-    requestMock.mockResolvedValue({ items: [] });
-    await secretService.search({ title: 'DB', excludeProjectId: 'p1', limit: 10 });
+  it('listCatalog hits catalog with pagination params', async () => {
+    requestMock.mockResolvedValue({ items: [], page: 1, page_size: 12, total: 0 });
+    await secretService.listCatalog({
+      title: 'DB',
+      excludeProjectId: 'p1',
+      page: 1,
+      pageSize: 20,
+    });
     expect(requestMock).toHaveBeenCalledWith(
-      '/v1/secrets?title=DB&exclude_project_id=p1&limit=10',
+      '/v1/secrets?title=DB&exclude_project_id=p1&page=1&page_size=20',
     );
+  });
+
+  it('getById hits catalog detail path', async () => {
+    requestMock.mockResolvedValue({
+      id: 's1',
+      name: 'X',
+      project_count: 0,
+      values: {},
+      projects: [],
+      created_at: '',
+      updated_at: '',
+    });
+    await secretService.getById('s1');
+    expect(requestMock).toHaveBeenCalledWith('/v1/secrets/s1');
   });
 
   it('attach posts secret_id', async () => {

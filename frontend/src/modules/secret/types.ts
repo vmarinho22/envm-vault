@@ -1,3 +1,5 @@
+export const SECRET_PAGE_SIZE = 12;
+
 export interface SecretValueMeta {
   has_value: boolean;
   updated_at?: string;
@@ -24,14 +26,34 @@ export interface CatalogSecret {
   updated_at: string;
 }
 
-export interface CatalogSearchResponse {
+export interface CatalogListResponse {
   items: CatalogSecret[];
+  page: number;
+  page_size: number;
+  total: number;
 }
 
-export interface SearchSecretsParams {
+export interface CatalogListParams {
   title?: string;
   excludeProjectId?: string;
-  limit?: number;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface SecretProjectLink {
+  id: string;
+  title: string;
+  slug: string;
+}
+
+export interface SecretDetail {
+  id: string;
+  name: string;
+  project_count: number;
+  values: Record<string, SecretValueMeta>;
+  projects: SecretProjectLink[];
+  created_at: string;
+  updated_at: string;
 }
 
 export interface CreateSecretInput {

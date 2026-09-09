@@ -2,13 +2,14 @@
 import { PencilSquareIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/outline';
 import { computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { RouterLink } from 'vue-router';
+import { useRouter } from 'vue-router';
 import CatalogMultiSelect from '@/modules/project/components/CatalogMultiSelect.vue';
 import ProjectFormModal from '@/modules/project/components/ProjectFormModal.vue';
 import { useProjects } from '@/modules/project/composables/useProjects';
 import { formatDate } from '@/shared/datetime/format';
 
 const { t } = useI18n();
+const router = useRouter();
 const {
   projects,
   teamOptions,
@@ -65,6 +66,10 @@ const {
 } = useProjects();
 
 const formMode = computed(() => (editing.value ? 'edit' : 'create'));
+
+function openProject(slug: string): void {
+  void router.push({ name: 'project-detail', params: { slug } });
+}
 
 onMounted(() => {
   void init();
@@ -147,15 +152,17 @@ onMounted(() => {
               {{ hasActiveSearch ? t('projects.emptySearch') : t('projects.empty') }}
             </td>
           </tr>
-          <tr v-for="project in projects" :key="project.id">
-            <td>
-              <RouterLink
-                class="link link-hover font-medium"
-                :to="{ name: 'project-detail', params: { slug: project.slug } }"
-              >
-                {{ project.title }}
-              </RouterLink>
-            </td>
+          <tr
+            v-for="project in projects"
+            :key="project.id"
+            class="cursor-pointer transition-colors hover:bg-base-200/70"
+            tabindex="0"
+            role="link"
+            :aria-label="project.title"
+            @click="openProject(project.slug)"
+            @keydown.enter.prevent="openProject(project.slug)"
+          >
+            <td class="font-medium">{{ project.title }}</td>
             <td>
               <span class="flex flex-wrap gap-1">
                 <span v-for="team in project.teams" :key="team.id" class="badge badge-ghost badge-sm">
@@ -182,7 +189,7 @@ onMounted(() => {
               </span>
             </td>
             <td>{{ formatDate(project.created_at) }}</td>
-            <td class="text-right">
+            <td class="text-right" @click.stop @keydown.stop>
               <div class="flex justify-end gap-1">
                 <button
                   class="btn btn-ghost btn-square btn-sm"

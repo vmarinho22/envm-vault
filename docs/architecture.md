@@ -75,7 +75,8 @@ The API lives in `api/` and provides authentication via email OTP plus a unique 
 | `GET` | `/v1/projects/:id/secrets/:secretId/values/:environmentId` | JWT | Reveal one decrypted value |
 | `DELETE` | `/v1/projects/:id/secrets/:secretId/values/:environmentId` | JWT | Clear value for one env (global) |
 | `GET` | `/v1/projects/:id/environments/:environmentId/values` | JWT | Export all values for an env (JSON or `?format=env`); `production` requires `super_admin` |
-| `GET` | `/v1/secrets` | JWT | Search global secret catalog (`?title=`, `?exclude_project_id=`, `?limit=`) |
+| `GET` | `/v1/secrets` | JWT | Paginated global secret catalog (`?title=`, `?page=`, `?page_size=` default 12; `?exclude_project_id=` allows page_size up to 50 for typeahead) |
+| `GET` | `/v1/secrets/:id` | JWT | Secret detail with value meta (no plaintext) and linked projects |
 | `GET` | `/v1/projects/:slug/env` | API key (`ev_…`) | Download env vars via `?environment=<title>` (JSON default; dotenv via `?format=env` or `Accept: text/plain`). Only `super_admin` may download `production`. |
 
 ### Auth Flow

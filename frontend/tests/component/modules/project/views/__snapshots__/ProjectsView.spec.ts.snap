@@ -47,8 +47,8 @@ exports[`ProjectsView (component) > hides delete for standard user but keeps cre
       </thead>
       <tbody>
         <!--v-if-->
-        <tr>
-          <td><a href="/project/payment" class="link link-hover font-medium">Payment</a></td>
+        <tr class="cursor-pointer transition-colors hover:bg-base-200/70" tabindex="0" role="link" aria-label="Payment">
+          <td class="font-medium">Payment</td>
           <td><span class="flex flex-wrap gap-1"><span class="badge badge-ghost badge-sm">Platform</span>
             <!--v-if--></span>
           </td>
@@ -159,8 +159,8 @@ exports[`ProjectsView (component) > lets admin create environment from project f
       </thead>
       <tbody>
         <!--v-if-->
-        <tr>
-          <td><a href="/project/payment" class="link link-hover font-medium">Payment</a></td>
+        <tr class="cursor-pointer transition-colors hover:bg-base-200/70" tabindex="0" role="link" aria-label="Payment">
+          <td class="font-medium">Payment</td>
           <td><span class="flex flex-wrap gap-1"><span class="badge badge-ghost badge-sm">Platform</span>
             <!--v-if--></span>
           </td>
@@ -273,8 +273,8 @@ exports[`ProjectsView (component) > lets admin create team from project form and
       </thead>
       <tbody>
         <!--v-if-->
-        <tr>
-          <td><a href="/project/payment" class="link link-hover font-medium">Payment</a></td>
+        <tr class="cursor-pointer transition-colors hover:bg-base-200/70" tabindex="0" role="link" aria-label="Payment">
+          <td class="font-medium">Payment</td>
           <td><span class="flex flex-wrap gap-1"><span class="badge badge-ghost badge-sm">Platform</span>
             <!--v-if--></span>
           </td>
@@ -387,8 +387,8 @@ exports[`ProjectsView (component) > renders projects with create/edit and delete
       </thead>
       <tbody>
         <!--v-if-->
-        <tr>
-          <td><a href="/project/payment" class="link link-hover font-medium">Payment</a></td>
+        <tr class="cursor-pointer transition-colors hover:bg-base-200/70" tabindex="0" role="link" aria-label="Payment">
+          <td class="font-medium">Payment</td>
           <td><span class="flex flex-wrap gap-1"><span class="badge badge-ghost badge-sm">Platform</span>
             <!--v-if--></span>
           </td>
@@ -595,8 +595,8 @@ exports[`ProjectsView (component) > shows catalog add buttons by role and create
       </thead>
       <tbody>
         <!--v-if-->
-        <tr>
-          <td><a href="/project/payment" class="link link-hover font-medium">Payment</a></td>
+        <tr class="cursor-pointer transition-colors hover:bg-base-200/70" tabindex="0" role="link" aria-label="Payment">
+          <td class="font-medium">Payment</td>
           <td><span class="flex flex-wrap gap-1"><span class="badge badge-ghost badge-sm">Platform</span>
             <!--v-if--></span>
           </td>

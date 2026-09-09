@@ -1,17 +1,19 @@
 import type {
-  CatalogSearchResponse,
+  CatalogListParams,
+  CatalogListResponse,
   CreateSecretInput,
   DownloadItem,
   DownloadResponse,
   RevealSecretResponse,
-  SearchSecretsParams,
   Secret,
+  SecretDetail,
   SecretListResponse,
 } from '@/modules/secret/types';
 import { httpClient } from '@/shared/http';
 
 export interface SecretService {
-  search(params: SearchSecretsParams): Promise<CatalogSearchResponse>;
+  listCatalog(params?: CatalogListParams): Promise<CatalogListResponse>;
+  getById(secretId: string): Promise<SecretDetail>;
   list(projectId: string): Promise<SecretListResponse>;
   create(projectId: string, input: CreateSecretInput): Promise<Secret>;
   attach(projectId: string, secretId: string): Promise<Secret>;
@@ -48,13 +50,18 @@ function quoteDotEnv(value: string): string {
 }
 
 export const secretService: SecretService = {
-  search(params: SearchSecretsParams): Promise<CatalogSearchResponse> {
+  listCatalog(params: CatalogListParams = {}): Promise<CatalogListResponse> {
     const query = new URLSearchParams();
     if (params.title) query.set('title', params.title);
     if (params.excludeProjectId) query.set('exclude_project_id', params.excludeProjectId);
-    if (params.limit != null) query.set('limit', String(params.limit));
+    if (params.page != null) query.set('page', String(params.page));
+    if (params.pageSize != null) query.set('page_size', String(params.pageSize));
     const qs = query.toString();
-    return httpClient.request<CatalogSearchResponse>(`/v1/secrets${qs ? `?${qs}` : ''}`);
+    return httpClient.request<CatalogListResponse>(`/v1/secrets${qs ? `?${qs}` : ''}`);
+  },
+
+  getById(secretId: string): Promise<SecretDetail> {
+    return httpClient.request<SecretDetail>(`/v1/secrets/${secretId}`);
   },
 
   list(projectId: string): Promise<SecretListResponse> {

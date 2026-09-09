@@ -129,32 +129,62 @@ func (r *SecretRepository) CountProjects(ctx context.Context, secretID uuid.UUID
 	return count, nil
 }
 
-// Search catalogs secrets by name substring. When excludeProjectID is set, omits secrets
-// already attached to that project. limit must be > 0.
-func (r *SecretRepository) Search(
-	ctx context.Context,
-	titleQuery string,
-	excludeProjectID *uuid.UUID,
-	limit int,
-) ([]model.Secret, error) {
-	q := r.db.WithContext(ctx).Model(&model.Secret{}).Order("name ASC").Limit(limit)
-	if term := strings.TrimSpace(titleQuery); term != "" {
+type SecretCatalogFilter struct {
+	TitleQuery        string
+	ExcludeProjectID  *uuid.UUID
+	Page              int
+	PageSize          int
+}
+
+// ListCatalog returns a page of catalog secrets with total count.
+func (r *SecretRepository) ListCatalog(ctx context.Context, filter SecretCatalogFilter) ([]model.Secret, int64, error) {
+	q := r.db.WithContext(ctx).Model(&model.Secret{})
+	if term := strings.TrimSpace(filter.TitleQuery); term != "" {
 		q = q.Where(`name ILIKE ? ESCAPE '\'`, "%"+escapeILIKE(term)+"%")
 	}
-	if excludeProjectID != nil {
+	if filter.ExcludeProjectID != nil {
 		q = q.Where(
 			`NOT EXISTS (
 				SELECT 1 FROM project_secrets ps
 				WHERE ps.secret_id = secrets.id AND ps.project_id = ?
 			)`,
-			*excludeProjectID,
+			*filter.ExcludeProjectID,
 		)
 	}
-	var secrets []model.Secret
-	if err := q.Find(&secrets).Error; err != nil {
-		return nil, fmt.Errorf("search secrets: %w", err)
+
+	var total int64
+	if err := q.Count(&total).Error; err != nil {
+		return nil, 0, fmt.Errorf("count catalog secrets: %w", err)
 	}
-	return secrets, nil
+
+	page := filter.Page
+	if page < 1 {
+		page = 1
+	}
+	pageSize := filter.PageSize
+	if pageSize < 1 {
+		pageSize = 12
+	}
+	offset := (page - 1) * pageSize
+
+	var secrets []model.Secret
+	if err := q.Order("name ASC").Offset(offset).Limit(pageSize).Find(&secrets).Error; err != nil {
+		return nil, 0, fmt.Errorf("list catalog secrets: %w", err)
+	}
+	return secrets, total, nil
+}
+
+func (r *SecretRepository) ListProjectsBySecretID(ctx context.Context, secretID uuid.UUID) ([]model.Project, error) {
+	var projects []model.Project
+	err := r.db.WithContext(ctx).
+		Joins("JOIN project_secrets ps ON ps.project_id = projects.id").
+		Where("ps.secret_id = ?", secretID).
+		Order("projects.title ASC").
+		Find(&projects).Error
+	if err != nil {
+		return nil, fmt.Errorf("list projects by secret: %w", err)
+	}
+	return projects, nil
 }
 
 func (r *SecretRepository) Create(ctx context.Context, secret *model.Secret) (*model.Secret, error) {

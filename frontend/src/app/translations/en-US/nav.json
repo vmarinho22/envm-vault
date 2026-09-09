@@ -5,6 +5,7 @@
   "teams": "Teams",
   "tags": "Tags",
   "environments": "Environments",
+  "secrets": "Secrets",
   "users": "Users",
   "audit": "Audit"
 }

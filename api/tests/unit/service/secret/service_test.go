@@ -55,11 +55,19 @@ func TestAttach_InvalidProjectID(t *testing.T) {
 	}
 }
 
-func TestSearch_InvalidExcludeProjectID(t *testing.T) {
+func TestListCatalog_InvalidExcludeProjectID(t *testing.T) {
 	svc := secret.New(nil, nil, testCrypter(t), nil)
-	_, err := svc.Search(t.Context(), "DB", "not-a-uuid", "")
+	_, err := svc.ListCatalog(t.Context(), "DB", "not-a-uuid", "1", "12")
 	if err != service.ErrProjectNotFound {
-		t.Errorf("Search() error = %v, want ErrProjectNotFound", err)
+		t.Errorf("ListCatalog() error = %v, want ErrProjectNotFound", err)
+	}
+}
+
+func TestGetCatalog_InvalidID(t *testing.T) {
+	svc := secret.New(nil, nil, testCrypter(t), nil)
+	_, err := svc.GetCatalog(t.Context(), "not-a-uuid")
+	if err != service.ErrSecretNotFound {
+		t.Errorf("GetCatalog() error = %v, want ErrSecretNotFound", err)
 	}
 }
 

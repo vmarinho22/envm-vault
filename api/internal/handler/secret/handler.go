@@ -34,13 +34,22 @@ type setValueRequest struct {
 	Value string `json:"value"`
 }
 
-func (h *Handler) SearchCatalog(c *fiber.Ctx) error {
-	resp, err := h.secret.Search(
+func (h *Handler) ListCatalog(c *fiber.Ctx) error {
+	resp, err := h.secret.ListCatalog(
 		c.UserContext(),
 		c.Query("title"),
 		c.Query("exclude_project_id"),
-		c.Query("limit"),
+		c.Query("page"),
+		c.Query("page_size"),
 	)
+	if err != nil {
+		return httperr.Write(c, err)
+	}
+	return c.JSON(resp)
+}
+
+func (h *Handler) GetCatalog(c *fiber.Ctx) error {
+	resp, err := h.secret.GetCatalog(c.UserContext(), c.Params("id"))
 	if err != nil {
 		return httperr.Write(c, err)
 	}

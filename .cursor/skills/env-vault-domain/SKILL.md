@@ -16,7 +16,7 @@ Central hub with unique `title` and unique `slug` (business key for `/project/<s
 Global catalog of deployment targets with unique `title` (e.g. `dev`, `staging`, `production`). Linked to projects via M2M. Any authenticated user may list/search; only `admin` / `super_admin` mutate. Seeded `production` cannot be renamed or deleted. Seeded defaults: `dev`, `test`, `staging`, `production`.
 
 ### Secret (EnvVar)
-A named key in the **global catalog** (`secrets` table, unique `name`). Linked to projects via M2M (`project_secrets`). Values live in `secret_values` per Environment (sparse) and are **shared** across all attached projects. Values encrypted at rest (AES-256-GCM, `ENCRYPTION_KEY`). Catalog search: `GET /v1/secrets?title=` (trigram-indexed ILIKE).
+A named key in the **global catalog** (`secrets` table, unique `name`). Linked to projects via M2M (`project_secrets`). Values live in `secret_values` per Environment (sparse) and are **shared** across all attached projects. Values encrypted at rest (AES-256-GCM, `ENCRYPTION_KEY`). Catalog list: `GET /v1/secrets` (paginated, page size 12). Detail: `GET /v1/secrets/:id` with linked projects.
 
 ### User
 Account that owns projects and manages a unique API key via the admin UI. May be blocked (`blocked_at`) by admin/super_admin — denies login, JWT, and API key create/rotate; blocking revokes the active key.

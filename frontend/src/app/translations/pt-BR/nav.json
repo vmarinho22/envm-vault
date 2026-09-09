@@ -5,6 +5,7 @@
   "teams": "Times",
   "tags": "Tags",
   "environments": "Ambientes",
+  "secrets": "Secrets",
   "users": "Usuários",
   "audit": "Auditoria"
 }

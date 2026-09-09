@@ -13,7 +13,7 @@ vi.mock('@/modules/project/services/ProjectService', () => ({
 
 vi.mock('@/modules/secret/services/SecretService', () => ({
   secretService: {
-    search: vi.fn(),
+    listCatalog: vi.fn(),
     list: vi.fn(),
     create: vi.fn(),
     attach: vi.fn(),
@@ -29,7 +29,7 @@ vi.mock('@/modules/secret/services/SecretService', () => ({
 
 const getBySlugMock = vi.mocked(projectService.getBySlug);
 const listMock = vi.mocked(secretService.list);
-const searchMock = vi.mocked(secretService.search);
+const listCatalogMock = vi.mocked(secretService.listCatalog);
 const attachMock = vi.mocked(secretService.attach);
 
 const session = {
@@ -81,11 +81,11 @@ describe('ProjectDetailView', () => {
   beforeEach(() => {
     getBySlugMock.mockReset();
     listMock.mockReset();
-    searchMock.mockReset();
+    listCatalogMock.mockReset();
     attachMock.mockReset();
     getBySlugMock.mockResolvedValue(sampleProject);
     listMock.mockResolvedValue({ items: [secretItem()] });
-    searchMock.mockResolvedValue({ items: [] });
+    listCatalogMock.mockResolvedValue({ items: [], page: 1, page_size: 20, total: 0 });
   });
 
   it('renders secret list with environments and actions', async () => {
@@ -169,7 +169,7 @@ describe('ProjectDetailView', () => {
   });
 
   it('opens create modal when Buscar finds no catalog hits', async () => {
-    searchMock.mockResolvedValue({ items: [] });
+    listCatalogMock.mockResolvedValue({ items: [], page: 1, page_size: 20, total: 0 });
 
     const { wrapper } = await mountComponent(ProjectDetailView, {
       session,
@@ -182,10 +182,11 @@ describe('ProjectDetailView', () => {
     await wrapper.get('form').trigger('submit');
     await flushPromises();
 
-    expect(searchMock).toHaveBeenCalledWith({
+    expect(listCatalogMock).toHaveBeenCalledWith({
       title: 'NEW_VAR',
       excludeProjectId: 'p1',
-      limit: 20,
+      page: 1,
+      pageSize: 20,
     });
     expect((wrapper.get('input[name="secret-name"]').element as HTMLInputElement).value).toBe(
       'NEW_VAR',
@@ -194,7 +195,7 @@ describe('ProjectDetailView', () => {
   });
 
   it('attaches catalog hit when user clicks Anexar', async () => {
-    searchMock.mockResolvedValue({
+    listCatalogMock.mockResolvedValue({
       items: [
         {
           id: 's9',
@@ -204,6 +205,9 @@ describe('ProjectDetailView', () => {
           updated_at: '2026-01-01T00:00:00Z',
         },
       ],
+      page: 1,
+      page_size: 20,
+      total: 1,
     });
     attachMock.mockResolvedValue(
       secretItem({ id: 's9', name: 'SHARED_KEY', project_count: 3, values: {} }),
