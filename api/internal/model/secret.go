@@ -6,13 +6,13 @@ import (
 	"github.com/google/uuid"
 )
 
-// Secret is a named env-var key scoped to a project (values live in SecretValue).
+// Secret is a named env-var key in the global catalog (values live in SecretValue).
+// Projects link to secrets via the project_secrets M2M table.
 type Secret struct {
 	ID        uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	ProjectID uuid.UUID `gorm:"type:uuid;not null;uniqueIndex:idx_secrets_project_name,priority:1;index"`
-	Project   Project   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	Name      string    `gorm:"type:varchar(128);not null;uniqueIndex:idx_secrets_project_name,priority:2"`
+	Name      string    `gorm:"type:varchar(128);uniqueIndex;not null"`
 	Values    []SecretValue
+	Projects  []Project `gorm:"many2many:project_secrets;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

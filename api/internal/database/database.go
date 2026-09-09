@@ -5,14 +5,19 @@ import (
 	"fmt"
 
 	"github.com/envm-vault/envm-vault/api/internal/model"
+	"github.com/envm-vault/envm-vault/api/internal/secretcrypto"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func Open(dsn string) (*gorm.DB, error) {
+func Open(dsn string, crypto secretcrypto.Crypter) (*gorm.DB, error) {
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, fmt.Errorf("open database: %w", err)
+	}
+
+	if err := migrateSecretsToGlobalCatalog(db, crypto); err != nil {
+		return nil, fmt.Errorf("migrate secrets catalog: %w", err)
 	}
 
 	if err := db.AutoMigrate(
@@ -25,6 +30,7 @@ func Open(dsn string) (*gorm.DB, error) {
 		&model.Environment{},
 		&model.Project{},
 		&model.Secret{},
+		&model.ProjectSecret{},
 		&model.SecretValue{},
 	); err != nil {
 		return nil, fmt.Errorf("auto migrate: %w", err)
@@ -35,6 +41,10 @@ func Open(dsn string) (*gorm.DB, error) {
 		if err := db.Migrator().DropColumn(&model.AuditLog{}, "summary"); err != nil {
 			return nil, fmt.Errorf("drop audit_logs.summary: %w", err)
 		}
+	}
+
+	if err := ensureSecretSearchIndexes(db); err != nil {
+		return nil, err
 	}
 
 	if err := EnsureDefaultTags(db); err != nil {

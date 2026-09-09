@@ -83,6 +83,8 @@ func Write(c *fiber.Ctx, err error) error {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "secret not found"})
 	case errors.Is(err, service.ErrSecretNameTaken):
 		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"error": "secret name already taken"})
+	case errors.Is(err, service.ErrSecretAlreadyAttached):
+		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"error": "secret already attached to this project"})
 	case errors.Is(err, service.ErrSecretValueNotFound):
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "secret value not found"})
 	case errors.Is(err, service.ErrEnvironmentNotInProject):

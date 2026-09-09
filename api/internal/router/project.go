@@ -15,6 +15,7 @@ func registerProjectRoutes(v1 fiber.Router, deps Deps) {
 
 	projects.Get("/:id/secrets", deps.Secret.List)
 	projects.Post("/:id/secrets", deps.Secret.Create)
+	projects.Post("/:id/secrets/attach", deps.Secret.Attach)
 	projects.Patch("/:id/secrets/:secretId", deps.Secret.UpdateName)
 	projects.Delete("/:id/secrets/:secretId", deps.Secret.Delete)
 	projects.Put("/:id/secrets/:secretId/values/:environmentId", deps.Secret.SetValue)

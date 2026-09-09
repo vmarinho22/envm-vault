@@ -1,13 +1,15 @@
-import { computed, ref } from 'vue';
+import { computed, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import type { CatalogOption } from '@/modules/project/components/CatalogMultiSelect.vue';
 import { projectService } from '@/modules/project/services/ProjectService';
 import type { Project } from '@/modules/project/types';
 import { secretService } from '@/modules/secret/services/SecretService';
-import type { Secret } from '@/modules/secret/types';
+import type { CatalogSecret, Secret } from '@/modules/secret/types';
 import { useConfirmDialog } from '@/shared/confirm/useConfirmDialog';
 import { ApiError } from '@/shared/http/ApiError';
+
+const SEARCH_DEBOUNCE_MS = 300;
 
 export function useProjectSecrets() {
   const { t } = useI18n();
@@ -17,6 +19,8 @@ export function useProjectSecrets() {
   const project = ref<Project | null>(null);
   const secrets = ref<Secret[]>([]);
   const environmentQuery = ref('');
+  const catalogHits = ref<CatalogSecret[]>([]);
+  const catalogSearching = ref(false);
   const loading = ref(false);
   const mutating = ref(false);
   const error = ref<string | null>(null);
@@ -26,6 +30,8 @@ export function useProjectSecrets() {
   const editingSecret = ref<Secret | null>(null);
   const selectedEnvironmentIds = ref<string[]>([]);
   const valuesByEnv = ref<Record<string, string>>({});
+
+  let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   const slug = computed(() => String(route.params.slug ?? ''));
 
@@ -84,9 +90,87 @@ export function useProjectSecrets() {
     }
   }
 
-  function openCreate(): void {
+  async function fetchCatalogPreview(term: string): Promise<void> {
+    if (!project.value || !term) {
+      catalogHits.value = [];
+      return;
+    }
+    catalogSearching.value = true;
+    try {
+      const resp = await secretService.search({
+        title: term,
+        excludeProjectId: project.value.id,
+        limit: 20,
+      });
+      catalogHits.value = resp.items;
+    } catch {
+      catalogHits.value = [];
+    } finally {
+      catalogSearching.value = false;
+    }
+  }
+
+  watch(environmentQuery, (value) => {
+    if (debounceTimer) clearTimeout(debounceTimer);
+    const term = value.trim();
+    if (!term) {
+      catalogHits.value = [];
+      return;
+    }
+    debounceTimer = setTimeout(() => {
+      void fetchCatalogPreview(term);
+    }, SEARCH_DEBOUNCE_MS);
+  });
+
+  onUnmounted(() => {
+    if (debounceTimer) clearTimeout(debounceTimer);
+  });
+
+  async function runCatalogSearch(): Promise<void> {
+    if (!project.value) return;
+    const term = environmentQuery.value.trim();
+    if (!term) {
+      catalogHits.value = [];
+      return;
+    }
+    error.value = null;
+    catalogSearching.value = true;
+    try {
+      const resp = await secretService.search({
+        title: term,
+        excludeProjectId: project.value.id,
+        limit: 20,
+      });
+      catalogHits.value = resp.items;
+      if (resp.items.length === 0) {
+        openCreate(term);
+      }
+    } catch (err) {
+      error.value = toErrorMessage(err, t('secrets.errors.searchFailed'));
+      catalogHits.value = [];
+    } finally {
+      catalogSearching.value = false;
+    }
+  }
+
+  async function attachCatalogSecret(hit: CatalogSecret): Promise<void> {
+    if (!project.value) return;
+    error.value = null;
+    mutating.value = true;
+    try {
+      await secretService.attach(project.value.id, hit.id);
+      catalogHits.value = catalogHits.value.filter((h) => h.id !== hit.id);
+      await refreshSecrets();
+    } catch (err) {
+      error.value = toErrorMessage(err, t('secrets.errors.attachFailed'));
+    } finally {
+      mutating.value = false;
+    }
+  }
+
+  function openCreate(prefillName = ''): void {
     editingSecret.value = null;
-    formName.value = '';
+    formName.value = prefillName;
     selectedEnvironmentIds.value = [];
     valuesByEnv.value = {};
     formOpen.value = true;
@@ -98,7 +182,12 @@ export function useProjectSecrets() {
     mutating.value = true;
     editingSecret.value = secret;
     formName.value = secret.name;
-    const envIds = Object.keys(secret.values).filter((id) => secret.values[id]?.has_value);
+    // Only environments linked to this project — shared secrets may have
+    // values for other projects' environments.
+    const projectEnvIds = new Set(project.value.environments.map((e) => e.id));
+    const envIds = Object.keys(secret.values).filter(
+      (id) => secret.values[id]?.has_value && projectEnvIds.has(id),
+    );
     selectedEnvironmentIds.value = envIds;
     valuesByEnv.value = Object.fromEntries(envIds.map((id) => [id, '']));
     formOpen.value = true;
@@ -195,7 +284,7 @@ export function useProjectSecrets() {
     if (!project.value) return;
     const ok = await confirm({
       title: t('secrets.delete'),
-      message: t('secrets.confirmDelete', { name: secret.name }),
+      message: t('secrets.confirmDetach', { name: secret.name }),
       confirmLabel: t('common.confirm'),
       cancelLabel: t('common.cancel'),
       variant: 'danger',
@@ -219,6 +308,8 @@ export function useProjectSecrets() {
     secrets,
     filteredSecrets,
     environmentQuery,
+    catalogHits,
+    catalogSearching,
     hasEnvironmentFilter,
     loading,
     mutating,
@@ -231,6 +322,8 @@ export function useProjectSecrets() {
     environmentOptions,
     slug,
     load,
+    runCatalogSearch,
+    attachCatalogSecret,
     openCreate,
     openEdit,
     closeForm,

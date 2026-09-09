@@ -1,16 +1,20 @@
 import type {
+  CatalogSearchResponse,
   CreateSecretInput,
   DownloadItem,
   DownloadResponse,
   RevealSecretResponse,
+  SearchSecretsParams,
   Secret,
   SecretListResponse,
 } from '@/modules/secret/types';
 import { httpClient } from '@/shared/http';
 
 export interface SecretService {
+  search(params: SearchSecretsParams): Promise<CatalogSearchResponse>;
   list(projectId: string): Promise<SecretListResponse>;
   create(projectId: string, input: CreateSecretInput): Promise<Secret>;
+  attach(projectId: string, secretId: string): Promise<Secret>;
   updateName(projectId: string, secretId: string, name: string): Promise<Secret>;
   remove(projectId: string, secretId: string): Promise<void>;
   setValue(
@@ -44,6 +48,15 @@ function quoteDotEnv(value: string): string {
 }
 
 export const secretService: SecretService = {
+  search(params: SearchSecretsParams): Promise<CatalogSearchResponse> {
+    const query = new URLSearchParams();
+    if (params.title) query.set('title', params.title);
+    if (params.excludeProjectId) query.set('exclude_project_id', params.excludeProjectId);
+    if (params.limit != null) query.set('limit', String(params.limit));
+    const qs = query.toString();
+    return httpClient.request<CatalogSearchResponse>(`/v1/secrets${qs ? `?${qs}` : ''}`);
+  },
+
   list(projectId: string): Promise<SecretListResponse> {
     return httpClient.request<SecretListResponse>(`/v1/projects/${projectId}/secrets`);
   },
@@ -52,6 +65,13 @@ export const secretService: SecretService = {
     return httpClient.request<Secret>(`/v1/projects/${projectId}/secrets`, {
       method: 'POST',
       body: input,
+    });
+  },
+
+  attach(projectId: string, secretId: string): Promise<Secret> {
+    return httpClient.request<Secret>(`/v1/projects/${projectId}/secrets/attach`, {
+      method: 'POST',
+      body: { secret_id: secretId },
     });
   },
 

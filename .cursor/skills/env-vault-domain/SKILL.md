@@ -10,13 +10,13 @@ Read [docs/architecture.md](../../docs/architecture.md) for the full specificati
 ## Entities
 
 ### Project
-Central hub with unique `title` and unique `slug` (business key for `/project/<slug>`). Many-to-many with Teams, Environments, and Tags. Any authenticated user may create/update; only `admin` / `super_admin` may delete. Owns Secrets.
+Central hub with unique `title` and unique `slug` (business key for `/project/<slug>`). Many-to-many with Teams, Environments, Tags, and Secrets. Any authenticated user may create/update; only `admin` / `super_admin` may delete.
 
 ### Environment
 Global catalog of deployment targets with unique `title` (e.g. `dev`, `staging`, `production`). Linked to projects via M2M. Any authenticated user may list/search; only `admin` / `super_admin` mutate. Seeded `production` cannot be renamed or deleted. Seeded defaults: `dev`, `test`, `staging`, `production`.
 
 ### Secret (EnvVar)
-A named key scoped to a **Project** (`secrets` table). Values live in `secret_values` per Environment (sparse). Values encrypted at rest (AES-256-GCM, `ENCRYPTION_KEY`). Unique `(project_id, name)`.
+A named key in the **global catalog** (`secrets` table, unique `name`). Linked to projects via M2M (`project_secrets`). Values live in `secret_values` per Environment (sparse) and are **shared** across all attached projects. Values encrypted at rest (AES-256-GCM, `ENCRYPTION_KEY`). Catalog search: `GET /v1/secrets?title=` (trigram-indexed ILIKE).
 
 ### User
 Account that owns projects and manages a unique API key via the admin UI. May be blocked (`blocked_at`) by admin/super_admin — denies login, JWT, and API key create/rotate; blocking revokes the active key.
@@ -45,8 +45,9 @@ Authorization: Bearer <access_token>
 2. Secret values and API key plaintext never appear in logs.
 3. Project `slug` is the unique natural key for UI routes (`/project/<slug>`); UUID is the PK for mutations and junctions.
 4. Slugs are generated with `api/internal/slug.FromName` (mirrored in `frontend/src/shared/slug`).
-5. Secret names match `^[A-Za-z_][A-Za-z0-9_]*$` (max 128).
+5. Secret names match `^[A-Za-z_][A-Za-z0-9_]*$` (max 128) and are unique globally.
 6. Only `super_admin` may download the `production` environment (API key or JWT export).
+7. Detaching a secret from a project (or deleting a project) does not delete catalog values. Changing a value updates all projects that share the secret.
 
 ## Relationships
 
@@ -56,6 +57,6 @@ User → accountable for many → Team
 Project ↔ Team (M2M)
 Project ↔ Environment (M2M)
 Project ↔ Tag (M2M)
-Project → has many → Secret
+Project ↔ Secret (M2M via project_secrets)
 Secret → has many → SecretValue (per Environment)
 ```

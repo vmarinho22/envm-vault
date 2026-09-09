@@ -31,6 +31,8 @@ const (
 	ActionSecretCreated             = "secret.created"
 	ActionSecretUpdated             = "secret.updated"
 	ActionSecretDeleted             = "secret.deleted"
+	ActionSecretAttached            = "secret.attached"
+	ActionSecretDetached            = "secret.detached"
 	ActionSecretValueSet            = "secret_value.set"
 	ActionSecretValueCleared        = "secret_value.cleared"
 	ActionSecretDownloaded          = "secret.downloaded"

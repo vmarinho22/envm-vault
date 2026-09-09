@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowLeftIcon, PencilSquareIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/outline';
+import { ArrowLeftIcon, MagnifyingGlassIcon, PencilSquareIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/outline';
 import { computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { RouterLink } from 'vue-router';
@@ -13,6 +13,8 @@ const {
   project,
   filteredSecrets,
   environmentQuery,
+  catalogHits,
+  catalogSearching,
   hasEnvironmentFilter,
   loading,
   mutating,
@@ -24,6 +26,8 @@ const {
   valuesByEnv,
   environmentOptions,
   load,
+  runCatalogSearch,
+  attachCatalogSecret,
   openCreate,
   openEdit,
   closeForm,
@@ -35,6 +39,7 @@ const {
 } = useProjectSecrets();
 
 const formMode = computed(() => (editingSecret.value ? 'edit' : 'create'));
+const formProjectCount = computed(() => editingSecret.value?.project_count ?? 1);
 
 onMounted(() => {
   void load();
@@ -64,7 +69,7 @@ onMounted(() => {
         class="btn btn-primary gap-2"
         type="button"
         :disabled="!project || mutating"
-        @click="openCreate"
+        @click="openCreate()"
       >
         <PlusIcon class="size-4" aria-hidden="true" />
         {{ t('secrets.create') }}
@@ -83,7 +88,10 @@ onMounted(() => {
         />
       </div>
 
-      <div class="mt-8 flex flex-wrap items-end gap-3">
+      <form
+        class="mt-8 flex flex-wrap items-end gap-3"
+        @submit.prevent="runCatalogSearch"
+      >
         <div class="w-full max-w-xs">
           <input
             v-model="environmentQuery"
@@ -95,6 +103,40 @@ onMounted(() => {
             :aria-label="t('secrets.search.environmentLabel')"
           />
         </div>
+        <button
+          class="btn btn-outline gap-2"
+          type="submit"
+          :disabled="mutating || catalogSearching || !environmentQuery.trim()"
+        >
+          <MagnifyingGlassIcon class="size-4" aria-hidden="true" />
+          {{ t('secrets.search.submit') }}
+        </button>
+      </form>
+
+      <div
+        v-if="catalogHits.length > 0"
+        class="mt-4 rounded-box border border-base-300 bg-base-200/40 p-3"
+      >
+        <p class="text-sm font-medium text-base-content/80">
+          {{ t('secrets.search.catalogTitle') }}
+        </p>
+        <ul class="mt-2 space-y-1">
+          <li
+            v-for="hit in catalogHits"
+            :key="hit.id"
+            class="flex flex-wrap items-center justify-between gap-2 rounded-lg px-2 py-1.5 hover:bg-base-200"
+          >
+            <span class="font-mono text-sm">{{ hit.name }}</span>
+            <button
+              class="btn btn-ghost btn-xs"
+              type="button"
+              :disabled="mutating"
+              @click="attachCatalogSecret(hit)"
+            >
+              {{ t('secrets.search.attach') }}
+            </button>
+          </li>
+        </ul>
       </div>
 
       <div class="mt-4 overflow-x-auto">
@@ -165,6 +207,7 @@ onMounted(() => {
       :mode="formMode"
       :name="formName"
       :saving="mutating"
+      :project-count="formProjectCount"
       :environment-options="environmentOptions"
       :selected-environment-ids="selectedEnvironmentIds"
       :values-by-env="valuesByEnv"

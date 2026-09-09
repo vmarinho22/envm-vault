@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -20,7 +21,9 @@ import (
 )
 
 const (
-	maxSecretNameLen = 128
+	maxSecretNameLen   = 128
+	defaultSearchLimit = 20
+	maxSearchLimit     = 50
 )
 
 func assertProductionDownloadAllowed(actorRole, envTitle string) error {
@@ -59,15 +62,28 @@ type ValueMeta struct {
 }
 
 type SecretResponse struct {
-	ID        string               `json:"id"`
-	Name      string               `json:"name"`
-	Values    map[string]ValueMeta `json:"values"`
-	CreatedAt time.Time            `json:"created_at"`
-	UpdatedAt time.Time            `json:"updated_at"`
+	ID           string               `json:"id"`
+	Name         string               `json:"name"`
+	Values       map[string]ValueMeta `json:"values"`
+	ProjectCount int64                `json:"project_count"`
+	CreatedAt    time.Time            `json:"created_at"`
+	UpdatedAt    time.Time            `json:"updated_at"`
 }
 
 type ListResponse struct {
 	Items []SecretResponse `json:"items"`
+}
+
+type CatalogItem struct {
+	ID           string    `json:"id"`
+	Name         string    `json:"name"`
+	ProjectCount int64     `json:"project_count"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+}
+
+type CatalogSearchResponse struct {
+	Items []CatalogItem `json:"items"`
 }
 
 type RevealResponse struct {
@@ -126,21 +142,89 @@ func projectEnvSet(project *model.Project) map[uuid.UUID]struct{} {
 	return set
 }
 
-func toResponse(secret model.Secret) SecretResponse {
-	values := make(map[string]ValueMeta, len(secret.Values))
+func toResponse(secret model.Secret, projectCount int64, projectEnvs map[uuid.UUID]struct{}) SecretResponse {
+	values := make(map[string]ValueMeta)
 	for _, v := range secret.Values {
+		if projectEnvs != nil {
+			if _, ok := projectEnvs[v.EnvironmentID]; !ok {
+				continue
+			}
+		}
 		values[v.EnvironmentID.String()] = ValueMeta{
 			HasValue:  true,
 			UpdatedAt: v.UpdatedAt,
 		}
 	}
 	return SecretResponse{
-		ID:        secret.ID.String(),
-		Name:      secret.Name,
-		Values:    values,
-		CreatedAt: secret.CreatedAt,
-		UpdatedAt: secret.UpdatedAt,
+		ID:           secret.ID.String(),
+		Name:         secret.Name,
+		Values:       values,
+		ProjectCount: projectCount,
+		CreatedAt:    secret.CreatedAt,
+		UpdatedAt:    secret.UpdatedAt,
 	}
+}
+
+func (s *Service) responseFor(ctx context.Context, secret model.Secret, project *model.Project) (*SecretResponse, error) {
+	count, err := s.secrets.CountProjects(ctx, secret.ID)
+	if err != nil {
+		return nil, err
+	}
+	resp := toResponse(secret, count, projectEnvSet(project))
+	return &resp, nil
+}
+
+func (s *Service) Search(
+	ctx context.Context,
+	titleQuery, excludeProjectIDRaw, limitRaw string,
+) (*CatalogSearchResponse, error) {
+	limit := defaultSearchLimit
+	if strings.TrimSpace(limitRaw) != "" {
+		n, err := strconv.Atoi(strings.TrimSpace(limitRaw))
+		if err != nil || n < 1 {
+			limit = defaultSearchLimit
+		} else if n > maxSearchLimit {
+			limit = maxSearchLimit
+		} else {
+			limit = n
+		}
+	}
+
+	var excludeID *uuid.UUID
+	if raw := strings.TrimSpace(excludeProjectIDRaw); raw != "" {
+		id, err := uuid.Parse(raw)
+		if err != nil {
+			return nil, service.ErrProjectNotFound
+		}
+		if _, err := s.projects.FindByID(ctx, id); err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return nil, service.ErrProjectNotFound
+			}
+			return nil, err
+		}
+		excludeID = &id
+	}
+
+	secrets, err := s.secrets.Search(ctx, titleQuery, excludeID, limit)
+	if err != nil {
+		return nil, err
+	}
+
+	items := make([]CatalogItem, 0, len(secrets))
+	for _, sec := range secrets {
+		count, countErr := s.secrets.CountProjects(ctx, sec.ID)
+		if countErr != nil {
+			return nil, countErr
+		}
+		items = append(items, CatalogItem{
+			ID:           sec.ID.String(),
+			Name:         sec.Name,
+			ProjectCount: count,
+			CreatedAt:    sec.CreatedAt,
+			UpdatedAt:    sec.UpdatedAt,
+		})
+	}
+	return &CatalogSearchResponse{Items: items}, nil
 }
 
 func (s *Service) List(ctx context.Context, projectID string) (*ListResponse, error) {
@@ -152,11 +236,66 @@ func (s *Service) List(ctx context.Context, projectID string) (*ListResponse, er
 	if err != nil {
 		return nil, err
 	}
+	envSet := projectEnvSet(project)
 	items := make([]SecretResponse, 0, len(secrets))
 	for _, sec := range secrets {
-		items = append(items, toResponse(sec))
+		count, countErr := s.secrets.CountProjects(ctx, sec.ID)
+		if countErr != nil {
+			return nil, countErr
+		}
+		items = append(items, toResponse(sec, count, envSet))
 	}
 	return &ListResponse{Items: items}, nil
+}
+
+func (s *Service) Attach(
+	ctx context.Context,
+	actorID, actorEmail, actorRole, projectID, secretID string,
+) (*SecretResponse, error) {
+	project, err := s.loadProject(ctx, projectID)
+	if err != nil {
+		return nil, err
+	}
+	sid, err := uuid.Parse(strings.TrimSpace(secretID))
+	if err != nil {
+		return nil, service.ErrSecretNotFound
+	}
+	if _, err := s.secrets.FindByID(ctx, sid); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, service.ErrSecretNotFound
+		}
+		return nil, err
+	}
+	attached, err := s.secrets.IsAttached(ctx, project.ID, sid)
+	if err != nil {
+		return nil, err
+	}
+	if attached {
+		return nil, service.ErrSecretAlreadyAttached
+	}
+	if err := s.secrets.Attach(ctx, project.ID, sid); err != nil {
+		return nil, err
+	}
+
+	fresh, err := s.secrets.FindByID(ctx, sid)
+	if err != nil {
+		return nil, err
+	}
+
+	pid := project.ID
+	s.audit.Record(ctx, audit.Event{
+		Action:       audit.ActionSecretAttached,
+		ActorUserID:  parseActorID(actorID),
+		ActorEmail:   actorEmail,
+		ActorRole:    actorRole,
+		ProjectID:    &pid,
+		ProjectTitle: project.Title,
+		ProjectSlug:  project.Slug,
+		SecretID:     &sid,
+		SecretName:   fresh.Name,
+	})
+
+	return s.responseFor(ctx, *fresh, project)
 }
 
 func (s *Service) Create(
@@ -172,7 +311,7 @@ func (s *Service) Create(
 	if err != nil {
 		return nil, err
 	}
-	taken, err := s.secrets.ExistsByName(ctx, project.ID, normalized, nil)
+	taken, err := s.secrets.ExistsByName(ctx, normalized, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -180,12 +319,13 @@ func (s *Service) Create(
 		return nil, service.ErrSecretNameTaken
 	}
 
-	secret := &model.Secret{
-		ProjectID: project.ID,
-		Name:      normalized,
-	}
+	secret := &model.Secret{Name: normalized}
 	created, err := s.secrets.Create(ctx, secret)
 	if err != nil {
+		return nil, err
+	}
+	if err := s.secrets.Attach(ctx, project.ID, created.ID); err != nil {
+		_ = s.secrets.Delete(ctx, created.ID)
 		return nil, err
 	}
 
@@ -193,14 +333,17 @@ func (s *Service) Create(
 	for envIDRaw, plaintext := range values {
 		envID, parseErr := uuid.Parse(strings.TrimSpace(envIDRaw))
 		if parseErr != nil {
+			_ = s.secrets.Detach(ctx, project.ID, created.ID)
 			_ = s.secrets.Delete(ctx, created.ID)
 			return nil, service.ErrEnvironmentNotFound
 		}
 		if _, ok := envSet[envID]; !ok {
+			_ = s.secrets.Detach(ctx, project.ID, created.ID)
 			_ = s.secrets.Delete(ctx, created.ID)
 			return nil, service.ErrEnvironmentNotInProject
 		}
 		if setErr := s.encryptAndUpsert(ctx, created.ID, envID, plaintext); setErr != nil {
+			_ = s.secrets.Detach(ctx, project.ID, created.ID)
 			_ = s.secrets.Delete(ctx, created.ID)
 			return nil, setErr
 		}
@@ -225,8 +368,7 @@ func (s *Service) Create(
 		SecretName:   fresh.Name,
 	})
 
-	resp := toResponse(*fresh)
-	return &resp, nil
+	return s.responseFor(ctx, *fresh, project)
 }
 
 func (s *Service) UpdateName(
@@ -253,7 +395,7 @@ func (s *Service) UpdateName(
 		return nil, err
 	}
 	if normalized != secret.Name {
-		taken, existsErr := s.secrets.ExistsByName(ctx, project.ID, normalized, &sid)
+		taken, existsErr := s.secrets.ExistsByName(ctx, normalized, &sid)
 		if existsErr != nil {
 			return nil, existsErr
 		}
@@ -283,8 +425,7 @@ func (s *Service) UpdateName(
 		SecretName:   fresh.Name,
 	})
 
-	resp := toResponse(*fresh)
-	return &resp, nil
+	return s.responseFor(ctx, *fresh, project)
 }
 
 func (s *Service) Delete(
@@ -306,7 +447,7 @@ func (s *Service) Delete(
 		}
 		return err
 	}
-	if err := s.secrets.Delete(ctx, sid); err != nil {
+	if err := s.secrets.Detach(ctx, project.ID, sid); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return service.ErrSecretNotFound
 		}
@@ -315,7 +456,7 @@ func (s *Service) Delete(
 
 	pid := project.ID
 	s.audit.Record(ctx, audit.Event{
-		Action:       audit.ActionSecretDeleted,
+		Action:       audit.ActionSecretDetached,
 		ActorUserID:  parseActorID(actorID),
 		ActorEmail:   actorEmail,
 		ActorRole:    actorRole,
@@ -389,8 +530,7 @@ func (s *Service) SetValue(
 		SecretName:   fresh.Name,
 	})
 
-	resp := toResponse(*fresh)
-	return &resp, nil
+	return s.responseFor(ctx, *fresh, project)
 }
 
 func (s *Service) RevealValue(

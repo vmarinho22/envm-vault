@@ -10,6 +10,7 @@ const props = defineProps<{
   mode: 'create' | 'edit';
   name: string;
   saving: boolean;
+  projectCount?: number;
   environmentOptions: CatalogOption[];
   selectedEnvironmentIds: string[];
   valuesByEnv: Record<string, string>;
@@ -56,6 +57,13 @@ function onClose(): void {
       <h3 class="text-lg font-medium">
         {{ mode === 'create' ? t('secrets.form.createTitle') : t('secrets.form.editTitle') }}
       </h3>
+      <p
+        v-if="mode === 'edit' && (projectCount ?? 1) > 1"
+        class="mt-2 text-sm text-warning"
+        role="status"
+      >
+        {{ t('secrets.form.sharedWarning', { count: projectCount }) }}
+      </p>
       <form class="mt-4 space-y-4" @submit.prevent="emit('submit')">
         <label class="form-control w-full">
           <span class="label-text">{{ t('secrets.form.name') }}</span>

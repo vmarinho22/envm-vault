@@ -48,7 +48,12 @@ func main() {
 		log.Fatalf("load env: %v", err)
 	}
 
-	gormDB, err := database.Open(env.Envs.Database.URL)
+	crypter, err := secretcrypto.NewAESGCM(env.Envs.Crypto.Key, env.Envs.Crypto.Version)
+	if err != nil {
+		log.Fatalf("init encryption: %v", err)
+	}
+
+	gormDB, err := database.Open(env.Envs.Database.URL, crypter)
 	if err != nil {
 		log.Fatalf("connect database: %v", err)
 	}
@@ -69,11 +74,6 @@ func main() {
 	projectRepo := repository.NewProjectRepository(gormDB)
 	secretRepo := repository.NewSecretRepository(gormDB)
 	auditSvc := auditservice.New(auditRepo, userRepo)
-
-	crypter, err := secretcrypto.NewAESGCM(env.Envs.Crypto.Key, env.Envs.Crypto.Version)
-	if err != nil {
-		log.Fatalf("init encryption: %v", err)
-	}
 
 	var sender email.Sender
 	if env.Envs.IsDevelopment() {

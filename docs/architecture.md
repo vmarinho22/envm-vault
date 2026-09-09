@@ -66,14 +66,16 @@ The API lives in `api/` and provides authentication via email OTP plus a unique 
 | `POST` | `/v1/projects` | JWT | Create project (title + teams + environments + tags) |
 | `PATCH` | `/v1/projects/:id` | JWT | Update project |
 | `DELETE` | `/v1/projects/:id` | JWT (admin+) | Delete project |
-| `GET` | `/v1/projects/:id/secrets` | JWT | List secrets (names + which envs have values; no plaintext) |
-| `POST` | `/v1/projects/:id/secrets` | JWT | Create secret (optional initial values per env) |
-| `PATCH` | `/v1/projects/:id/secrets/:secretId` | JWT | Rename secret |
-| `DELETE` | `/v1/projects/:id/secrets/:secretId` | JWT | Delete secret and all values |
-| `PUT` | `/v1/projects/:id/secrets/:secretId/values/:environmentId` | JWT | Upsert encrypted value |
+| `GET` | `/v1/projects/:id/secrets` | JWT | List secrets attached to the project (names + which envs have values; no plaintext) |
+| `POST` | `/v1/projects/:id/secrets` | JWT | Create catalog secret + attach (optional initial values per env); name unique globally |
+| `POST` | `/v1/projects/:id/secrets/attach` | JWT | Attach an existing catalog secret (`{ secret_id }`) |
+| `PATCH` | `/v1/projects/:id/secrets/:secretId` | JWT | Rename catalog secret (must be attached) |
+| `DELETE` | `/v1/projects/:id/secrets/:secretId` | JWT | Detach secret from project (catalog + values kept) |
+| `PUT` | `/v1/projects/:id/secrets/:secretId/values/:environmentId` | JWT | Upsert encrypted value (global; shared across projects) |
 | `GET` | `/v1/projects/:id/secrets/:secretId/values/:environmentId` | JWT | Reveal one decrypted value |
-| `DELETE` | `/v1/projects/:id/secrets/:secretId/values/:environmentId` | JWT | Clear value for one env |
+| `DELETE` | `/v1/projects/:id/secrets/:secretId/values/:environmentId` | JWT | Clear value for one env (global) |
 | `GET` | `/v1/projects/:id/environments/:environmentId/values` | JWT | Export all values for an env (JSON or `?format=env`); `production` requires `super_admin` |
+| `GET` | `/v1/secrets` | JWT | Search global secret catalog (`?title=`, `?exclude_project_id=`, `?limit=`) |
 | `GET` | `/v1/projects/:slug/env` | API key (`ev_…`) | Download env vars via `?environment=<title>` (JSON default; dotenv via `?format=env` or `Accept: text/plain`). Only `super_admin` may download `production`. |
 
 ### Auth Flow
@@ -94,7 +96,7 @@ JWT is the admin UI session. The API key (`Authorization: Bearer ev_…`) is the
 
 ### Project
 
-A project groups teams, catalog environments, and tags. Fields: unique `title`, unique `slug` (natural key for future `/project/<slug>`), timestamps. M2M with Team, Environment, and Tag. Any authenticated user can create/update; only `admin` / `super_admin` can delete. List supports filters by title/teams/tags and page size 12.
+A project groups teams, catalog environments, tags, and attached secrets. Fields: unique `title`, unique `slug` (natural key for future `/project/<slug>`), timestamps. M2M with Team, Environment, Tag, and Secret. Any authenticated user can create/update; only `admin` / `super_admin` can delete. List supports filters by title/teams/tags and page size 12.
 
 ### Environment
 
@@ -102,11 +104,11 @@ A global catalog of deployment targets with a unique `title` (e.g. `dev`, `stagi
 
 ### Secret / EnvVar
 
-A named key scoped to a **Project**. Values are stored per **Environment** (sparse: missing row = no value). Values are encrypted at rest with AES-256-GCM using `ENCRYPTION_KEY` (32-byte hex, separate from `JWT_SECRET`). Ciphertext is `nonce || ciphertext+tag` with AAD bound to `secret_id || environment_id`. Column `key_version` records which key encrypted the blob.
+A named key in the **global catalog** with a unique `name`. Projects attach secrets via M2M (`project_secrets`). Values are stored per **Environment** (sparse: missing row = no value) and are **shared** across all projects that use the secret — updating a value in one project updates it everywhere. Values are encrypted at rest with AES-256-GCM using `ENCRYPTION_KEY` (32-byte hex, separate from `JWT_SECRET`). Ciphertext is `nonce || ciphertext+tag` with AAD bound to `secret_id || environment_id`. Column `key_version` records which key encrypted the blob.
 
-Tables: `secrets` (project + name) and `secret_values` (secret + environment + ciphertext).
+Tables: `secrets` (unique name), `project_secrets` (project ↔ secret), and `secret_values` (secret + environment + ciphertext). Name search uses a `pg_trgm` GIN index.
 
-List/UI endpoints never return plaintext except explicit reveal and export/download. Removing an environment from a project deletes that environment's secret values for the project.
+List/UI endpoints never return plaintext except explicit reveal and export/download. Detaching a secret from a project (or deleting a project) does not delete catalog values. Removing an environment from a project does not delete secret values.
 
 ### User
 
@@ -161,7 +163,8 @@ erDiagram
   Environment ||--o{ ProjectEnvironment : in
   Project ||--o{ ProjectTag : has
   Tag ||--o{ ProjectTag : in
-  Project ||--o{ Secret : has
+  Project ||--o{ ProjectSecret : has
+  Secret ||--o{ ProjectSecret : in
   Secret ||--o{ SecretValue : has
   Environment ||--o{ SecretValue : for
   Tag {
@@ -186,10 +189,13 @@ erDiagram
   }
   Secret {
     uuid id PK
-    uuid project_id FK
-    string name
+    string name UK
     timestamp created_at
     timestamp updated_at
+  }
+  ProjectSecret {
+    uuid project_id PK,FK
+    uuid secret_id PK,FK
   }
   SecretValue {
     uuid id PK
@@ -257,7 +263,7 @@ erDiagram
   }
 ```
 
-Project↔Secret linking is implemented (`secrets` + `secret_values`). Team membership for access control remains TBD — any authenticated (non-blocked) user may manage secrets; API-key download uses the same broad access until membership exists.
+Project↔Secret linking is implemented via `project_secrets` (global catalog + shared values). Team membership for access control remains TBD — any authenticated (non-blocked) user may manage secrets; API-key download uses the same broad access until membership exists.
 
 ### User Roles
 

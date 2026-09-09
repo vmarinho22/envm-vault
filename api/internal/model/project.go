@@ -13,6 +13,7 @@ type Project struct {
 	Teams        []Team        `gorm:"many2many:project_teams;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT"`
 	Environments []Environment `gorm:"many2many:project_environments;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT"`
 	Tags         []Tag         `gorm:"many2many:project_tags;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT"`
+	Secrets      []Secret      `gorm:"many2many:project_secrets;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }

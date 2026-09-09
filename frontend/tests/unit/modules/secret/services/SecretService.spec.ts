@@ -33,8 +33,39 @@ describe('secretService', () => {
     expect(requestMock).toHaveBeenCalledWith('/v1/projects/proj-1/secrets');
   });
 
+  it('search hits catalog with query params', async () => {
+    requestMock.mockResolvedValue({ items: [] });
+    await secretService.search({ title: 'DB', excludeProjectId: 'p1', limit: 10 });
+    expect(requestMock).toHaveBeenCalledWith(
+      '/v1/secrets?title=DB&exclude_project_id=p1&limit=10',
+    );
+  });
+
+  it('attach posts secret_id', async () => {
+    requestMock.mockResolvedValue({
+      id: 's1',
+      name: 'X',
+      values: {},
+      project_count: 2,
+      created_at: '',
+      updated_at: '',
+    });
+    await secretService.attach('p1', 's1');
+    expect(requestMock).toHaveBeenCalledWith('/v1/projects/p1/secrets/attach', {
+      method: 'POST',
+      body: { secret_id: 's1' },
+    });
+  });
+
   it('setValue puts plaintext body', async () => {
-    requestMock.mockResolvedValue({ id: 's1', name: 'X', values: {}, created_at: '', updated_at: '' });
+    requestMock.mockResolvedValue({
+      id: 's1',
+      name: 'X',
+      values: {},
+      project_count: 1,
+      created_at: '',
+      updated_at: '',
+    });
     await secretService.setValue('p1', 's1', 'e1', 'secret');
     expect(requestMock).toHaveBeenCalledWith('/v1/projects/p1/secrets/s1/values/e1', {
       method: 'PUT',

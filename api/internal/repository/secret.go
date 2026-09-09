@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/envm-vault/envm-vault/api/internal/model"
 	"github.com/google/uuid"
@@ -27,8 +28,9 @@ func (r *SecretRepository) ListByProjectID(ctx context.Context, projectID uuid.U
 	var secrets []model.Secret
 	err := r.db.WithContext(ctx).
 		Preload("Values").
-		Where("project_id = ?", projectID).
-		Order("name ASC").
+		Joins("JOIN project_secrets ps ON ps.secret_id = secrets.id").
+		Where("ps.project_id = ?", projectID).
+		Order("secrets.name ASC").
 		Find(&secrets).Error
 	if err != nil {
 		return nil, fmt.Errorf("list secrets by project: %w", err)
@@ -52,7 +54,8 @@ func (r *SecretRepository) FindByProjectAndID(ctx context.Context, projectID, se
 	var secret model.Secret
 	err := r.db.WithContext(ctx).
 		Preload("Values").
-		Where("id = ? AND project_id = ?", secretID, projectID).
+		Joins("JOIN project_secrets ps ON ps.secret_id = secrets.id").
+		Where("secrets.id = ? AND ps.project_id = ?", secretID, projectID).
 		First(&secret).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -63,8 +66,8 @@ func (r *SecretRepository) FindByProjectAndID(ctx context.Context, projectID, se
 	return &secret, nil
 }
 
-func (r *SecretRepository) ExistsByName(ctx context.Context, projectID uuid.UUID, name string, excludeID *uuid.UUID) (bool, error) {
-	q := r.db.WithContext(ctx).Model(&model.Secret{}).Where("project_id = ? AND name = ?", projectID, name)
+func (r *SecretRepository) ExistsByName(ctx context.Context, name string, excludeID *uuid.UUID) (bool, error) {
+	q := r.db.WithContext(ctx).Model(&model.Secret{}).Where("name = ?", name)
 	if excludeID != nil {
 		q = q.Where("id <> ?", *excludeID)
 	}
@@ -73,6 +76,85 @@ func (r *SecretRepository) ExistsByName(ctx context.Context, projectID uuid.UUID
 		return false, fmt.Errorf("check secret name exists: %w", err)
 	}
 	return count > 0, nil
+}
+
+func (r *SecretRepository) IsAttached(ctx context.Context, projectID, secretID uuid.UUID) (bool, error) {
+	var count int64
+	err := r.db.WithContext(ctx).Model(&model.ProjectSecret{}).
+		Where("project_id = ? AND secret_id = ?", projectID, secretID).
+		Count(&count).Error
+	if err != nil {
+		return false, fmt.Errorf("check secret attached: %w", err)
+	}
+	return count > 0, nil
+}
+
+func (r *SecretRepository) Attach(ctx context.Context, projectID, secretID uuid.UUID) error {
+	err := r.db.WithContext(ctx).Clauses(clause.OnConflict{DoNothing: true}).
+		Create(&model.ProjectSecret{ProjectID: projectID, SecretID: secretID}).Error
+	if err != nil {
+		return fmt.Errorf("attach secret to project: %w", err)
+	}
+	return nil
+}
+
+func (r *SecretRepository) Detach(ctx context.Context, projectID, secretID uuid.UUID) error {
+	res := r.db.WithContext(ctx).
+		Where("project_id = ? AND secret_id = ?", projectID, secretID).
+		Delete(&model.ProjectSecret{})
+	if res.Error != nil {
+		return fmt.Errorf("detach secret from project: %w", res.Error)
+	}
+	if res.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}
+
+func (r *SecretRepository) DetachAllByProjectID(ctx context.Context, projectID uuid.UUID) error {
+	if err := r.db.WithContext(ctx).Where("project_id = ?", projectID).Delete(&model.ProjectSecret{}).Error; err != nil {
+		return fmt.Errorf("detach all secrets for project: %w", err)
+	}
+	return nil
+}
+
+func (r *SecretRepository) CountProjects(ctx context.Context, secretID uuid.UUID) (int64, error) {
+	var count int64
+	err := r.db.WithContext(ctx).Model(&model.ProjectSecret{}).
+		Where("secret_id = ?", secretID).
+		Count(&count).Error
+	if err != nil {
+		return 0, fmt.Errorf("count secret projects: %w", err)
+	}
+	return count, nil
+}
+
+// Search catalogs secrets by name substring. When excludeProjectID is set, omits secrets
+// already attached to that project. limit must be > 0.
+func (r *SecretRepository) Search(
+	ctx context.Context,
+	titleQuery string,
+	excludeProjectID *uuid.UUID,
+	limit int,
+) ([]model.Secret, error) {
+	q := r.db.WithContext(ctx).Model(&model.Secret{}).Order("name ASC").Limit(limit)
+	if term := strings.TrimSpace(titleQuery); term != "" {
+		q = q.Where(`name ILIKE ? ESCAPE '\'`, "%"+escapeILIKE(term)+"%")
+	}
+	if excludeProjectID != nil {
+		q = q.Where(
+			`NOT EXISTS (
+				SELECT 1 FROM project_secrets ps
+				WHERE ps.secret_id = secrets.id AND ps.project_id = ?
+			)`,
+			*excludeProjectID,
+		)
+	}
+	var secrets []model.Secret
+	if err := q.Find(&secrets).Error; err != nil {
+		return nil, fmt.Errorf("search secrets: %w", err)
+	}
+	return secrets, nil
 }
 
 func (r *SecretRepository) Create(ctx context.Context, secret *model.Secret) (*model.Secret, error) {
@@ -142,43 +224,19 @@ func (r *SecretRepository) DeleteValue(ctx context.Context, secretID, environmen
 	return nil
 }
 
-// ListValuesForEnvironment returns secrets that have a value for the given project+environment.
+// ListValuesForEnvironment returns secret values for secrets attached to the project
+// that have a value for the given environment.
 func (r *SecretRepository) ListValuesForEnvironment(ctx context.Context, projectID, environmentID uuid.UUID) ([]model.SecretValue, error) {
 	var values []model.SecretValue
 	err := r.db.WithContext(ctx).
 		Joins("JOIN secrets ON secrets.id = secret_values.secret_id").
+		Joins("JOIN project_secrets ps ON ps.secret_id = secrets.id").
 		Preload("Secret").
-		Where("secrets.project_id = ? AND secret_values.environment_id = ?", projectID, environmentID).
+		Where("ps.project_id = ? AND secret_values.environment_id = ?", projectID, environmentID).
 		Order("secrets.name ASC").
 		Find(&values).Error
 	if err != nil {
 		return nil, fmt.Errorf("list secret values for environment: %w", err)
 	}
 	return values, nil
-}
-
-// DeleteValuesForEnvironments removes secret values for the given environments within a project.
-func (r *SecretRepository) DeleteValuesForEnvironments(ctx context.Context, projectID uuid.UUID, environmentIDs []uuid.UUID) error {
-	if len(environmentIDs) == 0 {
-		return nil
-	}
-	err := r.db.WithContext(ctx).
-		Where(
-			`secret_id IN (SELECT id FROM secrets WHERE project_id = ?) AND environment_id IN ?`,
-			projectID,
-			environmentIDs,
-		).
-		Delete(&model.SecretValue{}).Error
-	if err != nil {
-		return fmt.Errorf("delete secret values for environments: %w", err)
-	}
-	return nil
-}
-
-// DeleteByProjectID removes all secrets (and cascading values) for a project.
-func (r *SecretRepository) DeleteByProjectID(ctx context.Context, projectID uuid.UUID) error {
-	if err := r.db.WithContext(ctx).Where("project_id = ?", projectID).Delete(&model.Secret{}).Error; err != nil {
-		return fmt.Errorf("delete secrets by project: %w", err)
-	}
-	return nil
 }

@@ -47,6 +47,22 @@ func TestDelete_InvalidProjectID(t *testing.T) {
 	}
 }
 
+func TestAttach_InvalidProjectID(t *testing.T) {
+	svc := secret.New(nil, nil, testCrypter(t), nil)
+	_, err := svc.Attach(t.Context(), uuid.Nil.String(), "a@b.com", service.RoleUser, "bad", uuid.New().String())
+	if err != service.ErrProjectNotFound {
+		t.Errorf("Attach() error = %v, want ErrProjectNotFound", err)
+	}
+}
+
+func TestSearch_InvalidExcludeProjectID(t *testing.T) {
+	svc := secret.New(nil, nil, testCrypter(t), nil)
+	_, err := svc.Search(t.Context(), "DB", "not-a-uuid", "")
+	if err != service.ErrProjectNotFound {
+		t.Errorf("Search() error = %v, want ErrProjectNotFound", err)
+	}
+}
+
 func TestFormatDotEnv(t *testing.T) {
 	out := secret.FormatDotEnv([]secret.DownloadItem{
 		{Name: "A", Value: "simple"},

@@ -52,6 +52,8 @@
     "secretCreated": "Secret criada",
     "secretUpdated": "Secret atualizada",
     "secretDeleted": "Secret excluída",
+    "secretAttached": "Secret anexada ao projeto",
+    "secretDetached": "Secret removida do projeto",
     "secretValueSet": "Valor de secret definido",
     "secretValueCleared": "Valor de secret removido",
     "secretDownloaded": "Secrets baixadas"

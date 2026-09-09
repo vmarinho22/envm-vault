@@ -22,6 +22,10 @@ type createRequest struct {
 	Values map[string]string `json:"values"`
 }
 
+type attachRequest struct {
+	SecretID string `json:"secret_id"`
+}
+
 type updateNameRequest struct {
 	Name string `json:"name"`
 }
@@ -30,12 +34,44 @@ type setValueRequest struct {
 	Value string `json:"value"`
 }
 
+func (h *Handler) SearchCatalog(c *fiber.Ctx) error {
+	resp, err := h.secret.Search(
+		c.UserContext(),
+		c.Query("title"),
+		c.Query("exclude_project_id"),
+		c.Query("limit"),
+	)
+	if err != nil {
+		return httperr.Write(c, err)
+	}
+	return c.JSON(resp)
+}
+
 func (h *Handler) List(c *fiber.Ctx) error {
 	resp, err := h.secret.List(c.UserContext(), c.Params("id"))
 	if err != nil {
 		return httperr.Write(c, err)
 	}
 	return c.JSON(resp)
+}
+
+func (h *Handler) Attach(c *fiber.Ctx) error {
+	var req attachRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid request body"})
+	}
+	resp, err := h.secret.Attach(
+		c.UserContext(),
+		middleware.GetUserID(c),
+		middleware.GetUserEmail(c),
+		middleware.GetUserRole(c),
+		c.Params("id"),
+		req.SecretID,
+	)
+	if err != nil {
+		return httperr.Write(c, err)
+	}
+	return c.Status(fiber.StatusCreated).JSON(resp)
 }
 
 func (h *Handler) Create(c *fiber.Ctx) error {
