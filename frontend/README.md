@@ -54,7 +54,7 @@ O frontend **não** usa o `.env` da API. Configure só variáveis públicas aqui
 | Arquivo | Conteúdo |
 |---------|----------|
 | `../api/.env` | Secrets da API (nunca `VITE_*`) |
-| `../.docker/db/.env` | PostgreSQL / Docker Compose (`POSTGRES_*`) |
+| `../.deploy/db/.env` | PostgreSQL / Docker Compose (`POSTGRES_*`) |
 | `.env` | Só `VITE_*` — vão para o bundle do browser |
 
 Leitura e validação ficam centralizadas em `src/shared/env/envs.ts`:

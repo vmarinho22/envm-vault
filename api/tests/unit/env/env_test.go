@@ -15,6 +15,7 @@ func clearAppEnv(t *testing.T) {
 	for _, key := range []string{
 		"DATABASE_URL", "JWT_SECRET", "ENCRYPTION_KEY", "ENCRYPTION_KEY_VERSION",
 		"APP_ENV", "PORT", "JWT_EXPIRY", "CORS_ORIGINS", "RATE_LIMIT_MAX", "RATE_LIMIT_WINDOW",
+		"FRONTEND_DIST",
 	} {
 		os.Unsetenv(key)
 	}
@@ -188,5 +189,27 @@ func TestLoad_RateLimitDefaults(t *testing.T) {
 	}
 	if env.Envs.RateLimit.Window.String() != "1m0s" {
 		t.Errorf("RateLimit.Window = %v, want 1m", env.Envs.RateLimit.Window)
+	}
+}
+
+func TestLoad_FrontendDistOptional(t *testing.T) {
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("getwd: %v", err)
+	}
+	t.Chdir(t.TempDir())
+	t.Cleanup(func() { t.Chdir(wd) })
+
+	clearAppEnv(t)
+	t.Setenv("DATABASE_URL", "postgres://envm:envm@localhost:5432/envm?sslmode=disable")
+	t.Setenv("JWT_SECRET", "test-secret")
+	t.Setenv("ENCRYPTION_KEY", testEncryptionKey)
+	t.Setenv("FRONTEND_DIST", " /app/ui ")
+
+	if err := env.Load(); err != nil {
+		t.Fatalf("Load() error = %v", err)
+	}
+	if env.Envs.App.FrontendDist != "/app/ui" {
+		t.Errorf("FrontendDist = %q, want /app/ui", env.Envs.App.FrontendDist)
 	}
 }

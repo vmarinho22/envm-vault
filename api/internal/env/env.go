@@ -18,8 +18,8 @@ import (
 // Usage: env.Load() then env.Envs.Database.URL (same idea as `import { envs } from 'env'`).
 //
 // Required: DATABASE_URL, JWT_SECRET, ENCRYPTION_KEY.
-// Optional (defaults): APP_ENV, PORT, JWT_EXPIRY, CORS_ORIGINS, RATE_LIMIT_*, ENCRYPTION_KEY_VERSION.
-// POSTGRES_* are Docker Compose / .docker/db/.env only — not loaded here.
+// Optional (defaults): APP_ENV, PORT, JWT_EXPIRY, CORS_ORIGINS, RATE_LIMIT_*, ENCRYPTION_KEY_VERSION, FRONTEND_DIST.
+// POSTGRES_* are Docker Compose / .deploy/db/.env only — not loaded here.
 var Envs Vars
 
 // Vars holds validated environment values after Load(), grouped by context.
@@ -33,8 +33,9 @@ type Vars struct {
 }
 
 type AppEnv struct {
-	Env  string // APP_ENV
-	Port string
+	Env          string // APP_ENV
+	Port         string
+	FrontendDist string // FRONTEND_DIST; empty disables SPA serving
 }
 
 type DatabaseEnv struct {
@@ -92,8 +93,9 @@ func Load() error {
 
 	Envs = Vars{
 		App: AppEnv{
-			Env:  optionalString("APP_ENV", "development"),
-			Port: optionalString("PORT", "8080"),
+			Env:          optionalString("APP_ENV", "development"),
+			Port:         optionalString("PORT", "8080"),
+			FrontendDist: strings.TrimSpace(os.Getenv("FRONTEND_DIST")),
 		},
 		Database: DatabaseEnv{
 			URL: databaseURL,

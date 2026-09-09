@@ -3,6 +3,7 @@ package router_test
 import (
 	"io"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 
@@ -156,5 +157,64 @@ func TestRegister_DownloadRequiresAPIKey(t *testing.T) {
 	}
 	if strings.Contains(got, "invalid or expired token") {
 		t.Fatalf("download hit JWT middleware: %q", got)
+	}
+}
+
+func TestMountFrontend_ServesIndexAndKeepsAPI(t *testing.T) {
+	dir := t.TempDir()
+	indexPath := dir + "/index.html"
+	if err := os.WriteFile(indexPath, []byte("<!doctype html><title>ui</title>"), 0o644); err != nil {
+		t.Fatalf("write index: %v", err)
+	}
+
+	app := fiber.New()
+	router.Register(app, emptyDeps(
+		middleware.NewJWTMiddleware("test-secret", nil, nil),
+		middleware.NewAPIKeyMiddleware(nil, nil, nil),
+	))
+	router.MountFrontend(app, dir)
+
+	spaReq := httptest.NewRequest(fiber.MethodGet, "/projects/demo", nil)
+	spaResp, err := app.Test(spaReq, -1)
+	if err != nil {
+		t.Fatalf("spa request: %v", err)
+	}
+	defer spaResp.Body.Close()
+	if spaResp.StatusCode != fiber.StatusOK {
+		t.Fatalf("spa status = %d, want %d", spaResp.StatusCode, fiber.StatusOK)
+	}
+	body, _ := io.ReadAll(spaResp.Body)
+	if !strings.Contains(string(body), "<title>ui</title>") {
+		t.Fatalf("spa body = %q, want index html", body)
+	}
+
+	apiReq := httptest.NewRequest(fiber.MethodGet, "/v1/tokens/me", nil)
+	apiResp, err := app.Test(apiReq, -1)
+	if err != nil {
+		t.Fatalf("api request: %v", err)
+	}
+	defer apiResp.Body.Close()
+	if apiResp.StatusCode != fiber.StatusUnauthorized {
+		t.Fatalf("api status = %d, want %d (route must not be SPA)", apiResp.StatusCode, fiber.StatusUnauthorized)
+	}
+	apiBody, _ := io.ReadAll(apiResp.Body)
+	if strings.Contains(string(apiBody), "<title>ui</title>") {
+		t.Fatalf("API route was shadowed by SPA")
+	}
+}
+
+func TestMountFrontend_EmptyDistIsNoop(t *testing.T) {
+	app := fiber.New()
+	router.MountFrontend(app, "")
+	router.MountFrontend(app, "/path/does/not/exist")
+
+	req := httptest.NewRequest(fiber.MethodGet, "/", nil)
+	resp, err := app.Test(req, -1)
+	if err != nil {
+		t.Fatalf("request: %v", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != fiber.StatusNotFound {
+		t.Fatalf("status = %d, want 404 when frontend is not mounted", resp.StatusCode)
 	}
 }

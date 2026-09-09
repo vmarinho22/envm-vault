@@ -120,10 +120,14 @@ func main() {
 		JWT:         middleware.NewJWTMiddleware(env.Envs.JWT.Secret, userRepo, auditSvc),
 		APIKey:      middleware.NewAPIKeyMiddleware(tokenRepo, userRepo, auditSvc),
 	})
+	router.MountFrontend(app, env.Envs.App.FrontendDist)
 
 	go func() {
 		addr := ":" + env.Envs.App.Port
 		log.Printf("server starting on %s (env=%s)", addr, env.Envs.App.Env)
+		if dist := env.Envs.App.FrontendDist; dist != "" {
+			log.Printf("serving frontend from %s", dist)
+		}
 		if err := app.Listen(addr); err != nil {
 			log.Fatalf("server error: %v", err)
 		}

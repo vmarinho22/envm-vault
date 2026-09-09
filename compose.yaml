@@ -1,0 +1,48 @@
+# App (API + UI) + Postgres. Docker or Podman.
+#
+# No clone: download this file + create .deploy/{db,api}/.env (see README), then:
+#   docker compose up -d
+#
+# Local build from a clone:
+#   make up
+#
+# Env:
+#   .deploy/db/.env   → Postgres
+#   .deploy/api/.env  → app runtime
+#   .deploy/frontend/.env → only when building the image locally
+
+services:
+  postgres:
+    image: docker.io/library/postgres:16-alpine
+    env_file:
+      - .deploy/db/.env
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    # Default: published image (no repo clone / no local build).
+    # Local build: APP_IMAGE=envm-vault:local (see `make up`).
+    image: ${APP_IMAGE:-ghcr.io/envm-vault/envm-vault:latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    pull_policy: missing
+    env_file:
+      - .deploy/api/.env
+    environment:
+      FRONTEND_DIST: /app/ui
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

@@ -1,38 +1,43 @@
-.PHONY: help setup db-up db-down db-reset migrate dev frontend-dev test test-unit test-frontend test-rtk rtk-trust hooks-install hooks-uninstall
+.PHONY: help setup db-up db-down db-reset migrate dev frontend-dev up down logs test test-unit test-frontend test-rtk rtk-trust hooks-install hooks-uninstall
 
 help:
-	@echo "Available commands:"
-	@echo "  make setup             - Copy api/, frontend/, and .docker/db .env.example files if missing"
-	@echo "  make db-up             - Start PostgreSQL via docker compose"
-	@echo "  make db-down           - Stop PostgreSQL"
-	@echo "  make db-reset          - Reset database volume and run AutoMigrate"
-	@echo "  make migrate           - Run database migrations (GORM AutoMigrate)"
-	@echo "  make dev               - Run API server"
-	@echo "  make frontend-dev      - Run Vue admin UI (port 3100)"
-	@echo "  make test              - Run API + frontend unit tests"
-	@echo "  make test-unit         - Same as make test"
-	@echo "  make test-frontend     - Run frontend unit tests (Vitest)"
-	@echo "  make test-rtk          - Run tests via RTK (token-optimized output)"
-	@echo "  make hooks-install     - Install git hooks via lefthook"
-	@echo "  make hooks-uninstall   - Remove git hooks installed by lefthook"
-	@echo "  make rtk-trust         - Trust project RTK filters (.rtk/filters.toml)"
+	@echo "Development (API + UI separately):"
+	@echo "  make setup          - Copy .env examples if missing (optional; see README)"
+	@echo "  make db-up          - Start Postgres only"
+	@echo "  make migrate        - Run AutoMigrate"
+	@echo "  make dev            - API on :8080"
+	@echo "  make frontend-dev   - UI on :3100"
+	@echo ""
+	@echo "Container (API + UI in one image + Postgres):"
+	@echo "  make up             - Build image, start stack → http://localhost:8080"
+	@echo "  make logs           - Follow app logs (OTP when APP_ENV=development)"
+	@echo "  make down           - Stop stack"
+	@echo "  (published image: create .deploy/{db,api}/.env then APP_IMAGE=… docker compose up -d)"
+	@echo ""
+	@echo "Other: make test | hooks-install | rtk-trust"
 
-COMPOSE_ENV := --env-file .docker/db/.env
+COMPOSE := docker compose
+COMPOSE_DB := $(COMPOSE) --env-file .deploy/db/.env
 
 setup:
 	@test -f api/.env || cp api/.env.example api/.env
 	@test -f frontend/.env || cp frontend/.env.example frontend/.env
-	@test -f .docker/db/.env || cp .docker/db/.env.example .docker/db/.env
-	@echo "Setup complete. Edit api/.env (API), frontend/.env (UI), and .docker/db/.env (Postgres) if needed."
+	@test -f .deploy/db/.env || cp .deploy/db/.env.example .deploy/db/.env
+	@test -f .deploy/api/.env || cp .deploy/api/.env.example .deploy/api/.env
+	@test -f .deploy/frontend/.env || cp .deploy/frontend/.env.example .deploy/frontend/.env
+	@echo "Setup complete."
+	@echo "  Dev:       api/.env + frontend/.env → make db-up && make migrate && make dev"
+	@echo "  Container: .deploy/{db,api,frontend}/.env → make up && make logs"
 
 db-up:
-	docker compose $(COMPOSE_ENV) up -d postgres
+	@test -f .deploy/db/.env || cp .deploy/db/.env.example .deploy/db/.env
+	$(COMPOSE_DB) up -d postgres
 
 db-down:
-	docker compose $(COMPOSE_ENV) down
+	$(COMPOSE_DB) down
 
 db-reset:
-	docker compose $(COMPOSE_ENV) down -v && docker compose $(COMPOSE_ENV) up -d postgres
+	$(COMPOSE_DB) down -v && $(COMPOSE_DB) up -d postgres
 	@sleep 2
 	@$(MAKE) migrate
 
@@ -44,6 +49,20 @@ dev:
 
 frontend-dev:
 	cd frontend && npm run dev
+
+up:
+	@test -f .deploy/db/.env || cp .deploy/db/.env.example .deploy/db/.env
+	@test -f .deploy/api/.env || cp .deploy/api/.env.example .deploy/api/.env
+	@test -f .deploy/frontend/.env || cp .deploy/frontend/.env.example .deploy/frontend/.env
+	@echo "Building and starting → http://localhost:8080"
+	APP_IMAGE=envm-vault:local $(COMPOSE) up -d --build
+	@echo "Ready. OTP: make logs | Stop: make down"
+
+down:
+	$(COMPOSE) down
+
+logs:
+	$(COMPOSE) logs -f app
 
 test: test-unit
 

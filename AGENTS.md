@@ -36,7 +36,8 @@ envm-vault/
 │   │   ├── repository/    ← data access layer
 │   └── tests/unit/        ← unit tests (mirrors internal/)
 ├── docs/
-├── docker-compose.yml
+├── compose.yaml
+├── Dockerfile
 ├── Makefile
 └── frontend/              ← Vue 3 admin UI (Vite, login + API key)
 ```
@@ -46,13 +47,14 @@ Always read `docs/architecture.md` before implementing domain logic.
 ## Security Rules (always apply)
 
 1. **Never commit secrets** — no real tokens, passwords, or `.env` files with production values.
-2. **Env split** — `api/.env` is API secrets; `.docker/db/.env` is PostgreSQL/Docker Compose (`POSTGRES_*`); `frontend/.env` is `VITE_*` only (public, baked into the browser bundle). Never put `JWT_SECRET` / `DATABASE_URL` / `ENCRYPTION_KEY` in the frontend env.
+2. **Env split** — Local: `api/.env`, `frontend/.env`. Containers: `.deploy/db/.env`, `.deploy/api/.env` (required at runtime); `.deploy/frontend/.env` only for image **build**. Image-only users create envs via `cp`/`curl` from `.env.example` (see README) — do not assume `make setup`. Never put `JWT_SECRET` / `DATABASE_URL` / `ENCRYPTION_KEY` in frontend env.
 3. **Never log secret values** — OTP codes are logged only in `APP_ENV=development`.
-4. **OTP lockout** — max 5 failed verify attempts per code; HTTP rate limit via `RATE_LIMIT_MAX` / `RATE_LIMIT_WINDOW`.
+4. **OTP lockout** — max 5 failed verify attempts per code; HTTP rate limit via `RATE_LIMIT_MAX` / `RATE_LIMIT_WINDOW` (API `/v1` only when SPA is served).
 5. **API keys** — one active key per user, hashed at rest; plaintext returned only from `POST /v1/tokens`.
 6. **Secret encryption** — `ENCRYPTION_KEY` (32-byte hex) encrypts secret values at rest (AES-256-GCM); separate from `JWT_SECRET`.
 7. **Audit** — `audit_logs` via `service/audit`; never include OTP, JWT, or full personal token plaintext.
 8. **Minimal diffs** — do not refactor unrelated code in the same change.
+9. **Container** — Default Compose image is GHCR (`ghcr.io/envm-vault/envm-vault`). No-clone users: curl `compose.yaml` + `.deploy/{db,api}/.env`, then `docker compose up -d`. Local build: `make up` (sets `APP_IMAGE=envm-vault:local`).
 
 ## Conventions
 
@@ -95,7 +97,7 @@ Always read `docs/architecture.md` before implementing domain logic.
 ### Commands
 
 ```bash
-make setup      # copy api/, frontend/, and .docker/db .env.example → .env if missing
+make setup      # copy api/, frontend/, and .deploy/db .env.example → .env if missing
 make db-up      # start PostgreSQL
 make migrate    # run GORM AutoMigrate
 make db-reset   # reset database volume + AutoMigrate

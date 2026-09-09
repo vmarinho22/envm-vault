@@ -2,17 +2,97 @@
 
 Vault open source para gerenciar e distribuir variáveis de ambiente.
 
-Crie projetos, anexe secrets de um catálogo global, defina valores por ambiente e baixe um `.env` com um token pessoal (`ev_…`) — no CI, no terminal ou no painel admin.
+Crie projetos, anexe secrets de um catálogo global, defina valores por ambiente e baixe um `.env` com um token pessoal (`ev_…`).
 
-## O que você pode fazer
+Detalhes técnicos: [docs/architecture.md](docs/architecture.md).
 
-- **Projetos** com times, tags e ambientes (`dev`, `staging`, `production`, …)
-- **Catálogo global de secrets** compartilhados entre projetos (valores criptografados em repouso)
-- **Prefixos por secret × ambiente** no download (ex.: `API_URL` → `VITE_API_URL`)
-- **UI admin** (Vue) para login OTP, chave de API, projetos e secrets
-- **Download programático** via API key para pipelines e desenvolvedores
+## Sumário
 
-Detalhes de domínio e segurança: [docs/architecture.md](docs/architecture.md).
+1. [Como usar](#como-usar)
+2. [Stack](#stack)
+3. [Arquivos `.env` (detalhes)](#arquivos-env-detalhes)
+4. [Outras formas de rodar](#outras-formas-de-rodar)
+5. [Download de env (API key)](#download-de-env-api-key)
+6. [Testes e agentes](#testes-e-agentes)
+7. [Documentação](#documentação)
+8. [Licença](#licença)
+
+## Como usar
+
+Você **não precisa clonar** o repositório. Basta criar uma pasta com os `.env`, baixar o `compose.yaml` e subir a imagem pronta.
+
+### 1. Pré-requisitos
+
+- [Docker](https://docs.docker.com/get-docker/) (ou Podman) com Docker Compose
+
+### 2. Criar a pasta e os arquivos `.env`
+
+```bash
+mkdir -p envm-vault/.deploy/db envm-vault/.deploy/api
+cd envm-vault
+
+# Postgres
+curl -fsSL https://raw.githubusercontent.com/envm-vault/envm-vault/main/.deploy/db/.env.example \
+  -o .deploy/db/.env
+
+# App (API + UI)
+curl -fsSL https://raw.githubusercontent.com/envm-vault/envm-vault/main/.deploy/api/.env.example \
+  -o .deploy/api/.env
+```
+
+Os exemplos servem para testar em local. Em produção, edite `.deploy/api/.env` e troque pelo menos `JWT_SECRET` e `ENCRYPTION_KEY` (veja [Arquivos `.env`](#arquivos-env-detalhes)).
+
+### 3. Baixar o Compose e subir
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/envm-vault/envm-vault/main/compose.yaml \
+  -o compose.yaml
+
+docker compose up -d
+```
+
+Isso puxa a imagem `ghcr.io/envm-vault/envm-vault:latest`, sobe o Postgres e a app.
+
+Abra: **http://localhost:8080**
+
+### 4. Fazer login
+
+1. Na UI, informe seu e-mail e peça o código OTP.
+2. Com `APP_ENV=development` (padrão do exemplo), o código aparece no log do container:
+
+```bash
+docker compose logs -f app
+# procure por: login code sent … code=……
+```
+
+3. Cole o código e entre. O **primeiro usuário** vira `super_admin`.
+
+### 5. Usar o vault (resumo)
+
+1. Crie ou use um **projeto** e vincule **ambientes** (ex.: `dev`).
+2. Anexe **secrets** e preencha os valores por ambiente.
+3. Em **Tokens**, gere uma chave pessoal (`ev_…`) — copie na hora; ela só aparece uma vez.
+4. Baixe as variáveis:
+
+```bash
+export ENVM_TOKEN="ev_…"   # cole a chave gerada
+curl -fsSL \
+  -H "Authorization: Bearer ${ENVM_TOKEN}" \
+  "http://localhost:8080/v1/projects/<slug-do-projeto>/env?environment=dev&format=env" \
+  -o app.env
+```
+
+Troque `<slug-do-projeto>` pelo slug do seu projeto (ex.: `meu-app`).
+
+### 6. Parar
+
+```bash
+docker compose down
+```
+
+---
+
+Quer construir a imagem localmente, contribuir com código ou usar hot reload? Veja [Outras formas de rodar](#outras-formas-de-rodar).
 
 ## Stack
 
@@ -23,108 +103,101 @@ Detalhes de domínio e segurança: [docs/architecture.md](docs/architecture.md).
 | Auth | OTP por e-mail + JWT · chave de API (`ev_…`) |
 | UI | Vue 3 + Vite + TypeScript + Tailwind + daisyUI |
 
-## Quick Start
+## Arquivos `.env` (detalhes)
 
-Pré-requisitos: [mise](https://mise.jdx.dev/) (Node + Go), Docker, Make.
+Não commite valores reais. Em produção, gere chaves próprias:
+
+```bash
+openssl rand -hex 32   # cole o resultado em ENCRYPTION_KEY
+```
+
+| Arquivo | Precisa? | Para quê |
+|---------|----------|----------|
+| `.deploy/db/.env` | Sim (Compose com Postgres) | `POSTGRES_*` |
+| `.deploy/api/.env` | Sim | Runtime da app |
+| `.deploy/frontend/.env` | Só no **build** da imagem a partir do código | `VITE_*` (vazio = same-origin `/v1`) |
+
+Variáveis **obrigatórias** em `.deploy/api/.env`:
+
+| Variável | Notas |
+|----------|--------|
+| `DATABASE_URL` | No Compose o host é `postgres` (nome do serviço) |
+| `JWT_SECRET` | Troque o valor de exemplo |
+| `ENCRYPTION_KEY` | 64 caracteres hex (32 bytes). **Não mude** depois de gravar secrets — senão o download falha ao descriptografar |
+
+Opcionais (já têm default): `APP_ENV`, `PORT`, `JWT_EXPIRY`, `CORS_ORIGINS`, `RATE_LIMIT_*`, `ENCRYPTION_KEY_VERSION`. Na imagem publicada, `FRONTEND_DIST=/app/ui` já vem definida.
+
+## Outras formas de rodar
+
+### Só a app (Postgres externo)
+
+Se você já tem um PostgreSQL:
+
+```bash
+docker run --rm -p 8080:8080 \
+  -e DATABASE_URL='postgres://USER:PASS@HOST:5432/DB?sslmode=disable' \
+  -e JWT_SECRET='troque-isto' \
+  -e ENCRYPTION_KEY="$(openssl rand -hex 32)" \
+  -e APP_ENV=production \
+  -e CORS_ORIGINS='["http://localhost:8080"]' \
+  ghcr.io/envm-vault/envm-vault:latest
+```
+
+### Clonar e construir localmente
 
 ```bash
 git clone https://github.com/envm-vault/envm-vault.git
 cd envm-vault
-
-mise install        # versões de Node e Go (mise.toml)
-make setup          # copia .env.example → .env se faltarem
-make db-up          # PostgreSQL
-make migrate        # AutoMigrate
-make dev            # API em :8080
-make frontend-dev   # UI em :3100
-make hooks-install  # git hooks (testes + conventional commits)
+make setup
+make up          # build local → envm-vault:local
+make logs
+make down
 ```
 
-| Arquivo | Uso |
-|---------|-----|
-| `api/.env` | Secrets da API (`DATABASE_URL`, `JWT_*`, `ENCRYPTION_KEY`, CORS, rate limit) |
-| `.docker/db/.env` | PostgreSQL / Docker Compose (`POSTGRES_*`) |
-| `frontend/.env` | Só `VITE_*` públicas (expostas no browser) |
+### Desenvolvimento — hot reload
 
-A UI em `http://localhost:3100` faz proxy de `/v1` para a API. Em desenvolvimento, o OTP aparece no log da API.
-
-Gere `ENCRYPTION_KEY` (32 bytes hex) se ainda não existir:
+API e UI em processos separados (precisa de [mise](https://mise.jdx.dev/) ou Go/Node):
 
 ```bash
-openssl rand -hex 32
+git clone https://github.com/envm-vault/envm-vault.git
+cd envm-vault
+mise install
+make setup
+make db-up && make migrate
+make dev              # API :8080
+make frontend-dev     # UI  :3100
 ```
 
-### Primeiro acesso
+Arquivos nesse modo: `api/.env`, `frontend/.env`, `.deploy/db/.env` (ou `make setup`).
 
-1. Abra `http://localhost:3100/login` e entre com um e-mail (o primeiro usuário vira `super_admin`).
-2. Gere sua chave de API em **Chave de API** (mostrada uma vez).
-3. Crie projetos, ambientes e secrets no painel.
-
-Via curl (bootstrap):
-
-```bash
-curl -X POST http://localhost:8080/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email": "admin@example.com"}'
-
-# Código OTP no log da API (APP_ENV=development)
-curl -X POST http://localhost:8080/v1/auth/verify \
-  -H "Content-Type: application/json" \
-  -d '{"email": "admin@example.com", "code": "12345678"}'
-```
-
-### Baixar variáveis (API key)
-
-No detalhe do projeto a UI mostra o snippet pronto. Exemplo:
+## Download de env (API key)
 
 ```bash
 export ENVM_TOKEN="ev_…"
-
 curl -fsSL \
   -H "Authorization: Bearer ${ENVM_TOKEN}" \
   "http://localhost:8080/v1/projects/<slug>/env?environment=dev&format=env" \
-  -o .env
+  -o app.env
 ```
 
-Só `super_admin` pode baixar o ambiente `production`.
+Só o papel `super_admin` pode baixar o ambiente `production`.
 
-## Testes
+## Testes e agentes
 
 ```bash
-make test           # API + frontend
-make test-frontend  # só Vitest
+make test
+brew install rtk && make rtk-trust && make test-rtk
 ```
 
-Em testes de componente Vue, use `expectComponentSnapshot(wrapper)` e versione `__snapshots__/`. Ver [frontend/README.md](frontend/README.md).
-
-## Agentes de IA
-
-Este repositório é otimizado para contribuições assistidas por agentes:
-
-- **[AGENTS.md](AGENTS.md)** — instruções para coding agents
-- **[RTK.md](RTK.md)** — prefixe comandos shell com `rtk` para economizar tokens
-- **[docs/agent-guide.md](docs/agent-guide.md)** — guia completo
-
-```bash
-brew install rtk          # ou: https://www.rtk-ai.app/
-make rtk-trust
-make test-rtk
-```
+- [AGENTS.md](AGENTS.md) · [RTK.md](RTK.md) · [docs/agent-guide.md](docs/agent-guide.md)
 
 ## Documentação
 
 | Documento | Descrição |
 |-----------|-----------|
 | [Arquitetura](docs/architecture.md) | Domínio, API, segurança |
-| [Guia de agentes](docs/agent-guide.md) | Como usar agentes de IA |
-| [AGENTS.md](AGENTS.md) | Convenções para agents |
-| [RTK.md](RTK.md) | CLI otimizada para tokens |
 | [Contribuindo](CONTRIBUTING.md) | Como contribuir |
-| [Segurança](SECURITY.md) | Reporte de vulnerabilidades |
-
-## Contribuindo
-
-Contribuições são bem-vindas! Leia [CONTRIBUTING.md](CONTRIBUTING.md).
+| [Segurança](SECURITY.md) | Vulnerabilidades |
 
 ## Licença
 
@@ -132,4 +205,4 @@ Contribuições são bem-vindas! Leia [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## English Summary
 
-**envm-vault** is an open-source environment variable vault: shared secret catalog, per-project environments, optional download-time name prefixes, Go (Fiber) API, Vue 3 admin UI, and personal API keys for CI/developer downloads. See [docs/architecture.md](docs/architecture.md).
+**envm-vault** — environment variable vault. No clone required: create `.deploy/db/.env` + `.deploy/api/.env`, download `compose.yaml`, run `docker compose up -d` (pulls `ghcr.io/envm-vault/envm-vault`). Dev/contributors: `make setup` + `make up`. See [docs/architecture.md](docs/architecture.md).

@@ -148,7 +148,8 @@ envm-vault/
 │   │   └── slug/         # shared name→slug helper
 ├── frontend/             # Vue 3 admin UI (Vite :3100)
 ├── docs/
-├── docker-compose.yml
+├── compose.yaml          # app image + Postgres (Docker/Podman)
+├── Dockerfile            # single OCI image (API + UI)
 └── Makefile
 ```
 
