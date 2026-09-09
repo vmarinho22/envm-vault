@@ -31,6 +31,13 @@ export interface SecretService {
     environmentId: string,
   ): Promise<RevealSecretResponse>;
   clearValue(projectId: string, secretId: string, environmentId: string): Promise<void>;
+  setPrefix(
+    projectId: string,
+    secretId: string,
+    environmentId: string,
+    prefix: string,
+  ): Promise<Secret>;
+  clearPrefix(projectId: string, secretId: string, environmentId: string): Promise<Secret>;
   exportEnvironment(projectId: string, environmentId: string): Promise<DownloadResponse>;
 }
 
@@ -120,6 +127,25 @@ export const secretService: SecretService = {
   clearValue(projectId: string, secretId: string, environmentId: string): Promise<void> {
     return httpClient.request<void>(
       `/v1/projects/${projectId}/secrets/${secretId}/values/${environmentId}`,
+      { method: 'DELETE' },
+    );
+  },
+
+  setPrefix(
+    projectId: string,
+    secretId: string,
+    environmentId: string,
+    prefix: string,
+  ): Promise<Secret> {
+    return httpClient.request<Secret>(
+      `/v1/projects/${projectId}/secrets/${secretId}/prefixes/${environmentId}`,
+      { method: 'PUT', body: { prefix } },
+    );
+  },
+
+  clearPrefix(projectId: string, secretId: string, environmentId: string): Promise<Secret> {
+    return httpClient.request<Secret>(
+      `/v1/projects/${projectId}/secrets/${secretId}/prefixes/${environmentId}`,
       { method: 'DELETE' },
     );
   },

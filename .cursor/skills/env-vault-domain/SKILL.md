@@ -18,6 +18,9 @@ Global catalog of deployment targets with unique `title` (e.g. `dev`, `staging`,
 ### Secret (EnvVar)
 A named key in the **global catalog** (`secrets` table, unique `name`). Linked to projects via M2M (`project_secrets`). Values live in `secret_values` per Environment (sparse) and are **shared** across all attached projects. Values encrypted at rest (AES-256-GCM, `ENCRYPTION_KEY`). Catalog list: `GET /v1/secrets` (paginated, page size 12). Detail: `GET /v1/secrets/:id` with linked projects.
 
+### ProjectSecretPrefix
+Optional download-time name prefix for `(project, secret, environment)` (e.g. `VITE_`). Stored as plaintext `varchar` (not encrypted — it appears in the `.env` output). Applied only on download/export: emitted name is `prefix + catalogName`. Empty prefix clears the row. Colliding names after prefix → HTTP 409.
+
 ### User
 Account that owns projects and manages a unique API key via the admin UI. May be blocked (`blocked_at`) by admin/super_admin — denies login, JWT, and API key create/rotate; blocking revokes the active key.
 
@@ -36,6 +39,7 @@ Global catalog label with unique `title` and hex `color` (`#RRGGBB`). Linked to 
 GET /v1/projects/{projectSlug}/env?environment={envTitle}
 Authorization: Bearer <access_token>
 → Identifies the user, then returns env vars for that project+environment
+→ Names may include project×secret×env download prefixes
 → environment=production requires role super_admin
 ```
 
@@ -45,9 +49,10 @@ Authorization: Bearer <access_token>
 2. Secret values and API key plaintext never appear in logs.
 3. Project `slug` is the unique natural key for UI routes (`/project/<slug>`); UUID is the PK for mutations and junctions.
 4. Slugs are generated with `api/internal/slug.FromName` (mirrored in `frontend/src/shared/slug`).
-5. Secret names match `^[A-Za-z_][A-Za-z0-9_]*$` (max 128) and are unique globally.
+5. Secret names match `^[A-Za-z_][A-Za-z0-9_]*$` (max 128) and are unique globally. Download prefixes use the same charset (max 64).
 6. Only `super_admin` may download the `production` environment (API key or JWT export).
-7. Detaching a secret from a project (or deleting a project) does not delete catalog values. Changing a value updates all projects that share the secret.
+7. Detaching a secret from a project (or deleting a project) does not delete catalog values. Changing a value updates all projects that share the secret. Detach/delete project clears that project's prefixes.
+8. Prefixes are project-scoped metadata; they do not change the global catalog name.
 
 ## Relationships
 
@@ -59,4 +64,5 @@ Project ↔ Environment (M2M)
 Project ↔ Tag (M2M)
 Project ↔ Secret (M2M via project_secrets)
 Secret → has many → SecretValue (per Environment)
+Project × Secret × Environment → ProjectSecretPrefix (optional)
 ```

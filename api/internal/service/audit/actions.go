@@ -35,5 +35,7 @@ const (
 	ActionSecretDetached            = "secret.detached"
 	ActionSecretValueSet            = "secret_value.set"
 	ActionSecretValueCleared        = "secret_value.cleared"
+	ActionSecretPrefixSet           = "secret_prefix.set"
+	ActionSecretPrefixCleared       = "secret_prefix.cleared"
 	ActionSecretDownloaded          = "secret.downloaded"
 )

@@ -392,6 +392,16 @@ func (s *Service) Update(
 		if err := s.projects.ReplaceAssociations(ctx, project, teams, envs, tags); err != nil {
 			return nil, err
 		}
+
+		if s.secrets != nil {
+			keep := make([]uuid.UUID, 0, len(envs))
+			for _, e := range envs {
+				keep = append(keep, e.ID)
+			}
+			if err := s.secrets.DeletePrefixesOutsideEnvironments(ctx, project.ID, keep); err != nil {
+				return nil, err
+			}
+		}
 	}
 
 	updated, err := s.projects.Update(ctx, project)

@@ -36,4 +36,6 @@ var (
 	ErrEnvironmentParamRequired          = errors.New("environment query parameter is required")
 	ErrProductionDownloadForbidden       = errors.New("only super_admin can download production environment")
 	ErrProductionEnvironmentProtected    = errors.New("production environment cannot be modified or deleted")
+	ErrInvalidSecretPrefix               = errors.New("invalid secret prefix")
+	ErrDownloadNameConflict              = errors.New("download names conflict after applying prefixes")
 )

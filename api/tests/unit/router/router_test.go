@@ -79,6 +79,7 @@ func TestRegister_RoutesRegistered(t *testing.T) {
 		"GET /v1/projects/:id/secrets":   false,
 		"POST /v1/projects/:id/secrets":  false,
 		"GET /v1/projects/:slug/env":     false,
+		"PUT /v1/projects/:id/secrets/:secretId/prefixes/:environmentId": false,
 	}
 
 	for _, route := range app.GetRoutes() {

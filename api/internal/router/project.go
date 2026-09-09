@@ -28,5 +28,7 @@ func registerProjectRoutes(v1 fiber.Router, deps Deps) {
 	projects.Put("/:id/secrets/:secretId/values/:environmentId", deps.Secret.SetValue)
 	projects.Get("/:id/secrets/:secretId/values/:environmentId", deps.Secret.RevealValue)
 	projects.Delete("/:id/secrets/:secretId/values/:environmentId", deps.Secret.ClearValue)
+	projects.Put("/:id/secrets/:secretId/prefixes/:environmentId", deps.Secret.SetPrefix)
+	projects.Delete("/:id/secrets/:secretId/prefixes/:environmentId", deps.Secret.ClearPrefix)
 	projects.Get("/:id/environments/:environmentId/values", deps.Secret.ExportEnvironment)
 }

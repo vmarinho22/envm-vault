@@ -91,4 +91,35 @@ describe('secretService', () => {
       body: { value: 'secret' },
     });
   });
+
+  it('setPrefix puts prefix body', async () => {
+    requestMock.mockResolvedValue({
+      id: 's1',
+      name: 'X',
+      values: {},
+      project_count: 1,
+      created_at: '',
+      updated_at: '',
+    });
+    await secretService.setPrefix('p1', 's1', 'e1', 'VITE_');
+    expect(requestMock).toHaveBeenCalledWith('/v1/projects/p1/secrets/s1/prefixes/e1', {
+      method: 'PUT',
+      body: { prefix: 'VITE_' },
+    });
+  });
+
+  it('clearPrefix deletes prefix path', async () => {
+    requestMock.mockResolvedValue({
+      id: 's1',
+      name: 'X',
+      values: {},
+      project_count: 1,
+      created_at: '',
+      updated_at: '',
+    });
+    await secretService.clearPrefix('p1', 's1', 'e1');
+    expect(requestMock).toHaveBeenCalledWith('/v1/projects/p1/secrets/s1/prefixes/e1', {
+      method: 'DELETE',
+    });
+  });
 });

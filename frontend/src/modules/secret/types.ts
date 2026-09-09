@@ -3,6 +3,7 @@ export const SECRET_PAGE_SIZE = 12;
 export interface SecretValueMeta {
   has_value: boolean;
   updated_at?: string;
+  prefix?: string;
 }
 
 export interface Secret {

@@ -24,6 +24,7 @@ const {
   editingSecret,
   selectedEnvironmentIds,
   valuesByEnv,
+  prefixesByEnv,
   environmentOptions,
   load,
   runCatalogSearch,
@@ -33,6 +34,7 @@ const {
   closeForm,
   setSelectedEnvironmentIds,
   setEnvValue,
+  setEnvPrefix,
   submitForm,
   removeSecret,
   envTitlesForSecret,
@@ -211,11 +213,13 @@ onMounted(() => {
       :environment-options="environmentOptions"
       :selected-environment-ids="selectedEnvironmentIds"
       :values-by-env="valuesByEnv"
+      :prefixes-by-env="prefixesByEnv"
       @close="closeForm"
       @submit="submitForm"
       @update:name="formName = $event"
       @update:selected-environment-ids="setSelectedEnvironmentIds"
       @update:value="setEnvValue($event.environmentId, $event.value)"
+      @update:prefix="setEnvPrefix($event.environmentId, $event.prefix)"
     />
   </section>
 </template>

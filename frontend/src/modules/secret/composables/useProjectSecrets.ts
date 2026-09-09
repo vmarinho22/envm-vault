@@ -30,6 +30,7 @@ export function useProjectSecrets() {
   const editingSecret = ref<Secret | null>(null);
   const selectedEnvironmentIds = ref<string[]>([]);
   const valuesByEnv = ref<Record<string, string>>({});
+  const prefixesByEnv = ref<Record<string, string>>({});
 
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -175,6 +176,7 @@ export function useProjectSecrets() {
     formName.value = prefillName;
     selectedEnvironmentIds.value = [];
     valuesByEnv.value = {};
+    prefixesByEnv.value = {};
     formOpen.value = true;
   }
 
@@ -188,15 +190,25 @@ export function useProjectSecrets() {
     // values for other projects' environments.
     const projectEnvIds = new Set(project.value.environments.map((e) => e.id));
     const envIds = Object.keys(secret.values).filter(
-      (id) => secret.values[id]?.has_value && projectEnvIds.has(id),
+      (id) =>
+        projectEnvIds.has(id) &&
+        (secret.values[id]?.has_value || Boolean(secret.values[id]?.prefix)),
     );
-    selectedEnvironmentIds.value = envIds;
-    valuesByEnv.value = Object.fromEntries(envIds.map((id) => [id, '']));
+    // Prefer envs that have values; still include prefix-only for editing.
+    const valueEnvIds = envIds.filter((id) => secret.values[id]?.has_value);
+    selectedEnvironmentIds.value = valueEnvIds.length > 0 ? valueEnvIds : envIds;
+    valuesByEnv.value = Object.fromEntries(selectedEnvironmentIds.value.map((id) => [id, '']));
+    prefixesByEnv.value = Object.fromEntries(
+      selectedEnvironmentIds.value.map((id) => [id, secret.values[id]?.prefix ?? '']),
+    );
     formOpen.value = true;
 
     try {
       const revealed = await Promise.all(
-        envIds.map(async (environmentId) => {
+        selectedEnvironmentIds.value.map(async (environmentId) => {
+          if (!secret.values[environmentId]?.has_value) {
+            return [environmentId, ''] as const;
+          }
           const resp = await secretService.revealValue(project.value!.id, secret.id, environmentId);
           return [environmentId, resp.value] as const;
         }),
@@ -218,19 +230,36 @@ export function useProjectSecrets() {
     formName.value = '';
     selectedEnvironmentIds.value = [];
     valuesByEnv.value = {};
+    prefixesByEnv.value = {};
   }
 
   function setSelectedEnvironmentIds(ids: string[]): void {
     selectedEnvironmentIds.value = ids;
-    const next: Record<string, string> = {};
+    const nextValues: Record<string, string> = {};
+    const nextPrefixes: Record<string, string> = {};
     for (const id of ids) {
-      next[id] = valuesByEnv.value[id] ?? '';
+      nextValues[id] = valuesByEnv.value[id] ?? '';
+      nextPrefixes[id] =
+        prefixesByEnv.value[id] ?? editingSecret.value?.values[id]?.prefix ?? '';
     }
-    valuesByEnv.value = next;
+    valuesByEnv.value = nextValues;
+    prefixesByEnv.value = nextPrefixes;
   }
 
   function setEnvValue(environmentId: string, value: string): void {
     valuesByEnv.value = { ...valuesByEnv.value, [environmentId]: value };
+  }
+
+  function setEnvPrefix(environmentId: string, prefix: string): void {
+    prefixesByEnv.value = { ...prefixesByEnv.value, [environmentId]: prefix };
+  }
+
+  async function persistPrefixes(secretId: string, environmentIds: string[]): Promise<void> {
+    if (!project.value) return;
+    for (const id of environmentIds) {
+      const prefix = (prefixesByEnv.value[id] ?? '').trim();
+      await secretService.setPrefix(project.value.id, secretId, id, prefix);
+    }
   }
 
   async function submitForm(): Promise<void> {
@@ -248,11 +277,19 @@ export function useProjectSecrets() {
         const previousIds = new Set(
           Object.keys(secret.values).filter((id) => secret.values[id]?.has_value),
         );
+        const previousPrefixIds = new Set(
+          Object.keys(secret.values).filter((id) => Boolean(secret.values[id]?.prefix)),
+        );
         const nextIds = new Set(selectedEnvironmentIds.value);
 
         for (const id of previousIds) {
           if (!nextIds.has(id)) {
             await secretService.clearValue(project.value.id, secret.id, id);
+          }
+        }
+        for (const id of previousPrefixIds) {
+          if (!nextIds.has(id)) {
+            await secretService.clearPrefix(project.value.id, secret.id, id);
           }
         }
 
@@ -263,12 +300,14 @@ export function useProjectSecrets() {
           }
           await secretService.setValue(project.value.id, secret.id, id, plaintext);
         }
+        await persistPrefixes(secret.id, selectedEnvironmentIds.value);
       } else {
         const values: Record<string, string> = {};
         for (const id of selectedEnvironmentIds.value) {
           values[id] = valuesByEnv.value[id] ?? '';
         }
-        await secretService.create(project.value.id, { name, values });
+        const created = await secretService.create(project.value.id, { name, values });
+        await persistPrefixes(created.id, selectedEnvironmentIds.value);
       }
       closeForm();
       await refreshSecrets();
@@ -321,6 +360,7 @@ export function useProjectSecrets() {
     editingSecret,
     selectedEnvironmentIds,
     valuesByEnv,
+    prefixesByEnv,
     environmentOptions,
     slug,
     load,
@@ -331,6 +371,7 @@ export function useProjectSecrets() {
     closeForm,
     setSelectedEnvironmentIds,
     setEnvValue,
+    setEnvPrefix,
     submitForm,
     removeSecret,
     envTitlesForSecret,

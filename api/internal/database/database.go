@@ -31,6 +31,7 @@ func Open(dsn string, crypto secretcrypto.Crypter) (*gorm.DB, error) {
 		&model.Project{},
 		&model.Secret{},
 		&model.ProjectSecret{},
+		&model.ProjectSecretPrefix{},
 		&model.SecretValue{},
 	); err != nil {
 		return nil, fmt.Errorf("auto migrate: %w", err)

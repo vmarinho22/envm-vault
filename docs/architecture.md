@@ -74,10 +74,12 @@ The API lives in `api/` and provides authentication via email OTP plus a unique 
 | `PUT` | `/v1/projects/:id/secrets/:secretId/values/:environmentId` | JWT | Upsert encrypted value (global; shared across projects) |
 | `GET` | `/v1/projects/:id/secrets/:secretId/values/:environmentId` | JWT | Reveal one decrypted value |
 | `DELETE` | `/v1/projects/:id/secrets/:secretId/values/:environmentId` | JWT | Clear value for one env (global) |
-| `GET` | `/v1/projects/:id/environments/:environmentId/values` | JWT | Export all values for an env (JSON or `?format=env`); `production` requires `super_admin` |
+| `PUT` | `/v1/projects/:id/secrets/:secretId/prefixes/:environmentId` | JWT | Set download-time name prefix for this project×secret×env (`{ "prefix": "VITE_" }`; empty clears) |
+| `DELETE` | `/v1/projects/:id/secrets/:secretId/prefixes/:environmentId` | JWT | Clear download-time prefix |
+| `GET` | `/v1/projects/:id/environments/:environmentId/values` | JWT | Export all values for an env (JSON or `?format=env`); applies project prefixes; `production` requires `super_admin` |
 | `GET` | `/v1/secrets` | JWT | Paginated global secret catalog (`?title=`, `?page=`, `?page_size=` default 12; `?exclude_project_id=` allows page_size up to 50 for typeahead) |
 | `GET` | `/v1/secrets/:id` | JWT | Secret detail with value meta (no plaintext) and linked projects |
-| `GET` | `/v1/projects/:slug/env` | API key (`ev_…`) | Download env vars via `?environment=<title>` (JSON default; dotenv via `?format=env` or `Accept: text/plain`). Only `super_admin` may download `production`. |
+| `GET` | `/v1/projects/:slug/env` | API key (`ev_…`) | Download env vars via `?environment=<title>` (JSON default; dotenv via `?format=env` or `Accept: text/plain`). Applies per-(project, secret, env) prefixes to names. Only `super_admin` may download `production`. Colliding names after prefix → `409`. |
 
 ### Auth Flow
 
@@ -107,9 +109,9 @@ A global catalog of deployment targets with a unique `title` (e.g. `dev`, `stagi
 
 A named key in the **global catalog** with a unique `name`. Projects attach secrets via M2M (`project_secrets`). Values are stored per **Environment** (sparse: missing row = no value) and are **shared** across all projects that use the secret — updating a value in one project updates it everywhere. Values are encrypted at rest with AES-256-GCM using `ENCRYPTION_KEY` (32-byte hex, separate from `JWT_SECRET`). Ciphertext is `nonce || ciphertext+tag` with AAD bound to `secret_id || environment_id`. Column `key_version` records which key encrypted the blob.
 
-Tables: `secrets` (unique name), `project_secrets` (project ↔ secret), and `secret_values` (secret + environment + ciphertext). Name search uses a `pg_trgm` GIN index.
+Tables: `secrets` (unique name), `project_secrets` (project ↔ secret), `secret_values` (secret + environment + ciphertext), and `project_secret_prefixes` (project + secret + environment → plaintext download prefix such as `VITE_`). Name search uses a `pg_trgm` GIN index.
 
-List/UI endpoints never return plaintext except explicit reveal and export/download. Detaching a secret from a project (or deleting a project) does not delete catalog values. Removing an environment from a project does not delete secret values.
+List/UI endpoints never return plaintext except explicit reveal and export/download. Detaching a secret from a project (or deleting a project) does not delete catalog values; project prefixes for that link are removed. Removing an environment from a project does not delete secret values, but clears prefixes for that env on the project. On download/export, the emitted name is `prefix + catalogName` when a prefix is set.
 
 ### User
 
@@ -204,6 +206,15 @@ erDiagram
     uuid environment_id FK
     bytes ciphertext
     int key_version
+    timestamp created_at
+    timestamp updated_at
+  }
+  ProjectSecretPrefix {
+    uuid id PK
+    uuid project_id FK
+    uuid secret_id FK
+    uuid environment_id FK
+    string prefix
     timestamp created_at
     timestamp updated_at
   }

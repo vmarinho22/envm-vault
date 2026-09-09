@@ -99,6 +99,9 @@ func (r *SecretRepository) Attach(ctx context.Context, projectID, secretID uuid.
 }
 
 func (r *SecretRepository) Detach(ctx context.Context, projectID, secretID uuid.UUID) error {
+	if err := r.DeletePrefixesByProjectAndSecret(ctx, projectID, secretID); err != nil {
+		return err
+	}
 	res := r.db.WithContext(ctx).
 		Where("project_id = ? AND secret_id = ?", projectID, secretID).
 		Delete(&model.ProjectSecret{})
@@ -112,6 +115,9 @@ func (r *SecretRepository) Detach(ctx context.Context, projectID, secretID uuid.
 }
 
 func (r *SecretRepository) DetachAllByProjectID(ctx context.Context, projectID uuid.UUID) error {
+	if err := r.DeletePrefixesByProjectID(ctx, projectID); err != nil {
+		return err
+	}
 	if err := r.db.WithContext(ctx).Where("project_id = ?", projectID).Delete(&model.ProjectSecret{}).Error; err != nil {
 		return fmt.Errorf("detach all secrets for project: %w", err)
 	}
@@ -269,4 +275,87 @@ func (r *SecretRepository) ListValuesForEnvironment(ctx context.Context, project
 		return nil, fmt.Errorf("list secret values for environment: %w", err)
 	}
 	return values, nil
+}
+
+func (r *SecretRepository) UpsertPrefix(ctx context.Context, row *model.ProjectSecretPrefix) error {
+	err := r.db.WithContext(ctx).Clauses(clause.OnConflict{
+		Columns: []clause.Column{
+			{Name: "project_id"},
+			{Name: "secret_id"},
+			{Name: "environment_id"},
+		},
+		DoUpdates: clause.AssignmentColumns([]string{"prefix", "updated_at"}),
+	}).Create(row).Error
+	if err != nil {
+		return fmt.Errorf("upsert project secret prefix: %w", err)
+	}
+	return nil
+}
+
+func (r *SecretRepository) DeletePrefix(ctx context.Context, projectID, secretID, environmentID uuid.UUID) error {
+	res := r.db.WithContext(ctx).
+		Where("project_id = ? AND secret_id = ? AND environment_id = ?", projectID, secretID, environmentID).
+		Delete(&model.ProjectSecretPrefix{})
+	if res.Error != nil {
+		return fmt.Errorf("delete project secret prefix: %w", res.Error)
+	}
+	return nil
+}
+
+func (r *SecretRepository) DeletePrefixesByProjectAndSecret(ctx context.Context, projectID, secretID uuid.UUID) error {
+	if err := r.db.WithContext(ctx).
+		Where("project_id = ? AND secret_id = ?", projectID, secretID).
+		Delete(&model.ProjectSecretPrefix{}).Error; err != nil {
+		return fmt.Errorf("delete prefixes by project and secret: %w", err)
+	}
+	return nil
+}
+
+func (r *SecretRepository) DeletePrefixesByProjectID(ctx context.Context, projectID uuid.UUID) error {
+	if err := r.db.WithContext(ctx).
+		Where("project_id = ?", projectID).
+		Delete(&model.ProjectSecretPrefix{}).Error; err != nil {
+		return fmt.Errorf("delete prefixes by project: %w", err)
+	}
+	return nil
+}
+
+// DeletePrefixesOutsideEnvironments removes prefixes for envs no longer linked to the project.
+func (r *SecretRepository) DeletePrefixesOutsideEnvironments(ctx context.Context, projectID uuid.UUID, keepEnvIDs []uuid.UUID) error {
+	q := r.db.WithContext(ctx).Where("project_id = ?", projectID)
+	if len(keepEnvIDs) == 0 {
+		if err := q.Delete(&model.ProjectSecretPrefix{}).Error; err != nil {
+			return fmt.Errorf("delete all project prefixes: %w", err)
+		}
+		return nil
+	}
+	if err := q.Where("environment_id NOT IN ?", keepEnvIDs).Delete(&model.ProjectSecretPrefix{}).Error; err != nil {
+		return fmt.Errorf("delete prefixes outside environments: %w", err)
+	}
+	return nil
+}
+
+func (r *SecretRepository) ListPrefixesByProjectID(ctx context.Context, projectID uuid.UUID) ([]model.ProjectSecretPrefix, error) {
+	var rows []model.ProjectSecretPrefix
+	err := r.db.WithContext(ctx).
+		Where("project_id = ?", projectID).
+		Find(&rows).Error
+	if err != nil {
+		return nil, fmt.Errorf("list prefixes by project: %w", err)
+	}
+	return rows, nil
+}
+
+func (r *SecretRepository) ListPrefixesForEnvironment(
+	ctx context.Context,
+	projectID, environmentID uuid.UUID,
+) ([]model.ProjectSecretPrefix, error) {
+	var rows []model.ProjectSecretPrefix
+	err := r.db.WithContext(ctx).
+		Where("project_id = ? AND environment_id = ?", projectID, environmentID).
+		Find(&rows).Error
+	if err != nil {
+		return nil, fmt.Errorf("list prefixes for environment: %w", err)
+	}
+	return rows, nil
 }

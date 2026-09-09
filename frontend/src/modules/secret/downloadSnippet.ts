@@ -1,13 +1,16 @@
 import { envs } from '@/shared/env/envs';
 
-/** Absolute API origin for shell snippets (Vite proxy origin when VITE_API_BASE_URL is empty). */
+const DEFAULT_API_ORIGIN = 'http://localhost:8080';
+
+/**
+ * Absolute API origin for shell download snippets.
+ * Uses VITE_API_BASE_URL when set; otherwise localhost:8080 (never the Vite UI origin —
+ * curl/PowerShell must hit the API, not the frontend proxy).
+ */
 export function publicApiBaseUrl(): string {
   const configured = envs.api.baseUrl.replace(/\/$/, '');
   if (configured) return configured;
-  if (typeof window !== 'undefined' && window.location?.origin) {
-    return window.location.origin;
-  }
-  return 'http://localhost:8080';
+  return DEFAULT_API_ORIGIN;
 }
 
 export type DownloadOs = 'linux' | 'macos' | 'windows';

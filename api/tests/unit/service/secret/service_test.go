@@ -110,3 +110,36 @@ func TestDownloadBySlug_ProductionForbiddenForNonSuperAdmin(t *testing.T) {
 		}
 	}
 }
+
+func TestSetPrefix_InvalidProjectID(t *testing.T) {
+	svc := secret.New(nil, nil, testCrypter(t), nil)
+	_, err := svc.SetPrefix(
+		t.Context(),
+		uuid.Nil.String(),
+		"a@b.com",
+		service.RoleUser,
+		"not-a-uuid",
+		uuid.New().String(),
+		uuid.New().String(),
+		"VITE_",
+	)
+	if err != service.ErrProjectNotFound {
+		t.Errorf("SetPrefix() error = %v, want ErrProjectNotFound", err)
+	}
+}
+
+func TestClearPrefix_InvalidProjectID(t *testing.T) {
+	svc := secret.New(nil, nil, testCrypter(t), nil)
+	_, err := svc.ClearPrefix(
+		t.Context(),
+		uuid.Nil.String(),
+		"a@b.com",
+		service.RoleUser,
+		"bad",
+		uuid.New().String(),
+		uuid.New().String(),
+	)
+	if err != service.ErrProjectNotFound {
+		t.Errorf("ClearPrefix() error = %v, want ErrProjectNotFound", err)
+	}
+}

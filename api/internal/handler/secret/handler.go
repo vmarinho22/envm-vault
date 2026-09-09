@@ -34,6 +34,10 @@ type setValueRequest struct {
 	Value string `json:"value"`
 }
 
+type setPrefixRequest struct {
+	Prefix string `json:"prefix"`
+}
+
 func (h *Handler) ListCatalog(c *fiber.Ctx) error {
 	resp, err := h.secret.ListCatalog(
 		c.UserContext(),
@@ -184,6 +188,43 @@ func (h *Handler) ClearValue(c *fiber.Ctx) error {
 		return httperr.Write(c, err)
 	}
 	return c.SendStatus(fiber.StatusNoContent)
+}
+
+func (h *Handler) SetPrefix(c *fiber.Ctx) error {
+	var req setPrefixRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid request body"})
+	}
+	resp, err := h.secret.SetPrefix(
+		c.UserContext(),
+		middleware.GetUserID(c),
+		middleware.GetUserEmail(c),
+		middleware.GetUserRole(c),
+		c.Params("id"),
+		c.Params("secretId"),
+		c.Params("environmentId"),
+		req.Prefix,
+	)
+	if err != nil {
+		return httperr.Write(c, err)
+	}
+	return c.JSON(resp)
+}
+
+func (h *Handler) ClearPrefix(c *fiber.Ctx) error {
+	resp, err := h.secret.ClearPrefix(
+		c.UserContext(),
+		middleware.GetUserID(c),
+		middleware.GetUserEmail(c),
+		middleware.GetUserRole(c),
+		c.Params("id"),
+		c.Params("secretId"),
+		c.Params("environmentId"),
+	)
+	if err != nil {
+		return httperr.Write(c, err)
+	}
+	return c.JSON(resp)
 }
 
 func (h *Handler) ExportEnvironment(c *fiber.Ctx) error {

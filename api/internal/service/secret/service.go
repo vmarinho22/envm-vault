@@ -21,7 +21,8 @@ import (
 )
 
 const (
-	maxSecretNameLen      = 128
+	maxSecretNameLen       = 128
+	maxSecretPrefixLen     = 64
 	DefaultCatalogPageSize = 12
 	maxTypeaheadPageSize   = 50
 )
@@ -59,6 +60,7 @@ func New(
 type ValueMeta struct {
 	HasValue  bool      `json:"has_value"`
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	Prefix    string    `json:"prefix,omitempty"`
 }
 
 type SecretResponse struct {
@@ -130,6 +132,21 @@ func normalizeName(raw string) (string, error) {
 	return name, nil
 }
 
+// normalizePrefix returns ("", nil) for empty input (clear prefix).
+func normalizePrefix(raw string) (string, error) {
+	prefix := strings.TrimSpace(raw)
+	if prefix == "" {
+		return "", nil
+	}
+	if utf8.RuneCountInString(prefix) > maxSecretPrefixLen {
+		return "", service.ErrInvalidSecretPrefix
+	}
+	if !secretNamePattern.MatchString(prefix) {
+		return "", service.ErrInvalidSecretPrefix
+	}
+	return prefix, nil
+}
+
 func parseActorID(raw string) *uuid.UUID {
 	id, err := uuid.Parse(strings.TrimSpace(raw))
 	if err != nil {
@@ -161,7 +178,22 @@ func projectEnvSet(project *model.Project) map[uuid.UUID]struct{} {
 	return set
 }
 
-func toResponse(secret model.Secret, projectCount int64, projectEnvs map[uuid.UUID]struct{}) SecretResponse {
+func prefixesForSecret(rows []model.ProjectSecretPrefix, secretID uuid.UUID) map[uuid.UUID]string {
+	out := make(map[uuid.UUID]string)
+	for _, row := range rows {
+		if row.SecretID == secretID {
+			out[row.EnvironmentID] = row.Prefix
+		}
+	}
+	return out
+}
+
+func toResponse(
+	secret model.Secret,
+	projectCount int64,
+	projectEnvs map[uuid.UUID]struct{},
+	prefixes map[uuid.UUID]string,
+) SecretResponse {
 	values := make(map[string]ValueMeta)
 	for _, v := range secret.Values {
 		if projectEnvs != nil {
@@ -169,10 +201,31 @@ func toResponse(secret model.Secret, projectCount int64, projectEnvs map[uuid.UU
 				continue
 			}
 		}
-		values[v.EnvironmentID.String()] = ValueMeta{
+		meta := ValueMeta{
 			HasValue:  true,
 			UpdatedAt: v.UpdatedAt,
 		}
+		if p, ok := prefixes[v.EnvironmentID]; ok && p != "" {
+			meta.Prefix = p
+		}
+		values[v.EnvironmentID.String()] = meta
+	}
+	for envID, p := range prefixes {
+		if p == "" {
+			continue
+		}
+		if projectEnvs != nil {
+			if _, ok := projectEnvs[envID]; !ok {
+				continue
+			}
+		}
+		key := envID.String()
+		if existing, ok := values[key]; ok {
+			existing.Prefix = p
+			values[key] = existing
+			continue
+		}
+		values[key] = ValueMeta{HasValue: false, Prefix: p}
 	}
 	return SecretResponse{
 		ID:           secret.ID.String(),
@@ -189,7 +242,11 @@ func (s *Service) responseFor(ctx context.Context, secret model.Secret, project 
 	if err != nil {
 		return nil, err
 	}
-	resp := toResponse(secret, count, projectEnvSet(project))
+	prefixRows, err := s.secrets.ListPrefixesByProjectID(ctx, project.ID)
+	if err != nil {
+		return nil, err
+	}
+	resp := toResponse(secret, count, projectEnvSet(project), prefixesForSecret(prefixRows, secret.ID))
 	return &resp, nil
 }
 
@@ -321,6 +378,10 @@ func (s *Service) List(ctx context.Context, projectID string) (*ListResponse, er
 	if err != nil {
 		return nil, err
 	}
+	prefixRows, err := s.secrets.ListPrefixesByProjectID(ctx, project.ID)
+	if err != nil {
+		return nil, err
+	}
 	envSet := projectEnvSet(project)
 	items := make([]SecretResponse, 0, len(secrets))
 	for _, sec := range secrets {
@@ -328,7 +389,7 @@ func (s *Service) List(ctx context.Context, projectID string) (*ListResponse, er
 		if countErr != nil {
 			return nil, countErr
 		}
-		items = append(items, toResponse(sec, count, envSet))
+		items = append(items, toResponse(sec, count, envSet, prefixesForSecret(prefixRows, sec.ID)))
 	}
 	return &ListResponse{Items: items}, nil
 }
@@ -703,6 +764,90 @@ func (s *Service) ClearValue(
 	return nil
 }
 
+func (s *Service) SetPrefix(
+	ctx context.Context,
+	actorID, actorEmail, actorRole, projectID, secretID, environmentID, prefixRaw string,
+) (*SecretResponse, error) {
+	project, err := s.loadProject(ctx, projectID)
+	if err != nil {
+		return nil, err
+	}
+	sid, err := uuid.Parse(strings.TrimSpace(secretID))
+	if err != nil {
+		return nil, service.ErrSecretNotFound
+	}
+	eid, err := uuid.Parse(strings.TrimSpace(environmentID))
+	if err != nil {
+		return nil, service.ErrEnvironmentNotFound
+	}
+	if _, ok := projectEnvSet(project)[eid]; !ok {
+		return nil, service.ErrEnvironmentNotInProject
+	}
+	secret, err := s.secrets.FindByProjectAndID(ctx, project.ID, sid)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, service.ErrSecretNotFound
+		}
+		return nil, err
+	}
+
+	prefix, err := normalizePrefix(prefixRaw)
+	if err != nil {
+		return nil, err
+	}
+
+	pid := project.ID
+	if prefix == "" {
+		if err := s.secrets.DeletePrefix(ctx, project.ID, sid, eid); err != nil {
+			return nil, err
+		}
+		s.audit.Record(ctx, audit.Event{
+			Action:       audit.ActionSecretPrefixCleared,
+			ActorUserID:  parseActorID(actorID),
+			ActorEmail:   actorEmail,
+			ActorRole:    actorRole,
+			ProjectID:    &pid,
+			ProjectTitle: project.Title,
+			ProjectSlug:  project.Slug,
+			SecretID:     &sid,
+			SecretName:   secret.Name,
+		})
+	} else {
+		if err := s.secrets.UpsertPrefix(ctx, &model.ProjectSecretPrefix{
+			ProjectID:     project.ID,
+			SecretID:      sid,
+			EnvironmentID: eid,
+			Prefix:        prefix,
+		}); err != nil {
+			return nil, err
+		}
+		s.audit.Record(ctx, audit.Event{
+			Action:       audit.ActionSecretPrefixSet,
+			ActorUserID:  parseActorID(actorID),
+			ActorEmail:   actorEmail,
+			ActorRole:    actorRole,
+			ProjectID:    &pid,
+			ProjectTitle: project.Title,
+			ProjectSlug:  project.Slug,
+			SecretID:     &sid,
+			SecretName:   secret.Name,
+		})
+	}
+
+	fresh, err := s.secrets.FindByID(ctx, sid)
+	if err != nil {
+		return nil, err
+	}
+	return s.responseFor(ctx, *fresh, project)
+}
+
+func (s *Service) ClearPrefix(
+	ctx context.Context,
+	actorID, actorEmail, actorRole, projectID, secretID, environmentID string,
+) (*SecretResponse, error) {
+	return s.SetPrefix(ctx, actorID, actorEmail, actorRole, projectID, secretID, environmentID, "")
+}
+
 func (s *Service) ExportEnvironment(
 	ctx context.Context,
 	actorID, actorEmail, actorRole, projectID, environmentID string,
@@ -807,13 +952,30 @@ func (s *Service) decryptEnvironment(ctx context.Context, projectID, environment
 	if err != nil {
 		return nil, err
 	}
+	prefixRows, err := s.secrets.ListPrefixesForEnvironment(ctx, projectID, environmentID)
+	if err != nil {
+		return nil, err
+	}
+	prefixBySecret := make(map[uuid.UUID]string, len(prefixRows))
+	for _, row := range prefixRows {
+		prefixBySecret[row.SecretID] = row.Prefix
+	}
+
 	items := make([]DownloadItem, 0, len(values))
+	seen := make(map[string]struct{}, len(values))
 	for _, v := range values {
 		plaintext, decErr := s.crypto.Decrypt(v.Ciphertext, secretcrypto.AAD(v.SecretID, environmentID), v.KeyVersion)
 		if decErr != nil {
 			return nil, fmt.Errorf("decrypt secret value: %w", decErr)
 		}
 		name := v.Secret.Name
+		if p := prefixBySecret[v.SecretID]; p != "" {
+			name = p + name
+		}
+		if _, exists := seen[name]; exists {
+			return nil, service.ErrDownloadNameConflict
+		}
+		seen[name] = struct{}{}
 		items = append(items, DownloadItem{Name: name, Value: string(plaintext)})
 	}
 	sort.Slice(items, func(i, j int) bool { return items[i].Name < items[j].Name })
