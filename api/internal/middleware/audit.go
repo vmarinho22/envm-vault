@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	auditservice "github.com/envm-vault/envm-vault/api/internal/service/audit"
+	auditservice "github.com/vmarinho22/envm-vault/api/internal/service/audit"
 	"github.com/gofiber/fiber/v2"
 )
 

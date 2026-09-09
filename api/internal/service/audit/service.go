@@ -5,8 +5,8 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/envm-vault/envm-vault/api/internal/model"
-	"github.com/envm-vault/envm-vault/api/internal/repository"
+	"github.com/vmarinho22/envm-vault/api/internal/model"
+	"github.com/vmarinho22/envm-vault/api/internal/repository"
 )
 
 // Logger is the audit API used by middleware and domain services.

@@ -3,7 +3,7 @@ package slug_test
 import (
 	"testing"
 
-	"github.com/envm-vault/envm-vault/api/internal/slug"
+	"github.com/vmarinho22/envm-vault/api/internal/slug"
 )
 
 func TestFromName(t *testing.T) {

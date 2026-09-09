@@ -4,9 +4,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/envm-vault/envm-vault/api/internal/service"
-	"github.com/envm-vault/envm-vault/api/internal/service/audit"
-	"github.com/envm-vault/envm-vault/api/internal/service/token"
+	"github.com/vmarinho22/envm-vault/api/internal/service"
+	"github.com/vmarinho22/envm-vault/api/internal/service/audit"
+	"github.com/vmarinho22/envm-vault/api/internal/service/token"
 )
 
 func TestGeneratePlaintext(t *testing.T) {

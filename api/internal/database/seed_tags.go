@@ -3,7 +3,7 @@ package database
 import (
 	"fmt"
 
-	"github.com/envm-vault/envm-vault/api/internal/model"
+	"github.com/vmarinho22/envm-vault/api/internal/model"
 	"gorm.io/gorm"
 )
 

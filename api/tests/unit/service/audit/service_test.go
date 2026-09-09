@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/envm-vault/envm-vault/api/internal/service/audit"
+	"github.com/vmarinho22/envm-vault/api/internal/service/audit"
 	"github.com/google/uuid"
 )
 

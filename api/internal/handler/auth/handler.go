@@ -1,8 +1,8 @@
 package auth
 
 import (
-	"github.com/envm-vault/envm-vault/api/internal/handler/httperr"
-	authservice "github.com/envm-vault/envm-vault/api/internal/service/auth"
+	"github.com/vmarinho22/envm-vault/api/internal/handler/httperr"
+	authservice "github.com/vmarinho22/envm-vault/api/internal/service/auth"
 	"github.com/gofiber/fiber/v2"
 )
 

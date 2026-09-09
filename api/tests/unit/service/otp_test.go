@@ -3,7 +3,7 @@ package service_test
 import (
 	"testing"
 
-	"github.com/envm-vault/envm-vault/api/internal/service"
+	"github.com/vmarinho22/envm-vault/api/internal/service"
 )
 
 func TestOTPService_GenerateAndVerify(t *testing.T) {

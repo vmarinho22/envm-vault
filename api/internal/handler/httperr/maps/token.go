@@ -1,7 +1,7 @@
 package maps
 
 import (
-	"github.com/envm-vault/envm-vault/api/internal/service"
+	"github.com/vmarinho22/envm-vault/api/internal/service"
 	"github.com/gofiber/fiber/v2"
 )
 

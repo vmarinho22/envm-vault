@@ -1,9 +1,9 @@
 package team
 
 import (
-	"github.com/envm-vault/envm-vault/api/internal/handler/httperr"
-	"github.com/envm-vault/envm-vault/api/internal/middleware"
-	teamservice "github.com/envm-vault/envm-vault/api/internal/service/team"
+	"github.com/vmarinho22/envm-vault/api/internal/handler/httperr"
+	"github.com/vmarinho22/envm-vault/api/internal/middleware"
+	teamservice "github.com/vmarinho22/envm-vault/api/internal/service/team"
 	"github.com/gofiber/fiber/v2"
 )
 

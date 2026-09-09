@@ -3,7 +3,7 @@ package database_test
 import (
 	"testing"
 
-	"github.com/envm-vault/envm-vault/api/internal/database"
+	"github.com/vmarinho22/envm-vault/api/internal/database"
 )
 
 func TestDefaultTags_Catalog(t *testing.T) {

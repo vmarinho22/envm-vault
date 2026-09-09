@@ -29,7 +29,7 @@ services:
   app:
     # Default: published image (no repo clone / no local build).
     # Local build: APP_IMAGE=envm-vault:local (see `make up`).
-    image: ${APP_IMAGE:-ghcr.io/envm-vault/envm-vault:latest}
+    image: ${APP_IMAGE:-ghcr.io/vmarinho22/envm-vault:latest}
     build:
       context: .
       dockerfile: Dockerfile

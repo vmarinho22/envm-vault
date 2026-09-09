@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/envm-vault/envm-vault/api/internal/secretcrypto"
+	"github.com/vmarinho22/envm-vault/api/internal/secretcrypto"
 	"github.com/google/uuid"
 )
 

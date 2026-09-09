@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/envm-vault/envm-vault/api/internal/handler/httperr"
-	"github.com/envm-vault/envm-vault/api/internal/middleware"
-	auditservice "github.com/envm-vault/envm-vault/api/internal/service/audit"
+	"github.com/vmarinho22/envm-vault/api/internal/handler/httperr"
+	"github.com/vmarinho22/envm-vault/api/internal/middleware"
+	auditservice "github.com/vmarinho22/envm-vault/api/internal/service/audit"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 )

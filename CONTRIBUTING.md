@@ -92,4 +92,4 @@ This project follows the [Contributor Covenant](CODE_OF_CONDUCT.md). By particip
 
 ## Questions?
 
-Open a [GitHub Discussion](https://github.com/envm-vault/envm-vault/discussions) or an issue with the `question` label.
+Open a [GitHub Discussion](https://github.com/vmarinho22/envm-vault/discussions) or an issue with the `question` label.

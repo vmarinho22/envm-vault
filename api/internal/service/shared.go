@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/envm-vault/envm-vault/api/internal/model"
+	"github.com/vmarinho22/envm-vault/api/internal/model"
 )
 
 const (

@@ -54,7 +54,7 @@ Always read `docs/architecture.md` before implementing domain logic.
 6. **Secret encryption** — `ENCRYPTION_KEY` (32-byte hex) encrypts secret values at rest (AES-256-GCM); separate from `JWT_SECRET`.
 7. **Audit** — `audit_logs` via `service/audit`; never include OTP, JWT, or full personal token plaintext.
 8. **Minimal diffs** — do not refactor unrelated code in the same change.
-9. **Container** — Default Compose image is GHCR (`ghcr.io/envm-vault/envm-vault`). No-clone users: curl `compose.yaml` + `.deploy/{db,api}/.env`, then `docker compose up -d`. Local build: `make up` (sets `APP_IMAGE=envm-vault:local`).
+9. **Container** — Default Compose image is GHCR (`ghcr.io/vmarinho22/envm-vault`). No-clone users: curl `compose.yaml` + `.deploy/{db,api}/.env`, then `docker compose up -d`. Local build: `make up` (sets `APP_IMAGE=envm-vault:local`).
 
 ## Conventions
 

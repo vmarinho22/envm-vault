@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/envm-vault/envm-vault/api/internal/model"
-	"github.com/envm-vault/envm-vault/api/internal/secretcrypto"
+	"github.com/vmarinho22/envm-vault/api/internal/model"
+	"github.com/vmarinho22/envm-vault/api/internal/secretcrypto"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

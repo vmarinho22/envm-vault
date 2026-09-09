@@ -3,9 +3,9 @@ package main
 import (
 	"log"
 
-	"github.com/envm-vault/envm-vault/api/internal/database"
-	"github.com/envm-vault/envm-vault/api/internal/env"
-	"github.com/envm-vault/envm-vault/api/internal/secretcrypto"
+	"github.com/vmarinho22/envm-vault/api/internal/database"
+	"github.com/vmarinho22/envm-vault/api/internal/env"
+	"github.com/vmarinho22/envm-vault/api/internal/secretcrypto"
 )
 
 func main() {

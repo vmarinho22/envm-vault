@@ -1,17 +1,17 @@
 package router
 
 import (
-	audithandler "github.com/envm-vault/envm-vault/api/internal/handler/audit"
-	authhandler "github.com/envm-vault/envm-vault/api/internal/handler/auth"
-	environmenthandler "github.com/envm-vault/envm-vault/api/internal/handler/environment"
-	healthhandler "github.com/envm-vault/envm-vault/api/internal/handler/health"
-	projecthandler "github.com/envm-vault/envm-vault/api/internal/handler/project"
-	secrethandler "github.com/envm-vault/envm-vault/api/internal/handler/secret"
-	taghandler "github.com/envm-vault/envm-vault/api/internal/handler/tag"
-	teamhandler "github.com/envm-vault/envm-vault/api/internal/handler/team"
-	tokenhandler "github.com/envm-vault/envm-vault/api/internal/handler/token"
-	userhandler "github.com/envm-vault/envm-vault/api/internal/handler/user"
-	"github.com/envm-vault/envm-vault/api/internal/middleware"
+	audithandler "github.com/vmarinho22/envm-vault/api/internal/handler/audit"
+	authhandler "github.com/vmarinho22/envm-vault/api/internal/handler/auth"
+	environmenthandler "github.com/vmarinho22/envm-vault/api/internal/handler/environment"
+	healthhandler "github.com/vmarinho22/envm-vault/api/internal/handler/health"
+	projecthandler "github.com/vmarinho22/envm-vault/api/internal/handler/project"
+	secrethandler "github.com/vmarinho22/envm-vault/api/internal/handler/secret"
+	taghandler "github.com/vmarinho22/envm-vault/api/internal/handler/tag"
+	teamhandler "github.com/vmarinho22/envm-vault/api/internal/handler/team"
+	tokenhandler "github.com/vmarinho22/envm-vault/api/internal/handler/token"
+	userhandler "github.com/vmarinho22/envm-vault/api/internal/handler/user"
+	"github.com/vmarinho22/envm-vault/api/internal/middleware"
 )
 
 type Deps struct {

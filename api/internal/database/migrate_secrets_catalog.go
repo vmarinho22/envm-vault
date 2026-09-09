@@ -6,8 +6,8 @@ import (
 	"sort"
 	"time"
 
-	"github.com/envm-vault/envm-vault/api/internal/model"
-	"github.com/envm-vault/envm-vault/api/internal/secretcrypto"
+	"github.com/vmarinho22/envm-vault/api/internal/model"
+	"github.com/vmarinho22/envm-vault/api/internal/secretcrypto"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"

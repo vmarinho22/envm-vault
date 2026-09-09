@@ -1,9 +1,9 @@
 package user
 
 import (
-	"github.com/envm-vault/envm-vault/api/internal/handler/httperr"
-	"github.com/envm-vault/envm-vault/api/internal/middleware"
-	userservice "github.com/envm-vault/envm-vault/api/internal/service/user"
+	"github.com/vmarinho22/envm-vault/api/internal/handler/httperr"
+	"github.com/vmarinho22/envm-vault/api/internal/middleware"
+	userservice "github.com/vmarinho22/envm-vault/api/internal/service/user"
 	"github.com/gofiber/fiber/v2"
 )
 

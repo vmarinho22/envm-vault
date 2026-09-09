@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/envm-vault/envm-vault/api/internal/database"
-	"github.com/envm-vault/envm-vault/api/internal/email"
-	"github.com/envm-vault/envm-vault/api/internal/model"
-	"github.com/envm-vault/envm-vault/api/internal/repository"
-	"github.com/envm-vault/envm-vault/api/internal/service"
-	"github.com/envm-vault/envm-vault/api/internal/service/audit"
+	"github.com/vmarinho22/envm-vault/api/internal/database"
+	"github.com/vmarinho22/envm-vault/api/internal/email"
+	"github.com/vmarinho22/envm-vault/api/internal/model"
+	"github.com/vmarinho22/envm-vault/api/internal/repository"
+	"github.com/vmarinho22/envm-vault/api/internal/service"
+	"github.com/vmarinho22/envm-vault/api/internal/service/audit"
 	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/gorm"
 )

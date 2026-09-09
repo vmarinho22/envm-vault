@@ -11,11 +11,11 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/envm-vault/envm-vault/api/internal/model"
-	"github.com/envm-vault/envm-vault/api/internal/repository"
-	"github.com/envm-vault/envm-vault/api/internal/secretcrypto"
-	"github.com/envm-vault/envm-vault/api/internal/service"
-	"github.com/envm-vault/envm-vault/api/internal/service/audit"
+	"github.com/vmarinho22/envm-vault/api/internal/model"
+	"github.com/vmarinho22/envm-vault/api/internal/repository"
+	"github.com/vmarinho22/envm-vault/api/internal/secretcrypto"
+	"github.com/vmarinho22/envm-vault/api/internal/service"
+	"github.com/vmarinho22/envm-vault/api/internal/service/audit"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )

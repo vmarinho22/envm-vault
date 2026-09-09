@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/envm-vault/envm-vault/api/internal/env"
+	"github.com/vmarinho22/envm-vault/api/internal/env"
 )
 
 const testEncryptionKey = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"

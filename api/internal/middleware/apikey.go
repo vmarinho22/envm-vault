@@ -4,10 +4,10 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/envm-vault/envm-vault/api/internal/repository"
-	"github.com/envm-vault/envm-vault/api/internal/service"
-	auditservice "github.com/envm-vault/envm-vault/api/internal/service/audit"
-	tokenservice "github.com/envm-vault/envm-vault/api/internal/service/token"
+	"github.com/vmarinho22/envm-vault/api/internal/repository"
+	"github.com/vmarinho22/envm-vault/api/internal/service"
+	auditservice "github.com/vmarinho22/envm-vault/api/internal/service/audit"
+	tokenservice "github.com/vmarinho22/envm-vault/api/internal/service/token"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )

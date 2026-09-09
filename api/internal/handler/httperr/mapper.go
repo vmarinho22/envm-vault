@@ -4,7 +4,7 @@ import (
 	"errors"
 	"log"
 
-	"github.com/envm-vault/envm-vault/api/internal/handler/httperr/maps"
+	"github.com/vmarinho22/envm-vault/api/internal/handler/httperr/maps"
 	"github.com/gofiber/fiber/v2"
 )
 

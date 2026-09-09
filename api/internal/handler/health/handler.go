@@ -1,7 +1,7 @@
 package health
 
 import (
-	"github.com/envm-vault/envm-vault/api/internal/database"
+	"github.com/vmarinho22/envm-vault/api/internal/database"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )

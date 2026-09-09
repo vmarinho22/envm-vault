@@ -1,9 +1,9 @@
 package token
 
 import (
-	"github.com/envm-vault/envm-vault/api/internal/handler/httperr"
-	"github.com/envm-vault/envm-vault/api/internal/middleware"
-	tokenservice "github.com/envm-vault/envm-vault/api/internal/service/token"
+	"github.com/vmarinho22/envm-vault/api/internal/handler/httperr"
+	"github.com/vmarinho22/envm-vault/api/internal/middleware"
+	tokenservice "github.com/vmarinho22/envm-vault/api/internal/service/token"
 	"github.com/gofiber/fiber/v2"
 )
 

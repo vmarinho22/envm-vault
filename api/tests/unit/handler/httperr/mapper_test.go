@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/envm-vault/envm-vault/api/internal/handler/httperr"
-	"github.com/envm-vault/envm-vault/api/internal/service"
+	"github.com/vmarinho22/envm-vault/api/internal/handler/httperr"
+	"github.com/vmarinho22/envm-vault/api/internal/service"
 	"github.com/gofiber/fiber/v2"
 )
 

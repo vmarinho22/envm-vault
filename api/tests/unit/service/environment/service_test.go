@@ -4,9 +4,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/envm-vault/envm-vault/api/internal/service"
-	"github.com/envm-vault/envm-vault/api/internal/service/audit"
-	"github.com/envm-vault/envm-vault/api/internal/service/environment"
+	"github.com/vmarinho22/envm-vault/api/internal/service"
+	"github.com/vmarinho22/envm-vault/api/internal/service/audit"
+	"github.com/vmarinho22/envm-vault/api/internal/service/environment"
 )
 
 func TestCreate_ForbiddenForUserRole(t *testing.T) {

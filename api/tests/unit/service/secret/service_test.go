@@ -4,9 +4,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/envm-vault/envm-vault/api/internal/secretcrypto"
-	"github.com/envm-vault/envm-vault/api/internal/service"
-	"github.com/envm-vault/envm-vault/api/internal/service/secret"
+	"github.com/vmarinho22/envm-vault/api/internal/secretcrypto"
+	"github.com/vmarinho22/envm-vault/api/internal/service"
+	"github.com/vmarinho22/envm-vault/api/internal/service/secret"
 	"github.com/google/uuid"
 )
 

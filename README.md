@@ -32,11 +32,11 @@ mkdir -p envm-vault/.deploy/db envm-vault/.deploy/api
 cd envm-vault
 
 # Postgres
-curl -fsSL https://raw.githubusercontent.com/envm-vault/envm-vault/main/.deploy/db/.env.example \
+curl -fsSL https://raw.githubusercontent.com/vmarinho22/envm-vault/main/.deploy/db/.env.example \
   -o .deploy/db/.env
 
 # App (API + UI)
-curl -fsSL https://raw.githubusercontent.com/envm-vault/envm-vault/main/.deploy/api/.env.example \
+curl -fsSL https://raw.githubusercontent.com/vmarinho22/envm-vault/main/.deploy/api/.env.example \
   -o .deploy/api/.env
 ```
 
@@ -45,13 +45,13 @@ Os exemplos servem para testar em local. Em produção, edite `.deploy/api/.env`
 ### 3. Baixar o Compose e subir
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/envm-vault/envm-vault/main/compose.yaml \
+curl -fsSL https://raw.githubusercontent.com/vmarinho22/envm-vault/main/compose.yaml \
   -o compose.yaml
 
 docker compose up -d
 ```
 
-Isso puxa a imagem `ghcr.io/envm-vault/envm-vault:latest`, sobe o Postgres e a app.
+Isso puxa a imagem `ghcr.io/vmarinho22/envm-vault:latest`, sobe o Postgres e a app.
 
 Abra: **http://localhost:8080**
 
@@ -140,13 +140,13 @@ docker run --rm -p 8080:8080 \
   -e ENCRYPTION_KEY="$(openssl rand -hex 32)" \
   -e APP_ENV=production \
   -e CORS_ORIGINS='["http://localhost:8080"]' \
-  ghcr.io/envm-vault/envm-vault:latest
+  ghcr.io/vmarinho22/envm-vault:latest
 ```
 
 ### Clonar e construir localmente
 
 ```bash
-git clone https://github.com/envm-vault/envm-vault.git
+git clone https://github.com/vmarinho22/envm-vault.git
 cd envm-vault
 make setup
 make up          # build local → envm-vault:local
@@ -159,7 +159,7 @@ make down
 API e UI em processos separados (precisa de [mise](https://mise.jdx.dev/) ou Go/Node):
 
 ```bash
-git clone https://github.com/envm-vault/envm-vault.git
+git clone https://github.com/vmarinho22/envm-vault.git
 cd envm-vault
 mise install
 make setup
@@ -205,4 +205,4 @@ brew install rtk && make rtk-trust && make test-rtk
 
 ## English Summary
 
-**envm-vault** — environment variable vault. No clone required: create `.deploy/db/.env` + `.deploy/api/.env`, download `compose.yaml`, run `docker compose up -d` (pulls `ghcr.io/envm-vault/envm-vault`). Dev/contributors: `make setup` + `make up`. See [docs/architecture.md](docs/architecture.md).
+**envm-vault** — environment variable vault. No clone required: create `.deploy/db/.env` + `.deploy/api/.env`, download `compose.yaml`, run `docker compose up -d` (pulls `ghcr.io/vmarinho22/envm-vault`). Dev/contributors: `make setup` + `make up`. See [docs/architecture.md](docs/architecture.md).

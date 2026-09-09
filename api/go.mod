@@ -1,4 +1,4 @@
-module github.com/envm-vault/envm-vault/api
+module github.com/vmarinho22/envm-vault/api
 
 go 1.25.0
 

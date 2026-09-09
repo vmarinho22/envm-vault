@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/envm-vault/envm-vault/api/internal/model"
+	"github.com/vmarinho22/envm-vault/api/internal/model"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
