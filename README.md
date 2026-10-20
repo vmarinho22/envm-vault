@@ -1,5 +1,9 @@
 # envm-vault
 
+![Screenshot of envm-vault](https://github.com/vmarinho22/envm-vault/blob/main/docs/envm-vault.png)
+
+
+
 Vault open source para gerenciar e distribuir variáveis de ambiente.
 
 Crie projetos, anexe secrets de um catálogo global, defina valores por ambiente e baixe um `.env` com um token pessoal (`ev_…`).
